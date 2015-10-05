@@ -1146,7 +1146,9 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
                             if ($nologRecord and $userNotifyOnceOption == 1 ) {
                                 DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
                             }
-                            COM_mail($B['email'],$subjectline,$message);
+                            if (($B['email'] != '')  AND COM_isEmail($to)) {
+                                COM_mail($B['email'], $subjectline, $message);
+                            }
                         }
                     }
                 }

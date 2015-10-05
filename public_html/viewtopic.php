@@ -142,12 +142,14 @@ if ($onlytopic == 1) {
         $display .= COM_showMessageText($LANG_GF02['msg19']);
     }
     if ($msg==2) {
+        // Notification Saved
         $display .= COM_showMessageText($LANG_GF02['msg142']);
     }
     if ($msg==3) {
         $display .= COM_showMessageText($LANG_GF02['msg40']);
     }
     if ($msg==4) {
+        // Notification deleted
         $display .= COM_showMessageText($LANG_GF02['msg146']);
     }
     if ($msg==5) {
@@ -174,6 +176,10 @@ if ($onlytopic == 1) {
     	// Ban Deleted
         $display .= COM_showMessageText($LANG_GF03['banipremovemsg']);
     }    
+    if ($msg==12) {
+    	// Notification Saved but no email address reminder
+        $display .= COM_showMessageText($LANG_GF02['msg143']);
+    }      
     
     // Now display the forum header
     ForumHeader($forum, $showtopic, $display);

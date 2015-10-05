@@ -60,6 +60,11 @@ $display = '';
 // Debug Code to show variables
 $display .= gf_showVariables();
 
+// Display warning if no email found (usually happens with user oauth accounts)
+if (($_USER['email'] == '')  OR !COM_isEmail($_USER['email'])) {
+    $display .= alertMessage($LANG_GF02['msg145'], $LANG_GF01['WARNING'], false);
+}
+
 if ($msg==1) {
     $display .= COM_showMessageText($LANG_GF02['msg146']);
 }
@@ -85,7 +90,12 @@ if (isset($_REQUEST['submit'])) {
 	            }  else {
 	                DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$pid','{$_USER['uid']}',now() )");
 	            }
-	            $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
+                if (($_USER['email'] != '')  AND COM_isEmail($_USER['email'])) {
+                    $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
+                } else {
+                    // Invalid or no email address remind user to add one
+                    $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=12&amp;showtopic=$id");
+                }
 	        } else {
 	            $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=3&amp;showtopic=$id");
 	        }
@@ -93,7 +103,12 @@ if (isset($_REQUEST['submit'])) {
 	        DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$pid','{$_USER['uid']}',now() )");
 	        $nid = -$id;
 	        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$nid'");          
-	        $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
+            if (($_USER['email'] != '')  AND COM_isEmail($_USER['email'])) {
+                $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
+            } else {
+                // Invalid or no email address remind user to add one
+                $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=12&amp;showtopic=$id");
+            }
 	    }
 	    COM_output($display);
 	    exit();

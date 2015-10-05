@@ -291,7 +291,9 @@ $LANG_GF02['msg136']   = 'You must choose a forum to subscribe to.';
 $LANG_GF02['msg137']   = 'Notification for topic enabled';
 $LANG_GF02['msg138']   = '<b>Subscribed to complete forum</b>';
 $LANG_GF02['msg142']   = 'Notification saved.';
+$LANG_GF02['msg143']   = 'Notification saved but, no email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg144']   = 'Return to topic';
+$LANG_GF02['msg145']   = 'No email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg146']   = 'Notification Deleted';
 $LANG_GF02['msg147']   = 'Forum [printable version of topic';
 $LANG_GF02['msg148']   = 'Click <a href="javascript:history.back()">HERE</a> to return';
@@ -306,7 +308,7 @@ $LANG_GF02['msg163']   = 'Post moved';
 $LANG_GF02['msg164']   = 'Mark all Categories and Topics Read';
 $LANG_GF02['msg166']   = 'ERROR: Invalid topic or Topic not found';
 $LANG_GF02['msg167']   = 'Notification Option';
-$LANG_GF02['msg168']   = 'Setting of No will disable email notifictions';
+$LANG_GF02['msg168']   = 'Setting of No will disable email notifications';
 $LANG_GF02['msg169']   = 'Return to Members listing';
 $LANG_GF02['msg170']   = 'Latest Forum Posts';
 $LANG_GF02['msg171']   = 'Forum Access Error';
@@ -327,7 +329,7 @@ $LANG_GF02['msg187']   = 'Return to topic - click <a href="%s">here</a>';
 $LANG_GF02['msg188']   = 'Click to go directly to last post';
 $LANG_GF02['msg189']   = 'Error: You can not edit this post anymore';
 $LANG_GF02['msg190']   = 'Silent Edit';
-$LANG_GF02['msg191']   = 'Edit not permitted. Allowable edit timeframe expired or you need moderator rights';
+$LANG_GF02['msg191']   = 'Edit not permitted. Allowable edit time frame expired or you need moderator rights';
 $LANG_GF02['msg192']   = 'Completed ... Migrated %s topics and %s comments.';
 $LANG_GF02['msg193']   = 'Article to Forum Post Migration Tool';
 $LANG_GF02['msg194']   = 'Quiet Forum';
@@ -388,7 +390,7 @@ $LANG_GF04 = array (
     'label_occupation'        => 'Occupation',
 );
 
-/* Settings for Additional User profile - Instant Messenging links */
+/* Settings for Additional User profile - Instant Messaging links */
 $LANG_GF05 = array ( // No used
     'aim_link'               => '&nbsp;<a href="aim:goim?screenname=',
     'aim_linkend'            => '>',
@@ -485,11 +487,11 @@ $LANG_GF92 = array (
     'viewap'         	 => 'View Anonymous Posts',
     'viewapdscp'         => 'Setting of No will filter out anonymous posts',
     'alwaysn'            => 'Always Notify',
-    'alwaysndscp'        => 'Setting of Yes will enable auto notifcation for any topics you create or reply',
+    'alwaysndscp'        => 'Setting of Yes will enable auto notification for any topics you create or reply',
     'notifyoo'			 => 'Notify Once Only', 
     'notifyoodscp'   	 => 'Notifications will only be sent once for forums and topics which have multiple new posts since your last visit.', 
     'showiframe'         => 'Show Topic Review',
-    'showiframedscp'     => 'Show Topic Review (Iframe) at bottom when replying to a topic'
+    'showiframedscp'     => 'Show Topic Review frame at bottom when replying to a topic'
 );
 
 // Board Admin
@@ -533,7 +535,7 @@ $LANG_GF93 = array (
     'addmoderator'       => "Add Record",
     'delmoderator'       => " Delete\nSelected",
     'moderatorwarningtitle'   => 'Warning: No Forums Defined',
-    'moderatorwarning'   => 'Setup Forum Categories and Add at least 1 forum before attempting to add Modertators',
+    'moderatorwarning'   => 'Setup Forum Categories and Add at least 1 forum before attempting to add Moderators',
     'nomoderatorfound'   => "No Moderators found.",
     'modadded'   		 => "Moderator(s) have been added.",
     'moddeleted'   		 => "Moderator(s) have been deleted.",
@@ -546,7 +548,7 @@ $LANG_GF93 = array (
     'userrecords'        => 'User Records',
     'grouprecords'       => 'Group Records',
     'filterview'         => 'Filter View',
-    'readonly'           => 'Readonly Forum',
+    'readonly'           => 'Read only Forum',
     'readonlydscp'       => 'Only the Moderator can post to this forum',
     'hidden'             => 'Hidden Forum',
     'hiddendscp'         => 'Forum does not show in the forum index',
@@ -605,7 +607,7 @@ $LANG_GF_SMILIES = array(
     'twisted'  => 'Twisted',
     'rolleye'  => 'Rolling Eyes',
     'wink'     => 'Wink',
-    'exclaim'  => 'Exclaimation',
+    'exclaim'  => 'Exclamation',
     'question' => 'Question',
     'idea'     => 'Idea',
     'arrow'    => 'Arrow',
