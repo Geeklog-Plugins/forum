@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'Bevakning sparad.',
     'msg144' => 'Återgå till ämne',
     'msg146' => 'Raderat',
-    'msg147' => 'Forum [utskriftsvänlig version av ämne',
+    'msg147' => 'Forum [utskriftsvänlig version av ämne %s]',
     'msg148' => 'Tryck <a href="javascript:history.back()">HÄR</a> för att återvända',
     'msg155' => 'Inga inlägg.',
     'msg156' => 'Totalt antal foruminlägg',

@@ -307,7 +307,7 @@ $LANG_GF02 = array(
     'msg142' => 'Surveillance enregistrée.',
     'msg144' => 'Retourner au sujet',
     'msg146' => 'Surveillance effacé',
-    'msg147' => 'Forum [version imprimable du sujet',
+    'msg147' => 'Forum [version imprimable du sujet %s]',
     'msg148' => '<br' . XHTML . '>Cliquez <a href="javascript:history.back()">ici</a> pour revenir à la page précédante.',
     'msg155' => 'Aucune contribution de l\'utilisateur.',
     'msg156' => 'Nombre total de contributions :',

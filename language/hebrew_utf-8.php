@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'בקשת ההרשמה נשמרה.',
     'msg144' => 'Return to topic',
     'msg146' => 'ההתראה נמחקה',
-    'msg147' => 'פורום [גירסה מודפסת של נושא',
+    'msg147' => 'פורום [גירסה מודפסת של נושא %s',
     'msg148' => 'ליחצו <a href="javascript:history.back()">כאן</a> כדי לחזור',
     'msg155' => 'No user posts.',
     'msg156' => 'Total number of forum posts',

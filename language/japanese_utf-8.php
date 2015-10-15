@@ -297,7 +297,7 @@ $LANG_GF02['msg143']   = 'Notification saved but, no email is associated with yo
 $LANG_GF02['msg144']   = 'トピックへ';
 $LANG_GF02['msg145']   = 'No email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg146']   = 'メール通知を解除しました。';
-$LANG_GF02['msg147']   = '掲示板の印刷';
+$LANG_GF02['msg147']   = 'Forum [printable version of topic %s]';
 $LANG_GF02['msg148']   = '<a href="javascript:history.back()">戻る</a>';
 $LANG_GF02['msg149']   = '掲示板への投稿は中止されました。';
 $LANG_GF02['msg155']   = '投稿なし';

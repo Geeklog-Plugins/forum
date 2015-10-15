@@ -306,7 +306,7 @@ $LANG_GF02 = array(
     'msg142' => 'Notifica registrata.',
     'msg144' => 'Ritorna all\'argomento',
     'msg146' => 'Notifica Eliminata',
-    'msg147' => 'Forum [versione stampabile dell\'argomento',
+    'msg147' => 'Forum [versione stampabile dell\'argomento %s]',
     'msg148' => 'Fate clic <a href="javascript:history.back()">QUI</a> per ritornare',
     'msg155' => 'Nessun messaggio dall\'utente.',
     'msg156' => 'Numero totale messaggi nel forum',

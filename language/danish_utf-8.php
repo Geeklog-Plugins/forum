@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'Advisering gemt.',
     'msg144' => 'Retur til emne',
     'msg146' => 'Asvisering Slettet',
-    'msg147' => 'Forum [udskriftsvenlig udgave af emne',
+    'msg147' => 'Forum [udskriftsvenlig udgave af emne %s]',
     'msg148' => 'Klik <a href="javascript:history.back()">HER</a> for at vende tilbage',
     'msg155' => 'Ingen indlæg af bruger.',
     'msg156' => 'Samlet antal Forum indlæg',

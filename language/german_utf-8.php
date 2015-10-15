@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'Benachrichtigung gespeichert.',
     'msg144' => 'Zurück zum Thema',
     'msg146' => 'Löschung erfolgreich',
-    'msg147' => 'Forum [druckbare Version des Themas',
+    'msg147' => 'Forum [druckbare Version des Themas %s]',
     'msg148' => '<a href="javascript:history.back()">Zurück.</a>',
     'msg155' => 'Keine Forums-Beiträge.',
     'msg156' => 'Gesamtanzahl Forums-Beiträge',

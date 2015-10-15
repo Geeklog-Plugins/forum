@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'Notificación guardada.',
     'msg144' => 'Volver al tópico',
     'msg146' => 'Notificación Borrada',
-    'msg147' => 'Foro [versión imprimible del tópico',
+    'msg147' => 'Foro [versión imprimible del tópico %s]',
     'msg148' => 'Pulsa <a href="javascript:history.back()">AQUÍ</a> para volver',
     'msg155' => 'Sin mensajes de usuario.',
     'msg156' => 'Número total de mensajes al foro',

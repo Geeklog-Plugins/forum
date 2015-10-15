@@ -295,7 +295,7 @@ $LANG_GF02['msg143']   = 'Notification saved but, no email is associated with yo
 $LANG_GF02['msg144']   = 'Return to topic';
 $LANG_GF02['msg145']   = 'No email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg146']   = 'Notification Deleted';
-$LANG_GF02['msg147']   = 'Forum [printable version of topic';
+$LANG_GF02['msg147']   = 'Forum [printable version of topic %s]';
 $LANG_GF02['msg148']   = 'Click <a href="javascript:history.back()">HERE</a> to return';
 $LANG_GF02['msg149']   = 'Forum post canceled.';
 $LANG_GF02['msg155']   = 'No user posts.';

@@ -303,7 +303,7 @@ $LANG_GF02 = array(
     'msg142' => 'Varlsing lagret.',
     'msg144' => 'Returner til emne',
     'msg146' => 'Varlsing slettet',
-    'msg147' => 'Forum [utskriftsvennlig versjon av emnet',
+    'msg147' => 'Forum [utskriftsvennlig versjon av emnet %s]',
     'msg148' => 'Klikk <a href="javascript:history.back()">HER</a> for å returnere',
     'msg155' => 'Ingen brukerinnlegg.',
     'msg156' => 'Totalt antall foruminnlegg',
