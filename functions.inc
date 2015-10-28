@@ -219,8 +219,7 @@ function plugin_user_delete_forum ($uid)
 {
     global $_TABLES;
 
-    $username = DB_getItem($_TABLES['users'], "username", "uid=$uid");
-    DB_query("DELETE FROM {$_TABLES['forum_moderators']} WHERE mod_username='$username'");
+    DB_query("DELETE FROM {$_TABLES['forum_moderators']} WHERE mod_uid ='$uid'");
     DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid ='$uid'");
     DB_query("DELETE FROM {$_TABLES['forum_userinfo']} WHERE uid ='$uid'");
     DB_query("DELETE FROM {$_TABLES['forum_userprefs']} WHERE uid ='$uid'");
