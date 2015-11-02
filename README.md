@@ -1,10 +1,10 @@
-# Geeklog Forum plugin - version 2.9.0
+# Geeklog Forum plugin - version 2.9.1
 
 * Current Maintainers: [Geeklog Community Members](https://github.com/orgs/Geeklog-Plugins/people)
-* Original Author: Blaine Lang < blaine@portalparts.com >
-* Release Date: April 19, 2013
+* Original Author: Blaine Lang
+* Release Date: November 2, 2015
 
-**Requires minimum Geeklog version 2.0.0 and MySQL 4.1+**
+**Requires minimum Geeklog version 2.1.1 and MySQL 4.1+**
 
 * Features
 * Changelog
@@ -30,7 +30,7 @@ This plugin provides a full featured discussion forum with integrated Geeklog fe
 * Support for autotags in topic content and can reference other forum topics using an autotag [forum: topicid]
 * Integrated SPAMX and content filtering
 * Integrated support for Captcha 2.0 and reCAPTCHA 1.0 and higher versions
-* Integration opion with glMessenger for member private messaging and online smilie admin
+* Integration with glMessenger for member private messaging and online smilie admin
 * Easy online administration and member control
 * Supports MySql 5
 
