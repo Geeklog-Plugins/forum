@@ -179,7 +179,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 
             //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
             $notifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id='$topicparent' AND uid='$uid'");
-            if ($notify == 'on' AND $notifyRecID < 1) {
+            if ($notify == 1 AND $notifyRecID < 1) {
                 DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$topicparent','{$_USER['uid']}',now() )");
             } elseif ($notify == '' AND $notifyRecID > 1) {
                 DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$notifyRecID");
@@ -296,7 +296,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     gf_chknotifications($forum,$lastid,$uid,"forum");
                     //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
                     $currentNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
-                    if ($notify == 'on' AND $currentNotifyRecID < 1) {
+                    if ($notify == 1 AND $currentNotifyRecID < 1) {
                         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$lastid','{$_USER['uid']}',now() )");
                     } elseif ($notify == '' AND $currentNotifyRecID > 1) { // Subscribed to forum - but does not want to be notified about this topic
                         $nlastid = -$lastid;  // Negative Value
@@ -337,6 +337,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                          . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
             }
         }
+
         if ( $msg == '' ) {
             //Add Reply
             if ($aname != '') {
@@ -366,7 +367,6 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                             exit;
                         }
                     }
-
                     DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
 
                     // Check for any users subscribed notifications
@@ -391,14 +391,15 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     //NOTIFY - Checkbox variable in form set to "on" when checked and they don't already have subscribed to forum or topic
                     $nid = -$id;  // Negative Topic ID Value
+                
                     $currentForumNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
                     $currentTopicNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$id AND uid='$uid'");
                     $currentTopicUnNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$nid AND uid='$uid'");
-                    if ($notify == 'on' AND $currentForumNotifyRecID < 1) {
+                    if ($notify == 1 AND $currentForumNotifyRecID < 1) {
                         $sql = "INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) ";
                         $sql .= "VALUES ('$forum','$id','$_USER[uid]',now() )";
                         DB_query($sql);
-                    } elseif ($notify == 'on' AND $currentTopicUnNotifyRecID > 1) { // Had un-subcribed to topic and now wants to subscribe
+                    } elseif ($notify == 1 AND $currentTopicUnNotifyRecID > 1) { // Had un-subcribed to topic and now wants to subscribe
                         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$currentTopicUnNotifyRecID");
                     } elseif ($notify == '' AND $currentTopicNotifyRecID > 1) { // Subscribed to topic - but does not want to be notified anymore
                         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$id'");
@@ -860,7 +861,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $notifyquery = DB_query($sql);
 
         if (DB_getItem($_TABLES['forum_userprefs'],'alwaysnotify', "uid='$uid'") == 1 OR DB_numRows($notifyquery) > 0) {
-            $notify = 'on';
+            $notify = 1;
             // check and see if user has un-subscribed to this topic
             $nid = -$notifyTopicid;
             if ($notifyTopicid > 0 AND DB_getItem($_TABLES['forum_watch'],'id', "forum_id='{$edittopic['forum']}' AND topic_id=$nid AND uid='$uid'") > 1) {
@@ -874,7 +875,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $sticky_prompt = '';
     $notify_prompt = '';
     if ($editmoderator) {
-        if ($notify == 'on' || (isset($_POST['notify']) && $_POST['notify'] == 'on')) {
+        if ($notify == 1 || (isset($_POST['notify']) && $_POST['notify'] == 1)) {
             $notify_val = 'checked="checked"';
         } else {
             $notify_val = '';
@@ -920,7 +921,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         }
     } else {
         if ($uid > 1) {
-            if ($notify == 'on') {
+            if ($notify == 1) {
                 $notify_val = 'checked="checked"';
             } else {
                 $notify_val = '';
