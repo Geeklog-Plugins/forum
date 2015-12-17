@@ -75,6 +75,9 @@ if ($migrate == $LANG_GF01['MIGRATE_NOW'] && $selforum != "select"
         }
     }
     gf_resyncforum($selforum);
+    
+    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+    
     echo COM_refresh($_CONF['site_admin_url']
                      . "/plugins/forum/migrate.php?num_stories="
                      . $num_stories . "&num_posts=" . $num_posts);

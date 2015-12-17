@@ -103,9 +103,11 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
         DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
         PLG_itemDeleted($id, 'forum');
     }
+    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
 } elseif ($op == 'delrecord' AND SEC_checkToken()) {
     DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
     PLG_itemDeleted($id, 'forum');
+    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
 }
 
 // Page Navigation Logic
