@@ -187,19 +187,21 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
 
         // Still allow photo to be showen for users 
         if ($showtopic['uid'] > 1 AND ($userarray['photo'] != "" OR !empty($_CONF['default_photo']))) {
-            $avatar = USER_getPhoto($showtopic['uid'],'','',$CONF_FORUM['avatar_width']);
+            $avatar = '<figcaption class="uk-thumbnail-caption">'.USER_getPhoto($showtopic['uid'],'','',$CONF_FORUM['avatar_width']);
             $min_height = $min_height + 50;
         } else {
-			$avatar = '';
+			$avatar = '<figcaption class="uk-thumbnail-caption">';
 		}
 
         $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate'])). '<br' . XHTML . '>';
         $numposts = $LANG_GF01['POSTS']. ': ' .$posts;
+		$avatar .= '<figcaption class="uk-thumbnail-caption uk-text-small">';
         if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
-            $avatar .= '<br' . XHTML . '>' .$LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
+            $avatar .= $LANG_GF01['ONLINE'];
         } else {
-            $avatar .= '<br' . XHTML . '>' .$LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
+            $avatar .= $LANG_GF01['OFFLINE'];
         }
+		$avatar .=  '</figcaption></figure>';
 
         if ($userarray['sig'] != '') {
             $sig = $userarray['sig'];

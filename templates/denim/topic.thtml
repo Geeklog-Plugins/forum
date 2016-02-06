@@ -33,23 +33,17 @@
 <!-- END block_user_name -->
 
 <!-- BEGIN block_user_information -->
-		<div class="uk-float-left uk-text-center uk-margin-small-bottom">
-			<div class="uk-thumbnail uk-overlay-toggle uk-border-square uk-margin-small-right">
-				<div class="uk-overlay">
-					<div class="uk-align-center forum-userphoto">{avatar}</div>
-					<div class="uk-overlay-area uk-border-square">
-						<div class="uk-overlay-area-content">
-							{mood_icon}
-							{profile_link}
-							{email_link}
-							{website_link}
-							{pm_link}
-						</div>
-					</div>
-				</div>
+		<div class="uk-text-center uk-margin-small-bottom">
+			<div class="uk-text-center forum-userphoto">{avatar}</div>
+			<div class="uk-text-center uk-text-small">
+				{mood_icon}
+				{profile_link}
+				{email_link}
+				{website_link}
+				{pm_link}
 			</div>
 		</div>
-		<div class="uk-float-left uk-text-center">
+		<div class="uk-text-center">
 			{user_name}
 			{member_badge}
 			<div class="uk-text-muted uk-text-small">
