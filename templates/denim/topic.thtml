@@ -16,8 +16,7 @@
 		{user_information}
 	</div>
 	<div class="uk-width-large-5-6">
-		{# <div class="uk-panel uk-panel-box uk-width-medium-1-1 uk-panel-box-primary uk-text-break uk-margin topic-panel gl-forum-post-link" style="{comment_minheight};"> #}
-		<div class="uk-panel uk-panel-box uk-width-medium-1-1 uk-panel-box-primary uk-text-break uk-margin gl-forum-post-link">
+		<div class="uk-panel uk-panel-box uk-width-medium-1-1 uk-text-break uk-margin gl-forum-post-link">
 			{topic_comment}
 			{user_signature}
 		</div>
