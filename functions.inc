@@ -354,7 +354,8 @@ function plugin_showstats_forum($showsitestats)
 {
     global $_CONF, $_TABLES, $LANG_GF00,$LANG_GF01, $CONF_FORUM;
 
-    $stat_templates = COM_newTemplate(CTL_plugin_templatePath('forum', 'stats'));
+    // Use themes stats template files
+    $stat_templates = COM_newTemplate($_CONF['path_layout'] . '/stats');
     $stat_templates->set_file(array('itemstats'=>'itemstatistics.thtml',
                             'statrow'=>'singlestat.thtml'));
     $retval='';
