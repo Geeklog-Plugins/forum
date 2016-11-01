@@ -305,29 +305,10 @@ function gf_cleanHTML($message) {
     {
         return $message;
     }
-
-    if (!class_exists('ksesf4') ) {
-        require_once $CONF_FORUM['path_include'] . 'ksesf.class.php';
-    }
-
-    $filter = new ksesf4;
-    if ( isset( $_CONF['allowed_protocols'] ) && is_array( $_CONF['allowed_protocols'] ) && ( sizeof( $_CONF['allowed_protocols'] ) > 0 )) {
-        $filter->SetProtocols( $_CONF['allowed_protocols'] );
-    } else {
-        $filter->SetProtocols( array( 'http:', 'https:', 'ftp:' ));
-    }
-
-    if ( !SEC_hasRights( 'story.edit' ) || empty ( $_CONF['admin_html'] )) {
-        $html = $_CONF['user_html'];
-    } else {
-        $html = array_merge( $_CONF['user_html'], $_CONF['admin_html'] );
-    }
-
-    foreach( $html as $tag => $attr ) {
-        $filter->AddHTML( $tag, $attr );
-    }
-
-    return $filter->Parse( $message );
+    
+    // If user has story edit previlages then can use html allowed by admins
+    return gf_htmLawed($str, 'story.edit');
+    
 }
 
 
@@ -374,7 +355,55 @@ function geshi_formatted($str,$type='PHP') {
     return $geshi->parse_code();
 }
 
+function gf_htmLawed($str, $permissions = '') {
+    global $_CONF;
 
+    // Sets config options for htmLawed.  See http://www.bioinformatics.org/
+    // phplabware/internal_utilities/htmLawed/htmLawed_README.htm
+    $config = array(
+        'balance'        => 1, // Balance tags for well-formedness and proper nesting
+        'comment'        => 3, // Allow HTML comment
+        'css_expression' => 1, // Allow dynamic CSS expression in "style" attributes
+//            'keep_bad'       => 1, // Neutralize both tags and element content
+        'keep_bad'       => 0, // Neutralize both tags and element content
+        'tidy'           => 0, // Don't beautify or compact HTML code
+        'unique_ids'     => 1, // Remove duplicate and/or invalid ids
+        'valid_xhtml'    => 1, // Magic parameter to make input the most valid XHTML
+    );
+
+    if (isset($_CONF['allowed_protocols']) &&
+            is_array($_CONF['allowed_protocols']) &&
+            (count($_CONF['allowed_protocols']) > 0)) {
+        $schemes = $_CONF['allowed_protocols'];
+    } else {
+        $schemes = array('http:', 'https:', 'ftp:');
+    }
+
+    $schemes = str_replace(':', '', implode(', ', $schemes));
+    $config['schemes'] = 'href: ' . $schemes . '; *: ' . $schemes;
+
+    if (empty($permissions) || !SEC_hasRights($permissions) || empty($_CONF['admin_html'])) {
+        $html = $_CONF['user_html'];
+    } else {
+        $html = array_merge_recursive($_CONF['user_html'], $_CONF['admin_html']);
+    }
+
+    foreach ($html as $tag => $attr) {
+        if (is_array($attr) && (count($attr) > 0)) {
+            $spec[] = $tag . '=' . implode(', ', array_keys($attr));
+        } else {
+            $spec[] = $tag . '=-*';
+        }
+
+        $elements[] = $tag;
+    }
+
+    $config['elements'] = implode(', ', $elements);
+    $spec = implode('; ', $spec);
+    $str = htmLawed($str, $config, $spec);
+
+    return $str;
+}
 
 function gf_checkHTML($str) {
     global $CONF_FORUM, $_CONF;
@@ -390,27 +419,9 @@ function gf_checkHTML($str) {
     {
         return $str;
     }
-    if (!class_exists('ksesf4') ) {
-        require_once $CONF_FORUM['path_include'] . 'ksesf.class.php';
-    }
-
-    $filter = new ksesf4;
-    if ( isset( $_CONF['allowed_protocols'] ) && is_array( $_CONF['allowed_protocols'] ) && ( sizeof( $_CONF['allowed_protocols'] ) > 0 )) {
-        $filter->SetProtocols( $_CONF['allowed_protocols'] );
-    } else {
-        $filter->SetProtocols( array( 'http:', 'https:', 'ftp:' ));
-    }
-
-    if ( !SEC_hasRights( 'story.edit' ) || empty ( $_CONF['admin_html'] )) {
-        $html = $_CONF['user_html'];
-    } else {
-        $html = array_merge( $_CONF['user_html'], $_CONF['admin_html'] );
-    }
-
-    foreach( $html as $tag => $attr ) {
-        $filter->AddHTML( $tag, $attr );
-    }
-    return $filter->Parse( $str );
+    
+    // If user has story edit previlages then can use html allowed by admins
+    return gf_htmLawed($str, 'story.edit');
 }
 
 
