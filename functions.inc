@@ -785,6 +785,12 @@ function plugin_upgrade_forum() {
                 $current_version = "2.9.1";
                 
                 break;
+                
+            case "2.9.1" :
+
+                $current_version = "2.9.2";
+                
+                break;                
 
             default:
                 $done = true;
