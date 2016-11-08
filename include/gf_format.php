@@ -220,16 +220,28 @@ function forumNavbarMenu($current='') {
     require_once $_CONF['path_system'] . 'classes/navbar.class.php';
     $navmenu = new navbar; 
     $navmenu->add_menuitem($LANG_GF01['INDEXPAGE'],"{$_CONF['site_url']}/forum/index.php");
+    $navmenu->set_onclick($LANG_GF01['INDEXPAGE'], 'location.href="' . "{$_CONF['site_url']}/forum/index.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     if (!COM_isAnonUser()) {  
         $navmenu->add_menuitem($LANG_GF02['msg197'],"{$_CONF['site_url']}/forum/index.php?op=markallread");
-        $navmenu->set_onclick($LANG_GF02['msg197'], 'return confirm("' . $LANG_GF02['msg301'] . '");');
+        // Added as a fix for the navbar class (since uikit tabs do not support urls)
+        //$navmenu->set_onclick($LANG_GF02['msg197'], 'return confirm("' . $LANG_GF02['msg301'] . '");');
+        $navmenu->set_onclick($LANG_GF02['msg197'], '
+          if (confirm("' . $LANG_GF02['msg301'] . '")) {
+            window.location.href="' . "{$_CONF['site_url']}/forum/index.php?op=markallread" . '";
+          }
+          return false;        
+        ');
         $navmenu->add_menuitem($LANG_GF01['USERPREFS'],"{$_CONF['site_url']}/forum/userprefs.php");
+        $navmenu->set_onclick($LANG_GF01['USERPREFS'], 'location.href="' . "{$_CONF['site_url']}/forum/userprefs.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
         $navmenu->add_menuitem($LANG_GF01['SUBSCRIPTIONS'],"{$_CONF['site_url']}/forum/notify.php");
+        $navmenu->set_onclick($LANG_GF01['SUBSCRIPTIONS'], 'location.href="' . "{$_CONF['site_url']}/forum/notify.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     }
     if (($CONF_FORUM['show_memberslist_anonymous'] && COM_isAnonUser()) OR !COM_isAnonUser()) {
     	$navmenu->add_menuitem($LANG_GF02['msg200'],"{$_CONF['site_url']}/forum/memberlist.php");
+        $navmenu->set_onclick($LANG_GF02['msg200'], 'location.href="' . "{$_CONF['site_url']}/forum/memberlist.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 	}
     $navmenu->add_menuitem($LANG_GF02['msg201'],"{$_CONF['site_url']}/forum/index.php?op=popular");
+    $navmenu->set_onclick($LANG_GF02['msg201'], 'location.href="' . "{$_CONF['site_url']}/forum/index.php?op=popular" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     if ($current != '') {
         $navmenu->set_selected($current);
     }
