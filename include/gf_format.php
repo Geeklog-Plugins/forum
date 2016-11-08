@@ -319,6 +319,9 @@ function gf_preparefordb($message,$postmode) {
     if (get_magic_quotes_gpc() ) {
        $message = stripslashes($message);
     }
+    
+    // Remove Icons if database cannot store them (ie table collation needs to be utf8mb4)
+    $message = GLText::removeUtf8Icons($message);
 
     if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML') ) {
         $message = gf_checkHTMLforSQL($message,$postmode);
