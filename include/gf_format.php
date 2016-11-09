@@ -333,7 +333,7 @@ function gf_preparefordb($message,$postmode) {
     }
     
     // Remove Icons if database cannot store them (ie table collation needs to be utf8mb4)
-    $message = GLText::removeUtf8Icons($message);
+    $message = GLText::remove4byteUtf8Chars($message);
 
     if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML') ) {
         $message = gf_checkHTMLforSQL($message,$postmode);
