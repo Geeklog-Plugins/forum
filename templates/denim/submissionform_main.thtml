@@ -15,6 +15,7 @@
 		<textarea name="comment" id="form-forum-text" rows="20" class="post" style="width:98%" onselect="storeCaret(this);" onclick="storeCaret(this);" onkeyup="storeCaret(this);">{post_message}</textarea>
 	</div>	
 </div>
+{options}
 {!if captcha}
 <div class="uk-form-row">
     <div class="uk-align-right">
@@ -22,7 +23,6 @@
     </div>
 </div>
 {!endif}  
-{options}
 <div class="uk-form-row">
 	<div class="uk-form-controls uk-align-right">
 		<button class="uk-button" type="submit" name="preview" value="{LANG_PREVIEW}">{LANG_PREVIEW}</button>
