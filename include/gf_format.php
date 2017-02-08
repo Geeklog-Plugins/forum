@@ -41,7 +41,7 @@ if (!class_exists('StringParser') ) {
     require_once $CONF_FORUM['path_include'] . 'bbcode/stringparser_bbcode.class.php';
 }
 
-function gf_createHTMLDocument(&$content = '', $subject = '') {
+function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
     global $CONF_FORUM;
 
     // Display Common headers
@@ -52,6 +52,9 @@ function gf_createHTMLDocument(&$content = '', $subject = '') {
     $information['pagetitle'] = $subject;
     $information['what'] = 'menu';
     $information['rightblock'] = false;
+    if ($noIndex) {
+        $information['headercode'] = '<meta name="robots" content="noindex"' . XHTML . '>';
+    }
 
     if ($CONF_FORUM['showblocks'] == 'noblocks' OR $CONF_FORUM['showblocks'] == 'rightblocks') {
         $information['what'] = 'none';
