@@ -42,7 +42,7 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $_CONF['path_system'] . 'classes/timer.class.php';
 $mytimer = new timerobject();
-$mytimer->setPercision(2);
+$mytimer->setPrecision(2);
 $mytimer->startTimer();
 
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
