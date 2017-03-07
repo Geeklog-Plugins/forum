@@ -103,7 +103,7 @@ if ($onlytopic == 1) {
         $display .= '<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">' . LB;
         break;
     }
-    $display .= '<html>' . LB;
+    $display .= '<html class="glforum-preview-html">' . LB;
     $display .= '<head>' . LB;
     $display .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$LANG_CHARSET\"" . XHTML . ">" . LB;
     $display .= '<meta name="robots" content="NOINDEX"' . XHTML . '>' . LB;
@@ -131,7 +131,7 @@ if ($onlytopic == 1) {
     } else {
         $display .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$_CONF['site_url']}/layout/{$_CONF['theme']}/style.css\"></head>\n";
     }
-    $display .= '<body class="forum-sitebody">';
+    $display .= '<body class="glforum-preview-body">';
 } else {
     //Check is anonymous users can access
     forum_chkUsercanAccess();
