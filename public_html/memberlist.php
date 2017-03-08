@@ -291,7 +291,8 @@ if ($op == "lastposts") {
     $csscode = 1;
 
     while ($siteMembers = DB_fetchArray($query)) {
-        //$siteMembers['posts'] = DB_count($_TABLES['forum_topic'],'uid',$siteMembers['uid']);
+        $report->set_var ('memberoptionlink_settings', '');
+        
         if ($siteMembers['posts'] > 0) {
             $reportlinkURL = $_CONF['site_url'] .'/forum/memberlist.php?op=lastposts&amp;showuser='.$siteMembers['uid'];
             //$reportlinkURL .= '&amp;prevorder='.$order.'&amp;direction='.$direction.'&amp;page='.$page;
