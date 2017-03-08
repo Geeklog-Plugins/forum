@@ -67,6 +67,15 @@ $display = '';
 $display .= gf_showVariables();
 
 if ($op == "lastposts") {
+    
+    //make sure show user exists and can be accessed
+    $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['forum_topic']} topic WHERE user.uid ={$showuser} AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=topic.uid GROUP BY uid");
+	$membercount = DB_numRows($memberlistsql);
+	// Check to see if requesting a page that does not exist
+	if ($membercount < 1) {
+        $base_url = "{$_CONF['site_url']}/forum/index.php";
+		COM_handle404($base_url);    
+	}	    
 
     $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $report->set_file (array (
@@ -285,7 +294,7 @@ if ($op == "lastposts") {
         //$siteMembers['posts'] = DB_count($_TABLES['forum_topic'],'uid',$siteMembers['uid']);
         if ($siteMembers['posts'] > 0) {
             $reportlinkURL = $_CONF['site_url'] .'/forum/memberlist.php?op=lastposts&amp;showuser='.$siteMembers['uid'];
-            $reportlinkURL .= '&amp;prevorder='.$order.'&amp;direction='.$direction.'&amp;page='.$page;
+            //$reportlinkURL .= '&amp;prevorder='.$order.'&amp;direction='.$direction.'&amp;page='.$page;
             $report->set_var ('memberoptionlink', $reportlinkURL);
             $report->set_var ('memberoptiontext', $LANG_GF09['lastpost']);
             $report->parse('lastposts_link','memberoption_link');
