@@ -78,19 +78,20 @@ if ($op == "lastposts") {
     $report->set_block('report', 'links');
     $report->set_block('report', 'title');
 	$report->set_block('forum_links', 'return_link');
+    
+    $username = COM_getDisplayName($showuser);
 
     $report->set_var ('imgset', $CONF_FORUM['imgset']);
     $report->set_var ('layout_url', $CONF_FORUM['layout_url']);
     $report->set_var ('phpself', $_CONF['site_url'] .'/forum/memberlist.php?op=lastposts&amp;showuser='.$showuser);
-    $report->set_var ('startblock', COM_startBlock($LANG_GF02['msg86'] . DB_getItem($_TABLES['users'],"username", "uid=$showuser")) );
+    $report->set_var ('startblock', COM_startBlock($LANG_GF02['msg86'] . $username));
     $report->set_var ('endblock', COM_endBlock());
     
-    
     if ($CONF_FORUM['show_last_post_count'] > 0) {
-		$title = sprintf($LANG_GF02['msg158'], $CONF_FORUM['show_last_post_count'], $_USER['username']);
+		$title = sprintf($LANG_GF02['msg158'], $CONF_FORUM['show_last_post_count'], $username);
     	$limit = "LIMIT {$CONF_FORUM['show_last_post_count']}";
 	} else {
-		$title = sprintf($LANG_GF02['msg158'], '', $_USER['username']);
+		$title = sprintf($LANG_GF02['msg158'], '', $username);
 		$limit = "";
 	}    
 	$report->set_var('report_title', $title);
@@ -146,7 +147,8 @@ if ($op == "lastposts") {
     
     $report->parse ('output', 'report');
     $display .= $report->finish($report->get_var('output'));
-    $display = gf_createHTMLDocument($display);
+    
+    $display = gf_createHTMLDocument($display, $title);
     COM_output($display);
     exit();
 
@@ -211,11 +213,11 @@ if ($op == "lastposts") {
 		$sortOrder = "$orderby DESC";
 		$report->parse ("img_desc$sort", 'sort_desc_on');
 	}     
-    
+
     if ($chkactivity) {
-        $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['forum_topic']} topic WHERE user.uid <> 1 AND user.uid=topic.uid GROUP BY uid");
+        $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['forum_topic']} topic WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=topic.uid GROUP BY uid");
     } else {
-        $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['userprefs']} userprefs WHERE user.uid > 1 AND user.uid=userprefs.uid");
+        $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['userprefs']} userprefs WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=userprefs.uid");
     }
 
     $membercount = DB_numRows($memberlistsql);
@@ -237,19 +239,19 @@ if ($op == "lastposts") {
         $sql .= "AND user.uid=userprefs.uid";
     }
     */
-    $sql = "SELECT u.uid, u.uid, u.username, u.regdate, u.email, u.homepage, COUNT(*) AS posts, up.emailfromuser ";
+    $sql = "SELECT u.uid, u.uid, u.username, u.regdate, u.email, u.homepage, COUNT(ft.uid) AS posts, up.emailfromuser ";
     if ($chkactivity) {
         $sql .= "FROM {$_TABLES['users']} u, {$_TABLES['userprefs']} up, {$_TABLES['forum_topic']} ft 
-        		WHERE u.uid <> 1 AND u.uid = ft.uid AND u.uid=up.uid ";
+        		WHERE u.uid > 1 AND u.status = " . USER_ACCOUNT_ACTIVE . " AND u.uid = ft.uid AND u.uid=up.uid ";
     } else {
         $sql .= "FROM {$_TABLES['users']} u  
         		LEFT JOIN {$_TABLES['forum_topic']} ft ON u.uid = ft.uid, 
         		{$_TABLES['userprefs']} up
-        		WHERE u.uid > 1 AND u.uid = up.uid ";
+        		WHERE u.uid > 1 AND u.status = " . USER_ACCOUNT_ACTIVE . " AND u.uid = up.uid ";
     }    
     $sql .= "GROUP BY u.uid 
     		ORDER BY $sortOrder LIMIT $offset, $show";
-
+    
     $query = DB_query($sql);
 
     $report->set_var ('imgset', $CONF_FORUM['imgset']);
@@ -280,7 +282,7 @@ if ($op == "lastposts") {
     $csscode = 1;
 
     while ($siteMembers = DB_fetchArray($query)) {
-        $siteMembers['posts'] = DB_count($_TABLES['forum_topic'],'uid',$siteMembers['uid']);
+        //$siteMembers['posts'] = DB_count($_TABLES['forum_topic'],'uid',$siteMembers['uid']);
         if ($siteMembers['posts'] > 0) {
             $reportlinkURL = $_CONF['site_url'] .'/forum/memberlist.php?op=lastposts&amp;showuser='.$siteMembers['uid'];
             $reportlinkURL .= '&amp;prevorder='.$order.'&amp;direction='.$direction.'&amp;page='.$page;
@@ -347,6 +349,6 @@ if ($op == "lastposts") {
 }
 
 $display = gf_createHTMLDocument($display);
-
 COM_output($display);
+
 ?>
