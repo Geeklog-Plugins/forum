@@ -781,6 +781,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $submissionform_main->set_var ('LANG_MOOD', $LANG_GF02['msg36']);
         $submissionform_main->set_var ('moodoptions', $moodoptions);
         $submissionform_main->parse ('moods', 'submissionform_moods');
+    } else {
+        $submissionform_main->set_var('moods', '');
     }
 
     $sub_dot = '...';
@@ -1161,7 +1163,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
                                 DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
                             }
                             if (($B['email'] != '')  AND COM_isEmail($B['email'])) {
-                                COM_mail($B['email'], $subjectline, $message);
+                                //COM_mail($B['email'], $subjectline, $message);
                             }
                         }
                     }
