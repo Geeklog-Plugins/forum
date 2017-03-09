@@ -956,7 +956,7 @@ function forum_chkUsercanAccess($secure = false) {
 
         exit;
     //} elseif ($secure AND empty($_USER['uid'])) {
-    } elseif ($secure AND empty($_USER['uid'])) {
+    } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
 		$display = COM_siteHeader();
 		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
 		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
