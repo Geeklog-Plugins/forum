@@ -42,14 +42,18 @@ if (!class_exists('StringParser') ) {
 }
 
 function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
-    global $CONF_FORUM;
+    global $CONF_FORUM, $LANG_GF01;
 
     // Display Common headers
     if (!isset($CONF_FORUM['showblocks'])) $CONF_FORUM['showblocks'] = 'leftblocks';
     if (!isset($CONF_FORUM['usermenu'])) $CONF_FORUM['usermenu'] = 'blockmenu';
 
     $information = array();
-    $information['pagetitle'] = $subject;
+    if ($subject != '') {
+        $information['pagetitle'] = $subject;
+    } else {
+        $information['pagetitle'] = $LANG_GF01['FORUM'];
+    }
     $information['what'] = 'menu';
     $information['rightblock'] = false;
     if ($noIndex) {
@@ -253,7 +257,7 @@ function forumNavbarMenu($current='') {
 
 function ForumHeader($forum, $showtopic, &$display) {
     global $_TABLES, $_CONF, $CONF_FORUM, $LANG_GF01, $LANG_GF02;
-
+    
     $navbar = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $navbar->set_file (array ('topicheader'=>'navbar.thtml'));
     $navbar->set_var ('search_forum', f_forumsearch());
@@ -277,10 +281,16 @@ function ForumHeader($forum, $showtopic, &$display) {
         } elseif ($forum != "") {
             $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum'");
         }
+        // Double check forum and/or topic exists
+        if ($grp_id == "") {
+            COM_handle404("{$_CONF['site_url']}/forum/index.php");
+            exit;
+        }        
         $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
         if (!SEC_inGroup($groupname)) {
         	$display .= alertMessage($LANG_GF02['msg77'], $LANG_GF01['ACCESSERROR']);
-            COM_handle404("{$_CONF['site_url']}/forum/index.php");
+            $display = gf_createHTMLDocument($display);
+            COM_output($display);            
             exit;
         }
     }
