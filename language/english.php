@@ -181,6 +181,7 @@ $LANG_GF01['MSG_NO_CAT']     = 'No Categories or Forums Defined';
 $LANG_GF01['FORUMPOSTS']     = 'Forum Posts';
 $LANG_GF01['FORUMPOST']      = 'Forum Post';
 $LANG_GF01['MESSAGE']     	 = 'Message';
+$LANG_GF01['HERE']     	     = 'here';
 
 // Language for bbcode toolbar
 $LANG_GF01['CODE']           = 'Code';

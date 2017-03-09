@@ -183,6 +183,7 @@ $LANG_GF01['MSG_NO_CAT']     = 'カテゴリーまたは掲示板が定義され
 $LANG_GF01['FORUMPOSTS']     = '掲示板投稿';
 $LANG_GF01['FORUMPOST']      = '掲示板投稿';
 $LANG_GF01['MESSAGE']        = 'メッセージ';
+$LANG_GF01['HERE']     	     = 'here';
 
 // Language for bbcode toolbar
 $LANG_GF01['CODE']           = 'コード';

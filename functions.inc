@@ -154,7 +154,7 @@ function plugin_autotags_forum($op,$content='',$autotag='') {
     } elseif ($op == 'parse') {
         $id = COM_applyFilter($autotag['parm1']);
         if (!empty($id)) {
-            $linktext = 'here';
+            $linktext = $LANG_GF01['HERE'];
             if (!empty($autotag['parm2'])) $linktext = $autotag['parm2'];
             $url = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $id;
             $filelink = COM_createLink($linktext, $url);
