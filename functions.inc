@@ -1261,10 +1261,10 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
             $lastdate = strftime($CONF_FORUM['default_Datetime_format'], $A['lastupdated']);
         }
         if ($A['uid'] > 1) {
-            $topicinfo = "{$A['subject']}<br" . XHTML . ">{$LANG_GF01['STARTEDBY']} " . COM_getDisplayName($A['uid']) . ', ';
+            $topicinfo = htmlspecialchars($A['subject']) . "<br" . XHTML . ">{$LANG_GF01['STARTEDBY']} " . COM_getDisplayName($A['uid']) . ', ';
             $topicinfo_short = "{$LANG_GF01['STARTEDBY']} " . COM_getDisplayName($A['uid']) . ', ';
         } else {
-            $topicinfo = "{$A['subject']}<br" . XHTML . ">{$LANG_GF01['STARTEDBY']} {$A['name']},";
+            $topicinfo = htmlspecialchars($A['subject']) . "<br" . XHTML . ">{$LANG_GF01['STARTEDBY']} {$A['name']},";
             $topicinfo_short = "{$LANG_GF01['STARTEDBY']} {$A['name']}";
         }
 
@@ -1288,6 +1288,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
                 $repliesinfo = sprintf($LANG_GF01['LASTREPLYBY'],$B['name']) . " &raquo; $lastdate $repliesinfo";
             }
         }
+        
         $lastpostinfo = strip_tags(COM_truncate($lastcomment, $CONF_FORUM['contentinfo_numchars'], '...'));
         $lastpostinfo = stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
         $lastpostinfo = forum_mb_wordwrap($lastpostinfo, $CONF_FORUM['linkinfo_width'], LB);
