@@ -95,9 +95,6 @@ if (!COM_isAnonUser() && $op == 'markallread') {
     exit();
 }
 
-//Check if anonymous users allowed to access forum
-forum_chkUsercanAccess();
-
 // Debug Code to show variables
 $display .= gf_showVariables();
 
