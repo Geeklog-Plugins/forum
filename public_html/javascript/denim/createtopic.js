@@ -118,6 +118,7 @@ function bbfontstyle(bbopen, bbclose) {
 
 function bbstyle(bbnumber) {
     var txtarea = document.forumpost.comment;
+    var button;
 
     txtarea.focus();
     donotinsert = false;
@@ -128,9 +129,8 @@ function bbstyle(bbnumber) {
         while (bbcode[0]) {
             butnumber = arraypop(bbcode) - 1;
             txtarea.value += bbtags[butnumber + 1];
-            buttext = eval('document.forumpost.addbbcode' + butnumber + '.value');
-            eval('document.forumpost.addbbcode' + butnumber + '.className ="uk-button"'); // Used for uikit themes
-            eval('document.forumpost.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
+            button = eval('document.forumpost.addbbcode' + butnumber);
+            button.classList.remove('uk-active');
         }
         imageTag = false; // All tags are closed including image tags :D
         txtarea.focus();
@@ -164,14 +164,14 @@ function bbstyle(bbnumber) {
 
     if (donotinsert) {        // Close all open tags up to the one just clicked & default button names
         while (bbcode[bblast]) {
-                butnumber = arraypop(bbcode) - 1;
-                txtarea.value += bbtags[butnumber + 1];
-                buttext = eval('document.forumpost.addbbcode' + butnumber + '.value');
-                eval('document.forumpost.addbbcode' + butnumber + '.value ="' + buttext.substr(0,(buttext.length - 1)) + '"');
-                imageTag = false;
-            }
-            txtarea.focus();
-            return;
+            butnumber = arraypop(bbcode) - 1;
+            txtarea.value += bbtags[butnumber + 1];
+            button = eval('document.forumpost.addbbcode' + butnumber);
+            button.classList.remove('uk-active');
+            imageTag = false;
+        }
+        txtarea.focus();
+        return;
     } else { // Open tags
 
         if (imageTag && (bbnumber != 14)) {        // Close image tag before adding another
@@ -185,7 +185,8 @@ function bbstyle(bbnumber) {
         txtarea.value += bbtags[bbnumber];
         if ((bbnumber == 14) && (imageTag == false)) imageTag = 1; // Check to stop additional tags after an unclosed image tag
         arraypush(bbcode,bbnumber+1);
-        eval('document.forumpost.addbbcode'+bbnumber+'.value += "*"');
+        button = eval('document.forumpost.addbbcode' + bbnumber);
+        button.classList.add('uk-active');
         txtarea.focus();
         return;
     }
