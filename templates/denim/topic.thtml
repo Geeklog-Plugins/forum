@@ -4,7 +4,7 @@
 <div class="uk-grid">
 	<div class="uk-width-6-10">
 		<i class="uk-icon-comment-o"></i>&nbsp;{posted_date}{preview_topic_subject}&nbsp;{read_msg}&nbsp;{topiclocked_icon}
-		<a id="#{topic_post_id}"></a> {# topic post link jump point #}
+		<a id="{topic_post_id}"></a> {# topic post link jump point #}
 	</div>
 	<div class="uk-width-4-10 uk-text-right">
 		{mod_functions}

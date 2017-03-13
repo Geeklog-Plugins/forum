@@ -75,8 +75,8 @@
     	{replies}
 	</td>
     <td>
-    	{LANG_BY}{lastposter}<br{xhtml}>
-    	{lastdate}
+    	<a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" data-uk-tooltip title="{LANG_lastpost}">{LANG_BY}{lastposter}<br{xhtml}>
+    	{lastdate}</a>
     </td>
 </tr>
 <!-- END topic_record -->
