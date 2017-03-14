@@ -109,7 +109,7 @@ if ($msg==3) {
 }
 
 if ($msg==9) {
-	// Forum Post Canceld
+	// Forum Post Cancelled
 	$display .= COM_showMessageText($LANG_GF02['msg149']);
 }
 
@@ -1275,8 +1275,8 @@ if ($forum > 0) {
             $firstposterName = $record['name'];
         }
         $topicinfo =  "<b>{$LANG_GF01['STARTEDBY']} {$firstposterName}, {$firstdate}</b><br" . XHTML . ">";
-        $lastpostinfo = stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
         $lastpostinfo = strip_tags(COM_truncate($record['comment'], $CONF_FORUM['contentinfo_numchars'], '...'));
+        $lastpostinfo = stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
         $lastpostinfo = htmlspecialchars($lastpostinfo); // Escape things like " so it displays properly in tooltip
         $topicinfo .= str_replace(LB, "<br" . XHTML . ">", forum_mb_wordwrap($lastpostinfo, $CONF_FORUM['linkinfo_width'], LB));
         
