@@ -22,9 +22,9 @@
         </td>
 </tr>
 <tr class="pluginRow{csscode}">
-    <td style="vertical-align:top; padding:6px; white-space:nowrap;">
+    <td style="vertical-align:top; padding:6px; word-wrap: break-word;">
     	{user_information}
-        <div style="background:transparent; width:110px; height:1px;"></div>       
+        <div style="background:transparent; width:140px; height:1px;"></div>    {# Create a cell with a specified width #}    
     </td>
     <td style="vertical-align:top; padding:6px; width:100%;" class="pluginRow{csscode}">
             <div style="{comment_minheight};">
