@@ -1163,7 +1163,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
                                 DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
                             }
                             if (($B['email'] != '')  AND COM_isEmail($B['email'])) {
-                                //COM_mail($B['email'], $subjectline, $message);
+                                COM_mail($B['email'], $subjectline, $message);
                             }
                         }
                     }
