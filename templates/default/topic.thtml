@@ -76,10 +76,13 @@
         </div>
         <div>
                     {mood_icon}
-                    <div style="padding-top:3px;">{avatar}</div>
-                    {member_badge}
-                    <br{xhtml}>
-                    {regdate}
+                    {!if avatar}
+                    <div style="padding-top:3px;">{avatar}<br{xhtml}>{user_status}</div>
+                    {!else}
+                    {user_status}
+                    {!endif}
+                    {member_badge}<br{xhtml}>
+                    {regdate}<br{xhtml}>
                     {numposts}<br{xhtml}>
                     {location}
                     {ip_address}

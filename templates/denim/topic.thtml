@@ -36,7 +36,8 @@
 		<div class="uk-float-left uk-text-center uk-margin-small-bottom">
 			<div class="uk-thumbnail uk-overlay-toggle uk-border-square uk-margin-small-right">
 				<div class="uk-overlay">
-					<div class="uk-align-center forum-userphoto">{avatar}</div>
+                    {!if avatar}
+					<figure class="uk-align-center forum-userphoto">{avatar}<figcaption>{user_status}</figcaption></figure>
 					<div class="uk-overlay-area uk-border-square">
 						<div class="uk-overlay-area-content">
 							{mood_icon}
@@ -46,6 +47,16 @@
 							{pm_link}
 						</div>
 					</div>
+                    {!else}
+                    <div class="uk-align-center uk-border-square">
+                        {user_status}<br{xhtml}>
+                        {mood_icon}
+                        {profile_link}
+                        {email_link}
+                        {website_link}
+                        {pm_link}
+					</div>                    
+                    {!endif}
 				</div>
 			</div>
 		</div>
@@ -55,7 +66,7 @@
 			<div class="uk-text-muted uk-text-small">
 				{user_level}<br{xhtml}>
 				{user_levelname}<br{xhtml}>
-				{regdate}
+				{regdate}<br{xhtml}>
 				{numposts}<br{xhtml}>
 				{location}
 				{ip_address}

@@ -185,20 +185,21 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
             }
         }
 
-        // Still allow photo to be showen for users 
+        // Still allow photo to be shown for users 
         if ($showtopic['uid'] > 1 AND ($userarray['photo'] != "" OR !empty($_CONF['default_photo']))) {
             $avatar = USER_getPhoto($showtopic['uid'],'','',$CONF_FORUM['avatar_width']);
             $min_height = $min_height + 50;
         } else {
 			$avatar = '';
+            $user_status = '';
 		}
 
-        $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate'])). '<br' . XHTML . '>';
+        $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate']));
         $numposts = $LANG_GF01['POSTS']. ': ' .$posts;
         if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
-            $avatar .= '<br' . XHTML . '>' .$LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
+            $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
         } else {
-            $avatar .= '<br' . XHTML . '>' .$LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
+            $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
         }
 
         if ($userarray['sig'] != '') {
@@ -214,7 +215,8 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
 
     if ($CONF_FORUM['show_moods'] &&  $showtopic['mood'] != "") {
 		$topictemplate->set_var ('moodicon', gf_getImage($showtopic['mood'],'moods'));
-		$topictemplate->set_var ('moodicontext', $showtopic['mood']);
+		$topictemplate->set_var ('moodicontitle', $showtopic['mood']);
+        $topictemplate->set_var ('moodtitle', $showtopic['mood']);
 		$topictemplate->parse ('mood_icon', 'mood_icon');
         
 		$min_height = $min_height + 30;
@@ -406,6 +408,7 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
     $topictemplate->set_var ('user_levelname', $user_levelname);
     $topictemplate->set_var ('user_level', $user_level);
     $topictemplate->set_var ('avatar', $avatar);
+    $topictemplate->set_var ('user_status', $user_status);
     $topictemplate->set_var ('regdate', $regdate);
     $topictemplate->set_var ('numposts', $numposts);
     if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_ban')) {
