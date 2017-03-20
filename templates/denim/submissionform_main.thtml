@@ -37,7 +37,7 @@
 <div class="uk-form-row">
 	<label class="uk-form-label" for="form-forum-username">{LANG_NAME}</label>
 	<div class="uk-form-controls">
-		<input id="form-forum-username" placeholder="" type="hidden" name="name" size="35" value="{xusername}"{xhtml}>{username}
+		<input id="form-forum-username" placeholder="" type="hidden" name="name" size="35" value="{xusername}"{xhtml}>{username}{!if aname}: <input id="form-forum-username" placeholder="" type="text" name="aname" value="{aname}"  maxlength="50" class="uk-form-width-medium"{xhtml}>{!endif}
 	</div>	
 </div>
 <!-- END submissionform_membertop -->

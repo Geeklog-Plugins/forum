@@ -120,8 +120,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
     $date = time();
 
     $editAllowed = false;
+    $moderator_anon_post = false;
     if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
         $editAllowed = true;
+        if (DB_getItem($_TABLES['forum_topic'],'uid',"id='$id'") == 1) {
+            $moderator_anon_post = true;
+        }
     } else {
         if ($CONF_FORUM['allowed_editwindow'] > 0) {
             $t1 = DB_getItem($_TABLES['forum_topic'],'date',"id='$id'");
@@ -141,7 +145,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
         $link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$id}";
         $display .= alertMessage('',$LANG_GF02['msg189'], sprintf($LANG_GF02['msg187'],$link));
     } else {
-        if (strlen(trim($_POST['name'])) > $CONF_FORUM['min_username_length'] && strlen(trim($_POST['comment'])) > $CONF_FORUM['min_comment_length']) {
+        if ($moderator_anon_post) {
+            $name = gf_preparefordb($aname,'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
+        } else {
+            $name = gf_preparefordb($_POST['name'],'text');
+        }        
+        if (strlen(trim($name)) > $CONF_FORUM['min_username_length'] && strlen(trim($_POST['comment'])) > $CONF_FORUM['min_comment_length']) {
             if ($CONF_FORUM['use_spamx_filter'] == 1) {
                 // Check for SPAM
                 $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
@@ -155,7 +164,6 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
                     exit;
                 }
             }
-
             $postmode = gf_chkpostmode($postmode,$mode_switch);
             $subject  = gf_preparefordb(strip_tags($_POST['subject']),'text');
             $comment  = gf_preparefordb($_POST['comment'],$postmode);
@@ -168,9 +176,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
                 if (isset($_POST['sticky_switch']) AND $_POST['sticky_switch'] == 1)  $sticky = 1;
             }
             $sql = "UPDATE {$_TABLES['forum_topic']} SET subject='$subject',comment='$comment',postmode='$postmode', ";
+            if ($moderator_anon_post) {
+                $sql .= "name='$name', ";
+            }
             $sql .= "mood='$mood', sticky='$sticky', locked='$locked' WHERE (id='$editid')";
             DB_query($sql);
-            // PLG_itemSaved($editid, 'forum'); // done below so commented out
 
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$editid'");
             if ($topicparent == 0) {
@@ -203,7 +213,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             exit;
 
         } else {
-            $display .= alertMessage($LANG_GF01['msg18'], $LANG_GF02['msg180']);
+            $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
         }
     }
 
@@ -500,7 +510,12 @@ if ($preview == 'Preview') {
     $previewitem = array();
     if ($method == 'edit') {
         $previewitem['uid']  = $edittopic['uid'];
-        $previewitem['name'] = $edittopic['name'];
+        if ($edittopic['uid'] == 1 AND $aname != '') { // Means mod is editing an anonymous post so update anonymous name if not blank
+            // reflect updated anonymous user name
+            $previewitem['name'] = stripslashes($aname);
+        } else {
+            $previewitem['name'] = $edittopic['name'];
+        }
     } else {
         if ($uid > 1) {
             $previewitem['name'] = stripslashes($aname);
@@ -747,10 +762,20 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             } else {
                 $username = COM_getDisplayName($_USER['uid']);
             }
+        } else {
+            if ($editmoderator AND $edittopic['uid'] == 1) {
+                //$aname = COM_stripslashes($edittopic['name']);
+                if ($method == 'edit' AND $aname == '') {
+                    $aname = COM_stripslashes($edittopic['name']);
+                } else {
+                    $aname = COM_stripslashes($aname);
+                }
+            }
         }
 
         $submissionform_main->set_var ('username', $username);
         $submissionform_main->set_var ('xusername', $username);
+        $submissionform_main->set_var ('aname', $aname);
         $submissionform_main->parse ('user_name', 'submissionform_membertop');
     }
 
