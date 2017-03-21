@@ -1,5 +1,26 @@
 Geeklog Forum Plugin History/Changes:
 
+March ??, 2017 (2.9.2)
+------------
+For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/2?closed=1
+
+- [Feature] Allow Moderators to edit Anonymous names of forum posts [Tom]
+- [Feature] French Language file updated [Ben]
+- [Feature] Forum now can handle utf8mb4 characters [Tom]
+- [Feature] NoIndex meta tag added to edit pages of forum topics [Tom]
+- [Update] Geshi Library updated to 1.0.8.12 [Tom]
+- [Update] Replaced kesf with htmLawed from Geeklog [Tom]
+- [Bug] Fixed Forum statistics displayed on Geeklog Stats page [Tom]
+- [Bug] Fixed numerous issues with Member list page [Tom]
+- [Bug] Fixed saving forum post in HTML mode [Tom]
+- [Bug] Tool tips with BBCode and " character now display properly [Tom]
+- [Bug] Several fixes to support PHP 7 and 7.1 [Tom]
+- [Bug] Fixed topic notifications not being set in certain cases [Tom]
+- [Bug] Minor tweaks to template files (for both default and denim) [Tom]
+- [Bug] Forum RSS feeds are now updated with new posts [Tom]
+- [Bug] Fixed missing text in User Forum Preference Page for default templates [Tom]
+- [Bug] When Moods disabled {moods} will not be displayed in the editor [Tom]
+
 November 2, 2015 (2.9.1)
 ------------
 
