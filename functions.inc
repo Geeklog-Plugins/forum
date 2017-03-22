@@ -145,7 +145,7 @@ function plugin_getmenuitems_forum()
 
 
 function plugin_autotags_forum($op,$content='',$autotag='') {
-    global $_CONF, $LANG_GF00;
+    global $_CONF, $LANG_GF00, $LANG_GF01;
 
     if ($op == 'tagname') {
         return 'forum';
