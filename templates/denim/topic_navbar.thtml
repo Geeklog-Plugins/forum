@@ -1,37 +1,38 @@
 {# begin {templatelocation} #}
 
-<div itemscope itemtype="http://schema.org/BreadcrumbList">
-	<ul class="uk-breadcrumb">
-		<li><i class="uk-icon-folder-open-o"></i></li>
-		<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-			<a itemprop="item" href="{site_url}/forum/index.php">
-				<span itemprop="name">{forum_home}</span>
-			</a>
-			<meta itemprop="position" content="1" />
-		</li>
-		<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-			<a itemprop="item" href="{site_url}/forum/index.php?category={category_id}">
-				<span itemprop="name">{cat_name}</span>
-			</a>
-			<meta itemprop="position" content="2" />
-		</li>
-		<li class="uk-active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-			<a itemprop="item" href="{site_url}/forum/index.php?forum={forum_id}">
-				<span itemprop="name">{forum_name}</span>
-			</a>
-			<meta itemprop="position" content="3" />
-		</li>
-	</ul>
+<div class="uk-margin-large-top">
+	<div itemscope itemtype="http://schema.org/BreadcrumbList">
+		<ul class="uk-breadcrumb">
+			<li><i class="uk-icon-folder-o"></i></li>
+			<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+				<a itemprop="item" href="{site_url}/forum/index.php">
+					<span itemprop="name">{forum_home}</span>
+				</a>
+				<meta itemprop="position" content="1" />
+			</li>
+			<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+				<a itemprop="item" href="{site_url}/forum/index.php?category={category_id}">
+					<span itemprop="name">{cat_name}</span>
+				</a>
+				<meta itemprop="position" content="2" />
+			</li>
+			<li class="uk-active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
+				<a itemprop="item" href="{site_url}/forum/index.php?forum={forum_id}">
+					<span itemprop="name">{forum_name}</span>
+				</a>
+				<meta itemprop="position" content="3" />
+			</li>
+		</ul>
+	</div>	
 </div>	
 
-<div class="uk-grid uk-grid-small uk-margin-small-left">
-	<div class="uk-width-1-1">
-		<i class="uk-icon-file-text-o"></i> <b><a href="viewtopic.php?showtopic={topic_id}">
+<div class="uk-grid uk-grid-small">
+	<div class="uk-width-1-1 uk-text-large">
+		<i class="uk-icon-comments-o"></i> <a href="viewtopic.php?showtopic={topic_id}">
 			<span>{subject}</span>
-		</a></b>
+		</a>
 	</div>
 </div>
-
 
 <div class="uk-grid uk-grid-small">
 	<div class="uk-width-1-1 uk-text-right">

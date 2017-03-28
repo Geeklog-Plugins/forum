@@ -1,6 +1,6 @@
 {# begin {templatelocation} #}
 
-<div class="uk-panel uk-panel-box uk-margin">
+<div class="uk-panel uk-panel-box uk-margin uk-margin-large-top">
 	{forum_time}
 	<hr{xhtml}>
 	<div class="uk-grid">

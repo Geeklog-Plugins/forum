@@ -18,10 +18,10 @@
 }
 .quotemain {
   background:#FAFCFE url('../../image_set/img_quote.png') no-repeat top right;
-  border: 1px dotted #000;
-  border-left: 4px solid #8394B2;
+/*  border: 1px dotted #000; */
+  border-left: 5px solid #8394B2;
   color:#465584;
-  padding: 4px;
+  padding: 15px;
   margin: 5px auto 8px auto;
 }
 
@@ -32,15 +32,103 @@ div .css { height:300px; overflow:auto; width:auto; min-height:100px; }
 
 /* using same styling as uk-link-muted but with custom class since links do not show up well in uikit panels which is used for forum posts */
 .gl-forum-post-link a {
-    color: #444;
-    font-weight: bold;
+  color: #444;
+  font-weight: bold;
+}
+.glforum-post-link a {
+  color: #444;
+  font-weight: bold;
 }
 
 /* Remove Topic iframe preview background if one set (which is the background of the main website) */
 .glforum-preview-html, 
 .glforum-preview-body {
-    background-image: none;
-    background: none;
+  background-image: none;
+  background: none;
+}
+
+
+.glforum-record {
+  position: relative;
+  min-height: 60px;
+  width: 100%;
+}
+.glforum-folderimg {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.glforum-category-name {
+  position: absolute;
+  top: 0px;
+  left: 30px;
+}
+.glforum-category-desc {
+  color: #444;
+}
+
+
+.glforum-topic-record {
+  position: relative;
+  min-height: 40px;
+  width: 100%;
+}
+.glforum-topic-name {
+  position: absolute;
+  top: 0px;
+  left: 30px;
+}
+
+.glforum-panel-topic {
+  padding: 15px;
+  background-color: #FFF;
+}
+
+.glforum-panel-userinfo {
+  padding: 15px;
+}
+.glforum-panel-link {
+  padding: 5px 15px;
+}
+
+/* Horizontal divider */
+.glforum-grid-divider > [class*='uk-width-1-']:not(.uk-width-1-1):nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-2-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-3-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-4-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-5-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-6-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-7-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-8-']:nth-child(n+2),
+.glforum-grid-divider > [class*='uk-width-9-']:nth-child(n+2) {
+  border-left: 1px solid #ddd;
+}
+/* Tablet and bigger */
+@media (min-width: 768px) {
+  .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-medium-1-1):nth-child(n+2) {
+    border-left: 1px solid #ddd;
+  }
+}
+/* Desktop and bigger */
+@media (min-width: 960px) {
+  .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-large-1-1):nth-child(n+2) {
+    border-left: 1px solid #ddd;
+  }
+}
+
+.glforum-table th,
+.glforum-table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.glforum-icon {
+  box-sizing: border-box;
+  padding: 0 !important;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  font-size: 14px;
+  line-height: 20px;
 }
 
 /* END of Forum Plugin CSS */
