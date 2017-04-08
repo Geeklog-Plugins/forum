@@ -369,16 +369,17 @@ function geshi_formatted($str,$type='PHP') {
     //$geshi->enable_strict_mode(true);
     //$geshi->enable_classes();
     $geshi->enable_line_numbers(GESHI_NO_LINE_NUMBERS, 5);
-    $geshi->set_overall_style('font-size: 12px; color: #000066; border: 1px solid #d0d0d0; background-color: #FAFAFA;', true);
-    // Note the use of set_code_style to revert colours...
-    $geshi->set_line_style('font: normal normal 95% \'Courier New\', Courier, monospace; color: #003030;', 'font-weight: bold; color: #006060;', true);
-    $geshi->set_code_style('color: #000020;', 'color: #000020;');
-    $geshi->set_line_style('background: red;', true);
-    $geshi->set_link_styles(GESHI_LINK, 'color: #000060;');
-    $geshi->set_link_styles(GESHI_HOVER, 'background-color: #f0f000;');
+    $geshi->set_overall_class('glforum-code');
+    //$geshi->set_overall_style('font-size: 12px; color: #000066; border: 1px solid #d0d0d0; background-color: #FAFAFA;', true);
+    //// Note the use of set_code_style to revert colours...
+    //$geshi->set_line_style('font: normal normal 95% \'Courier New\', Courier, monospace; color: #003030;', 'font-weight: bold; color: #006060;', true);
+    //$geshi->set_code_style('color: #000020;', 'color: #000020;');
+    //$geshi->set_line_style('background: red;', true);
+    //$geshi->set_link_styles(GESHI_LINK, 'color: #000060;');
+    //$geshi->set_link_styles(GESHI_HOVER, 'background-color: #f0f000;');
 
     $geshi->set_header_content("$type Formatted Code");
-    $geshi->set_header_content_style('font-family: Verdana, Arial, sans-serif; color: #808080; font-size: 90%; font-weight: bold; background-color: #f0f0ff; border-bottom: 1px solid #d0d0d0; padding: 2px;');
+    //$geshi->set_header_content_style('font-family: Verdana, Arial, sans-serif; color: #808080; font-size: 90%; font-weight: bold; background-color: #f0f0ff; border-bottom: 1px solid #d0d0d0; padding: 2px;');
 
     return $geshi->parse_code();
 }

@@ -2,9 +2,9 @@
 
 <div class="uk-margin-large">
 
-	<div class="uk-grid">
-		{#
-	  	<div class="uk-width-1-2">
+	<div class="uk-panel uk-margin-bottom">
+		
+	  	<div class="uk-float-left">
 			<div itemscope itemtype="http://schema.org/BreadcrumbList">
 				<ul class="uk-breadcrumb uk-margin-small">
 					<li><i class="uk-icon-folder-o"></i></li>
@@ -21,20 +21,21 @@
 						<meta itemprop="position" content="2" />
 					</li>
 				</ul>
-			</div>			
+			</div>
 	    </div>
-		#}
-
-	  	<div class="uk-width-1-2 uk-text-large">
+		
+	  	{#
+	  	<div class="uk-float-left uk-text-large">
 			<i class="uk-icon-folder-o"></i> <a href="{site_url}/forum/index.php?category={category_id}">
 				<span>{cat_name}</span>
 			</a>
 	    </div>
+	    #}
 
-	  	<div class="uk-width-1-2 uk-text-right">
+	  	<div class="uk-float-right uk-text-right">
 			{categorymenu_link}
 			{# Buttons instead of Menu - Remove comments to enable (plus remove categorymenu_link template variable) and change related links in forum_links.html #}
-			{# 
+			{#
 			{newposts_link}
 			{markread_link}
 			#}
@@ -83,9 +84,11 @@
 		{posts}
 	</td>
 	<td>
-		<div><a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}">{lastpostmsgTopic}</a></div>
-		<div>{lastpostmsgDate}</div>
-		<div>{lastpostmsgBy} {moderator}</div>
+		<div class="glforum-lastpost">
+			<div><a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}">{lastpostmsgTopic}</a></div>
+			<div>{lastpostmsgDate}</div>
+			<div>{lastpostmsgBy} {moderator}</div>
+		</div>
 	</td>
 </tr>
 <!-- END forum_record -->

@@ -1,10 +1,15 @@
+.forum-userphoto {
+  margin: 0;
+  max-width: 120px;
+}
+
 /* Override theme's userphoto class */
 .forum-userphoto img {
-  margin: 0;	
+  margin: 0;
 }
 
 /* Forum Plugin specific CSS */
-.codeblock  {
+.codeblock {
   background-color:#ECE9D8;
   color:#000;
   width: 550px;
@@ -16,79 +21,124 @@
   padding:5px;
   border: 1px dashed black;
 }
+
 .quotemain {
   background:#FAFCFE url('../../image_set/img_quote.png') no-repeat top right;
-/*  border: 1px dotted #000; */
+  border: 1px dotted #8394b2;
   border-left: 5px solid #8394B2;
   color:#465584;
   padding: 15px;
   margin: 5px auto 8px auto;
 }
 
-/* CSS Declarations for Code block feature - default will use the .php one */
-div .php { max-height:400px; overflow:auto; height:auto; width:auto; min-height:100px; }
-div .html { height:300px; overflow:auto; width:auto; min-height:100px; }
-div .css { height:300px; overflow:auto; width:auto; min-height:100px; }
+/* CSS Declarations for Code block feature */
+.glforum-code {
+  overflow: auto;
+  height: auto;
+  width: auto;
+  max-height: 600px;
+  min-height: 100px;
+  font-size: 13px;
+  color: #000066;
+  border: 1px solid #d0d0d0;
+  background-color: #FAFAFA;
+  padding: 10px;
+}
+
+.glforum-code > div:first-child {
+  font-family: Verdana, Arial, sans-serif; color: #808080;
+  font-size: 90%;
+  font-weight: bold;
+  background-color: #f0f0ff;
+  border-bottom: 1px solid #d0d0d0;
+  padding: 2px 10px;
+  margin: -10px -10px 10px;
+}
 
 /* using same styling as uk-link-muted but with custom class since links do not show up well in uikit panels which is used for forum posts */
-.gl-forum-post-link a {
-  color: #444;
-  font-weight: bold;
-}
 .glforum-post-link a {
   color: #444;
   font-weight: bold;
 }
 
 /* Remove Topic iframe preview background if one set (which is the background of the main website) */
-.glforum-preview-html, 
+.glforum-preview-html,
 .glforum-preview-body {
   background-image: none;
   background: none;
 }
-
 
 .glforum-record {
   position: relative;
   min-height: 60px;
   width: 100%;
 }
+
 .glforum-folderimg {
   position: absolute;
   top: 0;
   left: 0;
 }
+
 .glforum-category-name {
-  position: absolute;
-  top: 0px;
-  left: 30px;
+  float: left;
+  padding-left: 28px;
 }
+
 .glforum-category-desc {
   color: #444;
 }
 
+.glforum-lastpost {
+  font-size: 12px;
+}
 
 .glforum-topic-record {
   position: relative;
   min-height: 40px;
   width: 100%;
 }
+
 .glforum-topic-name {
-  position: absolute;
-  top: 0px;
-  left: 30px;
+  float: left;
+  padding-left: 28px;
+}
+
+.glforum-topic-lastpost {
+  font-size: 12px;
+}
+
+.glforum-panel-topic-container1 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background-color: #F5F5F5 !important;
+}
+
+.glforum-panel-topic-container2 {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background-color: #FFF !important;
 }
 
 .glforum-panel-topic {
   padding: 15px;
-  background-color: #FFF;
+  background-color: #FFF !important;
+}
+
+.glforum-panel-topic-container1 .glforum-panel-topic {
+  background-color: #F5F5F5 !important;
+}
+
+.glforum-panel-topic-container2 .glforum-panel-topic {
+  background-color: #FFF !important;
 }
 
 .glforum-panel-userinfo {
   padding: 15px;
 }
+
 .glforum-panel-link {
-  padding: 5px 15px;
+  padding-top: 5px;
 }
 
 /* Horizontal divider */
@@ -103,12 +153,14 @@ div .css { height:300px; overflow:auto; width:auto; min-height:100px; }
 .glforum-grid-divider > [class*='uk-width-9-']:nth-child(n+2) {
   border-left: 1px solid #ddd;
 }
+
 /* Tablet and bigger */
 @media (min-width: 768px) {
   .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-medium-1-1):nth-child(n+2) {
     border-left: 1px solid #ddd;
   }
 }
+
 /* Desktop and bigger */
 @media (min-width: 960px) {
   .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-large-1-1):nth-child(n+2) {
@@ -131,4 +183,53 @@ div .css { height:300px; overflow:auto; width:auto; min-height:100px; }
   line-height: 20px;
 }
 
+.glforum-hr-none {
+  margin: 0 auto;
+  border: none;
+  display: hidden;
+}
+
+.glforum-userinfo-mood {
+  margin-top: 5px;
+}
+
+/* Phone landscape and smaller */
+@media (max-width: 767px) {
+  .glforum-userinfo-thumbnail {
+    float: left;
+    width: 80px;
+    margin-right: 10px;
+  }
+
+  .glforum-userinfo-name {
+    text-align: left !important;
+    float: left;
+    margin-left: 5px;
+  }
+
+  .glforum-panel-userinfo {
+  }
+
+  .glforum-userinfo-badge,
+  .glforum-userinfo-level,
+  .glforum-userinfo-levelname,
+  .glforum-userinfo-regdate,
+  .glforum-userinfo-numposts,
+  .glforum-userinfo-location,
+  .glforum-userinfo-ip {
+    display: inline;
+    margin-right: 5px;
+  }
+
+  .glforum-userinfo-mood {
+    float: left;
+    margin-left: 5px;
+    text-align: left;
+  }
+
+  .glforum-br:before {
+    content: "\A";
+    white-space: pre;
+  }
+}
 /* END of Forum Plugin CSS */

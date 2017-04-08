@@ -2,8 +2,8 @@
 
 <div class="uk-margin-large">
 
-	<div class="uk-grid">
-	  	<div class="uk-width-1-2">
+	<div class="uk-panel">
+	  	<div class="uk-float-left uk-margin-bottom">
 			<ul class="uk-breadcrumb uk-margin-small" itemscope itemtype="http://schema.org/BreadcrumbList">
 				<li><i class="uk-icon-folder-o"></i></li>
 				<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
@@ -25,7 +25,7 @@
 				</li>
 			</ul>
 		</div>
-		<div class="uk-width-1-2 uk-text-right">
+		<div class="uk-float-right uk-text-right uk-margin-bottom">
 			{forummenu_link}
 			{newtopic_link}
 		</div>
@@ -33,12 +33,12 @@
 
 	{# Buttons instead of Menu - Remove comments to enable (plus remove forummenu_link template variable) and change related links in forum_links.html #}
 	{# 
-	<div class="uk-grid uk-grid-small">
+	<div class="uk-grid uk-grid-small uk-margin-bottom">
 		<div class="uk-width-1-1 uk-text-right">
 			{subscribeforum_link}
 		</div>
 	</div>
-	 #}
+	#}
 
 	{pagenavigation}
 
@@ -59,10 +59,8 @@
 
 	{pagenavigation}
 
-	<div class="uk-grid uk-grid-small">
-		<div class="uk-width-1-1 uk-text-right">
-			{newtopic_link}
-		</div>
+	<div class="uk-text-right">
+		{newtopic_link}
 	</div>
 
 </div>
@@ -84,8 +82,10 @@
     	{replies}
 	</td>
     <td>
-    	<a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" data-uk-tooltip title="{LANG_lastpost}">{LANG_BY}{lastposter}<br{xhtml}>
-    	{lastdate}</a>
+    	<div class="glforum-topic-lastpost">
+	    	<a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" data-uk-tooltip title="{LANG_lastpost}">{LANG_BY}{lastposter}<br{xhtml}>
+	    	{lastdate}</a>
+	    </div>
     </td>
 </tr>
 <!-- END topic_record -->
