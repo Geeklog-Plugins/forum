@@ -24,7 +24,7 @@
 <tr class="pluginRow{csscode}">
     <td style="vertical-align:top; padding:6px; word-wrap: break-word;">
     	{user_information}
-        <div style="background:transparent; width:140px; height:1px;"></div>    {# Create a cell with a specified width #}    
+        <div style="background:transparent; width:140px; height:1px;"></div>    {# Create a cell with a specified width #}
     </td>
     <td style="vertical-align:top; padding:6px; width:100%;" class="pluginRow{csscode}">
             <div style="{comment_minheight};">
@@ -36,7 +36,7 @@
 </tr>
 <tr class="pluginRow{csscode}" style="display:{preview_mode};">
     <td style="height:30px;">&nbsp;</td>
-    <td style="padding-left:6px; padding-right:6px;"> 
+    <td style="padding-left:6px; padding-right:6px;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
                 <td style="white-space:nowrap;">
@@ -79,7 +79,7 @@
                     {!if avatar}
                     <div style="padding-top:3px;">{avatar}<br{xhtml}>{user_status}</div>
                     {!else}
-                    {user_status}
+                    <div style="padding-top:3px;max-width:120px"><img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto" style="width:100%;"{xhtml}><br{xhtml}>{user_status}</div>
                     {!endif}
                     {member_badge}<br{xhtml}>
                     {regdate}<br{xhtml}>
@@ -90,12 +90,14 @@
 <!-- END block_user_information -->
 
 <!-- BEGIN block_anon_user_name -->
-{$LANG_GF01[ANON]} {userlink}
+{$LANG_GF01[ANON]}: {userlink}
 <!-- END block_anon_user_name -->
 
 <!-- BEGIN block_anon_user_information -->
         <div>
                     {mood_icon}
+                    <div style="padding-top:3px;max-width:130px"><img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto" style="width:100%;"{xhtml}></div>
+                    {!if ip_address}<div style="text-align: center">{ip_address}{!endif}
         </div>
 <!-- END block_anon_user_information -->
 
@@ -104,11 +106,11 @@
 <!-- END location -->
 
 <!-- BEGIN ip_address -->
-{ip}       
+{ip}
 <!-- END ip_address -->
 
 <!-- BEGIN anon_ip_address -->
-{ip}       
+{ip}
 <!-- END anon_ip_address -->
 
 <!-- BEGIN mod_functions -->
@@ -116,7 +118,7 @@
 <div>
 	{mod_functions}
 </div>
-</form>        
+</form>
 <!-- END mod_functions -->
 
 <!-- BEGIN user_signature -->
@@ -124,7 +126,7 @@
 	<hr class=""size="1" style="width: 95%; color:black; text-align:left; margin-left:0; margin-bottom:0.5em; padding:0;" noshade{xhtml}>
 	<b>{sig}</b><br{xhtml}>
 	{remote_ip}
-</div>		
+</div>
 <!-- END user_signature -->
 
 {# end {templatelocation} #}

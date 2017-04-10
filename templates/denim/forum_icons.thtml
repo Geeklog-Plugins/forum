@@ -1,39 +1,39 @@
 {# begin {templatelocation} - List of icons used by the forum #}
 
 <!-- BEGIN new_icon -->
-<i class="uk-icon-file-o uk-badge uk-badge-notification"></i>
+<i class="uk-icon-file-o uk-badge glforum-icon"></i>
 <!-- END new_icon -->
 
 <!-- BEGIN quiet_icon -->
-<i class="uk-icon-building-o uk-badge uk-badge-notification"></i>
+<i class="uk-icon-building-o uk-badge glforum-icon"></i>
 <!-- END quiet_icon -->
 
 <!-- BEGIN active_icon -->
-<i class="uk-icon-building-o uk-badge uk-badge-notification uk-badge-warning"></i>
+<i class="uk-icon-building-o uk-badge glforum-icon uk-badge-warning"></i>
 <!-- END active_icon -->
 
 <!-- BEGIN normal_icon -->
-<i class="uk-icon-file-text-o uk-badge uk-badge-notification"></i>
+<i class="uk-icon-file-text-o uk-badge glforum-icon"></i>
 <!-- END normal_icon -->
 
 <!-- BEGIN normalnew_icon -->
-<i class="uk-icon-file-text-o uk-badge uk-badge-notification uk-badge-warning"></i>
+<i class="uk-icon-file-text-o uk-badge glforum-icon uk-badge-warning"></i>
 <!-- END normalnew_icon -->
 
 <!-- BEGIN sticky_icon -->
-<i class="uk-icon-thumb-tack uk-badge uk-badge-notification"></i>
+<i class="uk-icon-thumb-tack uk-badge glforum-icon"></i>
 <!-- END sticky_icon -->
 
 <!-- BEGIN stickynew_icon -->
-<i class="uk-icon-thumb-tack uk-badge uk-badge-notification uk-badge-warning"></i>
+<i class="uk-icon-thumb-tack uk-badge glforum-icon uk-badge-warning"></i>
 <!-- END stickynew_icon -->
 
 <!-- BEGIN locked_icon -->
-<i class="uk-icon-lock uk-badge uk-badge-notification"></i>
+<i class="uk-icon-lock uk-badge glforum-icon"></i>
 <!-- END locked_icon -->
 
 <!-- BEGIN lockednew_icon -->
-<i class="uk-icon-lock uk-badge uk-badge-notification uk-badge-warning"></i>
+<i class="uk-icon-lock uk-badge glforum-icon uk-badge-warning"></i>
 <!-- END lockednew_icon -->
 
 <!-- BEGIN status_yes -->

@@ -17,6 +17,8 @@ function forum_css_denim()
 {
     global $_CONF, $LANG_DIRECTION;
 
+    return array();
+
     $direction = ($LANG_DIRECTION == 'rtl') ? '_rtl' : '';
 
     return array(
@@ -47,6 +49,8 @@ function forum_css_denim()
  */
 function forum_js_libs_denim()
 {
+    return array();
+
     return array(
        array(
             'library' => 'jquery',
@@ -61,6 +65,8 @@ function forum_js_libs_denim()
 function forum_js_files_denim()
 {
     global $_CONF;
+
+    return array();
 
     return array(
 

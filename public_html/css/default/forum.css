@@ -95,10 +95,27 @@ a.postbutton:hover {
   -webkit-box-shadow: 0px 0px 2px #888;
 }
 
-/* CSS Declarations for Code block feature - default will use the .php one */
-div .php { max-height:400px; overflow:auto; height:auto; width:auto; min-height:100px; }
-div .html { height:300px; overflow:auto; width:auto; min-height:100px; }
-div .css { height:300px; overflow:auto; width:auto; min-height:100px; }
+/* CSS Declarations for Code block feature */
+.glforum-code {
+  overflow: auto;
+  height: auto;
+  width: auto;
+  max-height: 600px;
+  min-height: 100px;
+  font-size: 12px;
+  color: #000066;
+  border: 1px solid #d0d0d0;
+  background-color: #FAFAFA;
+}
+
+.glforum-code > div:first-child {
+  font-family: Verdana, Arial, sans-serif; color: #808080;
+  font-size: 90%;
+  font-weight: bold;
+  background-color: #f0f0ff;
+  border-bottom: 1px solid #d0d0d0;
+  padding: 2px;
+}
 
 /* CSS Declarations for reCAPTCHA Plugin */
 div.gl-recaptcha_forum { float:right; margin-right:10px; }
