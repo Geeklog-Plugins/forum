@@ -67,7 +67,7 @@
 						{!if regdate}<div class="glforum-userinfo-regdate glforum-br">{regdate}</div>{!endif}
 						{!if numposts}<div class="glforum-userinfo-numposts">{numposts}</div>{!endif}
 						{!if location}<div class="glforum-userinfo-location">{location}</div>{!endif}
-						{!if ip_address}<div class="glforum-userinfo-ip">{ip_address}</div>{!endif}
+						{!if ip_address}<div class="glforum-userinfo-ip glforum-br">{ip_address}</div>{!endif}
 					</div>
 				</div>
                 {!if mood_icon}
@@ -97,7 +97,7 @@
 					{user_name}
 					<div class="uk-text-muted uk-text-small">
 						<div class="glforum-userinfo-badge"><div class="uk-badge">{$LANG_GF01[ANON]}</div></div>
-						{!if ip_address}{ip_address}{!endif}
+						{!if ip_address}<div class="glforum-userinfo-ip glforum-br">{ip_address}</div>{!endif}
 					</div>
 				</div>
                 {!if mood_icon}
@@ -110,7 +110,7 @@
 <!-- END block_anon_user_information -->
 
 <!-- BEGIN location -->
-{$LANG_GF04[label_location]}:{user_location}<br{xhtml}>
+{$LANG_GF04[label_location]}:{user_location}
 <!-- END location -->
 
 <!-- BEGIN ip_address -->
