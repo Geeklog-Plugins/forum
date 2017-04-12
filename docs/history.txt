@@ -1,6 +1,6 @@
 Geeklog Forum Plugin History/Changes:
 
-March ??, 2017 (2.9.2)
+April 12, 2017 (2.9.2)
 ------------
 For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/2?closed=1
 
