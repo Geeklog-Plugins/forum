@@ -110,7 +110,7 @@ class ForumSmilies {
                 if (isset($LANG_GF_SMILIES[$key])) {
                     $alt = htmlentities($LANG_GF_SMILIES[$key], ENT_QUOTES);
                 }
-                $retval .= "    <a href=\"javascript:emoticon('$symbol')\">\n";
+                $retval .= "    <a href=\"#\" onclick=\"emoticon('$symbol');return false;\">\n";
                 $retval .= "        <img class='frm_sml $class'\n";
                 $retval .= "             src='$image'\n";
                 $retval .= "             alt='$alt'\n";
