@@ -6,7 +6,7 @@
         <td class="alignleft" style="width:100%; white-space:nowrap;">&nbsp;<a href="{site_url}/forum/index.php">{forum_home}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?forum={forum_id}">{forum_name}</a></td>
     </tr>
     <tr>
-        <td colspan="2" style="padding-bottom:5px;">{navtopicimg}&nbsp;<b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b></td>
+        <td colspan="2" style="padding-bottom:5px;">{navtopicimg}{!if topic_id}&nbsp;<b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b>{!endif}</td>
     </tr>
 </table>
 

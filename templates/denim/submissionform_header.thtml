@@ -9,7 +9,7 @@
 
 <div class="uk-grid uk-grid-small uk-margin-small-left">
 	<div class="uk-width-1-1">
-  		<i class="uk-icon-file-text-o"></i> <b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b>
+  		<i class="uk-icon-file-text-o"></i>{!if topic_id} <b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b>{!endif}
   	</div>
 </div>
 
