@@ -227,12 +227,16 @@ function plugin_user_delete_forum ($uid)
     DB_query("UPDATE {$_TABLES['forum_topic']} SET uid = 1 WHERE uid = '$uid'");
 }
 
-function plugin_profileextrassave_forum()
+function plugin_profileextrassave_forum($uid = '')
 {
     global $_CONF,$_USER, $HTTP_POST_VARS, $_TABLES, $CONF_FORUM;
 
     require_once $CONF_FORUM['path_include'] . 'gf_format.php';
-    $uid = $_USER['uid'];
+    
+    if (empty($uid)) {
+        $uid = $_USER['uid'];
+    }
+    
     if ($uid > 1) {
         $aim        = gf_preparefordb($_POST['forum_aim'],'html');
         $icq        = gf_preparefordb($_POST['forum_icq'],'html');
@@ -789,6 +793,13 @@ function plugin_upgrade_forum() {
             case "2.9.1" :
 
                 $current_version = "2.9.2";
+                
+                break;
+                
+            case "2.9.2" :
+                if (upgrade_293() != 0) break 2;
+
+                $current_version = "2.9.3";
                 
                 break;                
 
