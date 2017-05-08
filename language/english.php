@@ -300,7 +300,7 @@ $LANG_GF02['msg147']   = 'Forum [printable version of topic %s]';
 $LANG_GF02['msg148']   = 'Click <a href="javascript:history.back()">HERE</a> to return';
 $LANG_GF02['msg149']   = 'Forum post canceled.';
 $LANG_GF02['msg155']   = 'No user posts.';
-$LANG_GF02['msg156']   = 'Total number of forum posts';
+$LANG_GF02['msg156']   = 'Total number of forum posts:';
 $LANG_GF02['msg157']   = 'Last %s Forum Posts';
 $LANG_GF02['msg158']   = 'Last %s Forum Posts by %s';
 $LANG_GF02['msg159']   = 'Are you sure you want to DELETE these selected Moderator records?';
