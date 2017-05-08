@@ -236,7 +236,7 @@ function plugin_profileextrassave_forum($uid = '')
     if (empty($uid)) {
         $uid = $_USER['uid'];
     }
-    
+
     if ($uid > 1) {
         $aim        = gf_preparefordb($_POST['forum_aim'],'html');
         $icq        = gf_preparefordb($_POST['forum_icq'],'html');
@@ -252,32 +252,77 @@ function plugin_profileextrassave_forum($uid = '')
 
 function plugin_profilevariablesedit_forum($uid, &$template)
 {
-    global $_TABLES, $LANG_GF04;
+    global $_TABLES, $LANG_GF04, $CONF_FORUM;
 
-    $result = DB_query ("SELECT uid,aim,yim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
+    $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
     $A = DB_fetchArray ($result);
-    $template->set_var('forum_aim', $A['aim']);
-    $template->set_var('forum_icq', $A['icq']);
-    $template->set_var('forum_yim', $A['yim']);
-    $template->set_var('forum_msnm', $A['msnm']);
-    $template->set_var('forum_interests', $A['interests']);
-    $template->set_var('forum_occupation', $A['occupation']);
-
-    $template->set_var ('lang_forum', $LANG_GF04['label_forum']);
-    $template->set_var ('lang_aim', $LANG_GF04['label_aim']);
-    $template->set_var ('lang_icq', $LANG_GF04['label_icq']);
-    $template->set_var ('lang_yim', $LANG_GF04['label_yim']);
-    $template->set_var ('lang_msnm', $LANG_GF04['label_msnm']);
-    $template->set_var ('lang_interests', $LANG_GF04['label_interests']);
-    $template->set_var ('lang_occupation', $LANG_GF04['label_occupation']);
+    
+    if ($CONF_FORUM['profile']['aim']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_aim']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['aim']);
+        $template->set_var('fieldname', 'forum_aim');
+        $template->set_var('fieldmaxlength', '128');
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['icq']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_icq']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['icq']);
+        $template->set_var('fieldname', 'forum_icq');
+        $template->set_var('fieldmaxlength', '128');
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['yim']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_yim']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['yim']);
+        $template->set_var('fieldname', 'forum_yim');
+        $template->set_var('fieldmaxlength', '128');
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['msnm']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_msnm']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['msnm']);
+        $template->set_var('fieldname', 'forum_msnm');
+        $template->set_var('fieldmaxlength', '128');
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['interests']) {    
+        $template->set_var ('lang_field', $LANG_GF04['label_interests']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['interests']);
+        $template->set_var('fieldname', 'forum_interests');
+        $template->set_var('fieldmaxlength', '255');
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['occupation']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_occupation']);
+        $template->set_var ('lang_field_text', '');
+        $template->set_var('field', $A['occupation']);
+        $template->set_var('fieldname', 'forum_occupation');
+        $template->set_var('fieldmaxlength', '255');
+        $template->parse('display_fields', 'display_field', true);
+    }
 }
 
 function plugin_profilevariablesdisplay_forum ($uid, &$template)
 {
-
-    global $_TABLES, $_CONF, $LANG_GF02, $LANG_GF04;
+    global $_TABLES, $_CONF, $LANG_GF02, $LANG_GF04, $CONF_FORUM;
+    
     $postlimit = "10";        // How many posts you want displayed
-
+    
+    $username = DB_getItem ($_TABLES['users'], 'username', "uid = $uid");
+    $title = sprintf($LANG_GF02['msg158'], $postlimit, $username);
+    $template->set_var ('start_block_last10', COM_startBlock($title));
+    $template->set_var('end_block', COM_endBlock());
+    
     $query = DB_query ("SELECT id,date,forum,subject FROM {$_TABLES['forum_topic']} WHERE uid = {$uid} ORDER BY date DESC LIMIT 100");
     $numposts = 0;
 
@@ -289,14 +334,20 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
             $postdate = COM_getUserDateTimeFormat ($date);
             $template->set_var ('row_number', $numposts . '.');
             $articleUrl = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $postid;
-            $template->set_var('story_title',
+            $template->set_var('item_title',
                 COM_createLink(
                     stripslashes($subject),
                     $articleUrl,
                     array('class'=>'b'))
             );
-            $template->set_var ('story_date', $postdate[0]);
-            $template->parse ('forum_post_row', 'strow', true);
+            $template->set_var ('item_date', $postdate[0]);
+            
+            if ($numposts == 1) {
+                $template->parse('last10_rows', 'last10_row');
+            } else {
+                $template->parse('last10_rows', 'last10_row', true);
+            }            
+            
             if ($numposts >= $postlimit) {
                 break;
             }
@@ -304,36 +355,54 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
     }
 
     if ($numposts == 0) {
-        $template->set_var ('forum_post_row', '<tr><td>' .$LANG_GF02['msg155']. '</td></tr>');
+        $template->set_var('last10_rows', $LANG_GF02['msg155']);
     }
+    $template->parse('last10_blocks', 'last10_block', true);
 
     $count = DB_count ($_TABLES['forum_topic'], 'uid', $uid);
-    $template->set_var ('forum_lang_number_posts', $LANG_GF02['msg156']);
-    $template->set_var ('forum_number_posts', $count);
-    
-    $username = DB_getItem ($_TABLES['users'], 'username', "uid = $uid");
-    $title = sprintf($LANG_GF02['msg158'], $postlimit, $username);
-    $template->set_var ('forum_start_block_last10posts', COM_startBlock
-        ($title));    
-    $template->set_var ('forum_headline_last10posts', $LANG_GF02['msg157']);
+    $template->set_var ('lang_number_field', $LANG_GF02['msg156']);
+    $template->set_var ('number_field', $count);
+    $template->parse('field_statistics', 'field_statistic', true);   
 
     /* Display Instant Messaging Handles */
-    $result = DB_query ("SELECT uid,aim,yim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
+    $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
     $A = DB_fetchArray ($result);
-    $template->set_var('forum_aim', $A['aim']);
-    $template->set_var('forum_icq', $A['icq']);
-    $template->set_var('forum_yim', $A['yim']);
-    $template->set_var('forum_msnm', $A['msnm']);
-    $template->set_var('forum_interests', $A['interests']);
-    $template->set_var('forum_occupation', $A['occupation']);
-
-    $template->set_var ('lang_forum', $LANG_GF04['label_forum']);
-    $template->set_var ('lang_aim', $LANG_GF04['label_aim']);
-    $template->set_var ('lang_icq', $LANG_GF04['label_icq']);
-    $template->set_var ('lang_yim', $LANG_GF04['label_yim']);
-    $template->set_var ('lang_msnm', $LANG_GF04['label_msnm']);
-    $template->set_var ('lang_interests', $LANG_GF04['label_interests']);
-    $template->set_var ('lang_occupation', $LANG_GF04['label_occupation']);
+    
+    if ($CONF_FORUM['profile']['aim']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_aim']);
+        $template->set_var('field', $A['aim']);
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['icq']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_icq']);
+        $template->set_var('field', $A['icq']);
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['yim']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_yim']);
+        $template->set_var('field', $A['yim']);
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['msnm']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_msnm']);
+        $template->set_var('field', $A['msnm']);
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['interests']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_interests']);
+        $template->set_var('field', $A['interests']);
+        $template->parse('display_fields', 'display_field', true);
+    }
+    
+    if ($CONF_FORUM['profile']['occupation']) {
+        $template->set_var ('lang_field', $LANG_GF04['label_occupation']);
+        $template->set_var('field', $A['occupation']);
+        $template->parse('display_fields', 'display_field', true);
+    }
 }
 
 function plugin_statssummary_forum() {

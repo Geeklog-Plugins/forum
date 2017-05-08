@@ -134,4 +134,12 @@ if (function_exists('CUSTOM_MOBILE_is_cellular') && CUSTOM_MOBILE_is_cellular())
     $CONF_FORUM['sideblock_numposts']    = 5;
 }
 
+// What Forum User Profile Fields to Use and display
+$CONF_FORUM['profile']['interests'] = true;
+$CONF_FORUM['profile']['occupation'] = true;
+$CONF_FORUM['profile']['aim'] = false;
+$CONF_FORUM['profile']['yim'] = false;
+$CONF_FORUM['profile']['icq'] = false;
+$CONF_FORUM['profile']['yim'] = false;
+
 ?>
