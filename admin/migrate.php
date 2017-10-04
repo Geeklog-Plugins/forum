@@ -78,6 +78,12 @@ if ($migrate == $LANG_GF01['MIGRATE_NOW'] && $selforum != "select"
     
     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
     
+    // Remove new block and centerblock cached items
+    $cacheInstance = 'forum__newpostsblock_';
+    CACHE_remove_instance($cacheInstance);
+    $cacheInstance = 'forum__centerblock_';
+    CACHE_remove_instance($cacheInstance);
+    
     echo COM_refresh($_CONF['site_admin_url']
                      . "/plugins/forum/migrate.php?num_stories="
                      . $num_stories . "&num_posts=" . $num_posts);

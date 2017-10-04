@@ -206,6 +206,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 
             PLG_itemSaved($editid, 'forum');
             COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+            // Remove new block and centerblock cached items
+            $cacheInstance = 'forum__newpostsblock_';
+            CACHE_remove_instance($cacheInstance);
+            $cacheInstance = 'forum__centerblock_';
+            CACHE_remove_instance($cacheInstance);
 
             $link = $_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$topicparent&amp;page=$page#$editid";
             $display = COM_refresh($link);
@@ -300,7 +305,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-
+                    // Remove new block and centerblock cached items
+                    $cacheInstance = 'forum__newpostsblock_';
+                    CACHE_remove_instance($cacheInstance);
+                    $cacheInstance = 'forum__centerblock_';
+                    CACHE_remove_instance($cacheInstance);
+ 
                     // Update forums record
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, topic_count=topic_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 
@@ -398,7 +408,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-
+                    // Remove new block and centerblock cached items
+                    $cacheInstance = 'forum__newpostsblock_';
+                    CACHE_remove_instance($cacheInstance);
+                    $cacheInstance = 'forum__centerblock_';
+                    CACHE_remove_instance($cacheInstance);
+                    
                     DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies + 1, lastupdated = $date,last_reply_rec=$lastid WHERE id=$id");
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 

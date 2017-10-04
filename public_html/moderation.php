@@ -91,8 +91,9 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'");
             if ($top == 'yes') {
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
+                
                 PLG_itemDeleted($msgid, 'forum');
-                COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+                
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (pid='$msgid')");
 
                 DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE (id='$msgid')");
@@ -108,8 +109,9 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             } else {
                 DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies-1 WHERE id=$topicparent");
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
+                
                 PLG_itemDeleted($msgid, 'forum');
-                COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+               
                 DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count-1 WHERE forum_id=$forum");
                 // Get the post id for the last post in this topic
                 $query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE forum=$forum");
@@ -135,6 +137,13 @@ if (forum_modPermission($forum,$_USER['uid'])) {
 
             // Remove any lastviewed records in the log so that the new updated topic indicator will appear
             DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$topicparent'");
+            
+            COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+            // Remove new block and centerblock cached items
+            $cacheInstance = 'forum__newpostsblock_';
+            CACHE_remove_instance($cacheInstance);
+            $cacheInstance = 'forum__centerblock_';
+            CACHE_remove_instance($cacheInstance);
 
             if ($top == 'yes') {
                 $display = COM_refresh($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");
@@ -249,6 +258,11 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             }
             
             COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+            // Remove new block and centerblock cached items
+            $cacheInstance = 'forum__newpostsblock_';
+            CACHE_remove_instance($cacheInstance);
+            $cacheInstance = 'forum__centerblock_';
+            CACHE_remove_instance($cacheInstance);
             
             echo $display;
             exit();

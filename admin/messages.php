@@ -101,13 +101,25 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
     foreach ($chk_record_delete as $id) {
         $id = COM_applyFilter($id,true);
         DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+        
         PLG_itemDeleted($id, 'forum');
     }
     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+    // Remove new block and centerblock cached items
+    $cacheInstance = 'forum__newpostsblock_';
+    CACHE_remove_instance($cacheInstance);
+    $cacheInstance = 'forum__centerblock_';
+    CACHE_remove_instance($cacheInstance);    
 } elseif ($op == 'delrecord' AND SEC_checkToken()) {
     DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+    
     PLG_itemDeleted($id, 'forum');
     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+    // Remove new block and centerblock cached items
+    $cacheInstance = 'forum__newpostsblock_';
+    CACHE_remove_instance($cacheInstance);
+    $cacheInstance = 'forum__centerblock_';
+    CACHE_remove_instance($cacheInstance);    
 }
 
 // Page Navigation Logic
@@ -193,6 +205,10 @@ if ($forumname == '') {
 	$report->set_var('startblock', COM_startBlock(sprintf($LANG_GF95['header2'], $forumname)));
 }
 
+// Needs to be here before individual records created
+$report->set_var('gltoken_name', CSRF_TOKEN);
+$report->set_var('gltoken', SEC_createToken());
+
 if ($nrows > 0) {
     $numpages = ceil($nrows / $show);
     $offset = ($page - 1) * $show;
@@ -232,9 +248,6 @@ if ($nrows > 0) {
 	$report->set_var ('records_message', $LANG_GF95['nomess']);
 	$report->parse ('no_records_message', 'no_records_message');
 }  
-
-$report->set_var('gltoken_name', CSRF_TOKEN);
-$report->set_var('gltoken', SEC_createToken());
 
 $report->set_var('endblock', COM_endBlock());
 

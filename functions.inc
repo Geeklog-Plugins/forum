@@ -1073,7 +1073,7 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 }
 
 function phpblock_forum_newposts() {
-    global $_CONF, $_USER, $_TABLES, $LANG_GF01, $LANG_GF02, $CONF_FORUM;
+    global $_CONF, $_USER, $_TABLES, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER;
 
     $post_limit = $CONF_FORUM['sideblock_numposts'];
     if ($CONF_FORUM['installed_version'] < 2.6) {
@@ -1108,6 +1108,12 @@ function phpblock_forum_newposts() {
                     $orderby = 'date';
                 }
         }
+        
+        $cacheInstance = 'forum__newpostsblock_' . $orderby  . '_' . CACHE_security_hash() . '_' . $_USER['theme'];
+        $retval = CACHE_check_instance($cacheInstance);
+        if ($retval) {
+            return $retval;
+        }          
 
         $block = COM_newTemplate(CTL_plugin_templatePath('forum', 'blocks'));
         $block->set_file (array ('block'=>'latestpostsblock.thtml'));
@@ -1222,6 +1228,9 @@ function phpblock_forum_newposts() {
 
         $block->parse ('output', 'block');
         $retval = $block->finish($block->get_var('output'));
+        
+        CACHE_create_instance($cacheInstance, $retval);    
+        
         return $retval;
     } else {
         return;
@@ -1240,7 +1249,7 @@ function phpblock_forum_newposts() {
 function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 {
     global $_CONF, $_USER, $_TABLES, $LANG_GF01, $CONF_FORUM;
-    global $LANG_GF02, $mode, $order;
+    global $LANG_GF02, $mode, $order, $_USER;
 
     //$TIMER = new timerobject();
     //$TIMER->startTimer();
@@ -1256,9 +1265,14 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 
     $retval = '';
 
+    if (!$CONF_FORUM['show_centerblock']) {
+        return;
+    }    
+    
     $cb_enable = $CONF_FORUM['show_centerblock'];
     $cb_where  = $CONF_FORUM['centerblock_where'];
-
+    
+   
     // If enabled only for homepage and this is not page 1 or a topic page,
     // then set disable flag
     if ($CONF_FORUM['centerblock_homepage'] == 1 AND ($page > 1 OR !empty ($topic))) {
@@ -1286,10 +1300,16 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         return;
     }
 
+    $cacheInstance = 'forum__centerblock' . '_' . CACHE_security_hash() . '_' . $_USER['theme'];
+    $retval = CACHE_check_instance($cacheInstance);
+    if ($retval) {
+        return $retval;
+    }    
+    
     $block = COM_newTemplate(CTL_plugin_templatePath('forum', 'blocks'));
     $block->set_file (array ('block' => 'centerblock.thtml'));
             
-	$block->set_block('block', 'block_record');
+    $block->set_block('block', 'block_record');
         
     $block->set_var ('phpself', $_CONF['site_url'] .'/index.php');
     $block->set_var ('startblock', COM_startBlock($LANG_GF02['msg170']));
@@ -1378,7 +1398,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         $cssid = ($cssid == 1) ? 2 : 1;
 
         if ($f_tooltip) {
-        	$block->set_var('gl-tooltip', true); // Used to verify gl tooltip is being set
+            $block->set_var('gl-tooltip', true); // Used to verify gl tooltip is being set
             $lastpostlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}&amp;lastpost=true#{$lastid}";
             $block->set_var ('tooltip_date', COM_getTooltip($lastdate, $lastpostinfo, $lastpostlink));
             $topiclink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
@@ -1410,6 +1430,8 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 
     //$exectime = $TIMER->stopTimer();
     //COM_errorLog("Centerblock Execution Time: $exectime seconds");
+    
+    CACHE_create_instance($cacheInstance, $retval);
 
     return $retval;
 }
@@ -2032,6 +2054,7 @@ function plugin_itemdeleted_forum($id, $type)
         }
         // Note: All topics could get deleted from array which would mean the block would not display untill user adds more in config
     }
+    
 }
 
 ?>
