@@ -100,9 +100,23 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
     }
     foreach ($chk_record_delete as $id) {
         $id = COM_applyFilter($id,true);
-        DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
         
-        PLG_itemDeleted($id, 'forum');
+        // Retrieve post info
+        $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+        $nrows = DB_numRows($result);
+        if ($nrows > 0) {
+            $A = DB_fetchArray($result);
+            $forum = $A['forum'];
+            $topicparent = $A['pid'];
+        
+            // Delete Record
+            DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+            
+            // Update the Last Post Information
+            gf_updateLastPost($forum, $topicparent);        
+            
+            PLG_itemDeleted($id, 'forum');
+        }
     }
     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
     // Remove new block and centerblock cached items
@@ -111,15 +125,28 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
     $cacheInstance = 'forum__centerblock_';
     CACHE_remove_instance($cacheInstance);    
 } elseif ($op == 'delrecord' AND SEC_checkToken()) {
-    DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+    // Retrieve post info
+    $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+    $nrows = DB_numRows($result);
+    if ($nrows > 0) {
+        $A = DB_fetchArray($result);
+        $forum = $A['forum'];
+        $topicparent = $A['pid'];
     
-    PLG_itemDeleted($id, 'forum');
-    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-    // Remove new block and centerblock cached items
-    $cacheInstance = 'forum__newpostsblock_';
-    CACHE_remove_instance($cacheInstance);
-    $cacheInstance = 'forum__centerblock_';
-    CACHE_remove_instance($cacheInstance);    
+        // Delete Record
+        DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
+        
+        // Update the Last Post Information
+        gf_updateLastPost($forum, $topicparent);        
+        
+        PLG_itemDeleted($id, 'forum');
+        COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+        // Remove new block and centerblock cached items
+        $cacheInstance = 'forum__newpostsblock_';
+        CACHE_remove_instance($cacheInstance);
+        $cacheInstance = 'forum__centerblock_';
+        CACHE_remove_instance($cacheInstance);    
+    }
 }
 
 // Page Navigation Logic
