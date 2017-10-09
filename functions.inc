@@ -254,8 +254,18 @@ function plugin_profilevariablesedit_forum($uid, &$template)
 {
     global $_TABLES, $LANG_GF04, $CONF_FORUM;
 
-    $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
-    $A = DB_fetchArray ($result);
+    // Need to handle new users as well
+    if ($uid > 1) {
+        $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
+        $A = DB_fetchArray ($result);
+    } else {
+        $A['aim'] = '';
+        $A['icq'] = '';
+        $A['yim'] = '';
+        $A['msnm'] = '';
+        $A['interests'] = '';
+        $A['occupation'] = '';
+    }
     
     if ($CONF_FORUM['profile']['aim']) {
         $template->set_var ('lang_field', $LANG_GF04['label_aim']);
