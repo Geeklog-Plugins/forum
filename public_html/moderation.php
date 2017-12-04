@@ -221,9 +221,6 @@ if (forum_modPermission($forum,$_USER['uid'])) {
                     gf_updateLastPost($forum,$curpostpid);
                     gf_updateLastPost($newforumid,$topicparent);
 
-                    /* Update the number of replies now in all previous topic post records */
-                    DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies-$numreplies WHERE id='$curpostpid' ");
-
                     // Update Topic and Post Count for the effected forums
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=topic_count+1, post_count=post_count+$numreplies WHERE forum_id=$newforumid");
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=topic_count-1, post_count=post_count-$numreplies WHERE forum_id=$forum");
