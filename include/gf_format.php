@@ -959,19 +959,17 @@ function forum_chkUsercanAccess($secure = false) {
     global $_CONF, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER;
 
     if ($CONF_FORUM['registration_required'] && COM_isAnonUser()) {
-        $display = COM_siteHeader();
     	$message = sprintf($LANG_GF01['loginreqview'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
     	$display .= alertMessage($message);
-        $display .= COM_siteFooter();
+        $display = gf_createHTMLDocument($display);
         COM_output($display);
 
         exit;
     //} elseif ($secure AND empty($_USER['uid'])) {
     } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
-		$display = COM_siteHeader();
 		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
 		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
-		$display .= COM_siteFooter();
+		$display = gf_createHTMLDocument($display);
 		COM_output($display);
 	
 		exit;    	
