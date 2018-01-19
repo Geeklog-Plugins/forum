@@ -102,7 +102,6 @@ require_once $_CONF['path'] . 'plugins/forum/config.php';
 $CONF_FORUM['debug'] = false;
 
 $CONF_FORUM['layout_url']  = $_CONF['site_url'] . '/forum';
-$CONF_FORUM['css_smilies_url'] = "{$_CONF['site_url']}/forum/css/smilies.css.php";
 $CONF_FORUM['imgset']       = CTL_plugin_dirLocation('forum', 'image_set', true);
 $CONF_FORUM['imgset_path']  = CTL_plugin_dirLocation('forum', 'image_set', false);
 $CONF_FORUM['path_include'] = $_CONF['path'] . 'plugins/forum/include/';
@@ -1477,9 +1476,6 @@ function plugin_getheadercode_forum()
     
     // Look for forum templates functions.php for current theme. If exist add in its required javascript and css
     CTL_plugin_setTemplatesFunctions("forum");
-
-    // Left this as is since it is a php file that returns css
-	$retval = '<link rel="stylesheet" type="text/css" href="' . $CONF_FORUM['css_smilies_url'] . '"' . XHTML . '>';
     
     return $retval;
 }
