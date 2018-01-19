@@ -154,6 +154,85 @@
   border-left: 1px solid #ddd;
 }
 
+/* Tablet and bigger */
+@media (min-width: 768px) {
+  .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-medium-1-1):nth-child(n+2) {
+    border-left: 1px solid #ddd;
+  }
+}
+
+/* Desktop and bigger */
+@media (min-width: 960px) {
+  .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-large-1-1):nth-child(n+2) {
+    border-left: 1px solid #ddd;
+  }
+}
+
+.glforum-table th,
+.glforum-table td {
+  border-bottom: 1px solid #ddd;
+}
+
+.glforum-icon {
+  box-sizing: border-box;
+  padding: 0 !important;
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.glforum-hr-none {
+  margin: 0 auto;
+  border: none;
+  display: hidden;
+}
+
+.glforum-userinfo-mood {
+  margin-top: 5px;
+}
+
+/* Phone landscape and smaller */
+@media (max-width: 767px) {
+  .glforum-userinfo-thumbnail {
+    float: left;
+    width: 80px;
+    margin-right: 10px;
+  }
+
+  .glforum-userinfo-name {
+    text-align: left !important;
+    float: left;
+    margin-left: 5px;
+  }
+
+  .glforum-panel-userinfo {
+  }
+
+  .glforum-userinfo-badge,
+  .glforum-userinfo-level,
+  .glforum-userinfo-levelname,
+  .glforum-userinfo-regdate,
+  .glforum-userinfo-numposts,
+  .glforum-userinfo-location,
+  .glforum-userinfo-ip {
+    display: inline;
+    margin-right: 5px;
+  }
+
+  .glforum-userinfo-mood {
+    float: left;
+    margin-left: 5px;
+    text-align: left;
+  }
+
+  .glforum-br:before {
+    content: "\A";
+    white-space: pre;
+  }
+}
+
 /* Forum Smilies */
 div#forum_smilies a {
 	float: left;
@@ -242,82 +321,4 @@ div#forum_smilies a {
     background-position: 0 -32px;
 }
 
-/* Tablet and bigger */
-@media (min-width: 768px) {
-  .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-medium-1-1):nth-child(n+2) {
-    border-left: 1px solid #ddd;
-  }
-}
-
-/* Desktop and bigger */
-@media (min-width: 960px) {
-  .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-large-1-1):nth-child(n+2) {
-    border-left: 1px solid #ddd;
-  }
-}
-
-.glforum-table th,
-.glforum-table td {
-  border-bottom: 1px solid #ddd;
-}
-
-.glforum-icon {
-  box-sizing: border-box;
-  padding: 0 !important;
-  width: 20px;
-  height: 20px;
-  border-radius: 2px;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-.glforum-hr-none {
-  margin: 0 auto;
-  border: none;
-  display: hidden;
-}
-
-.glforum-userinfo-mood {
-  margin-top: 5px;
-}
-
-/* Phone landscape and smaller */
-@media (max-width: 767px) {
-  .glforum-userinfo-thumbnail {
-    float: left;
-    width: 80px;
-    margin-right: 10px;
-  }
-
-  .glforum-userinfo-name {
-    text-align: left !important;
-    float: left;
-    margin-left: 5px;
-  }
-
-  .glforum-panel-userinfo {
-  }
-
-  .glforum-userinfo-badge,
-  .glforum-userinfo-level,
-  .glforum-userinfo-levelname,
-  .glforum-userinfo-regdate,
-  .glforum-userinfo-numposts,
-  .glforum-userinfo-location,
-  .glforum-userinfo-ip {
-    display: inline;
-    margin-right: 5px;
-  }
-
-  .glforum-userinfo-mood {
-    float: left;
-    margin-left: 5px;
-    text-align: left;
-  }
-
-  .glforum-br:before {
-    content: "\A";
-    white-space: pre;
-  }
-}
 /* END of Forum Plugin CSS */
