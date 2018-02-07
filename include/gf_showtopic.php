@@ -182,6 +182,9 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
             } elseif (($posts > $CONF_FORUM['level5'])){
                 $user_level = showrank(5, $CONF_FORUM['level5name']);
                 $user_levelname = $CONF_FORUM['level5name'];
+            } else {
+                $user_level = '';
+                $user_levelname = '';
             }
         }
 
@@ -405,13 +408,25 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
     $topictemplate->set_var ('postmode', $showtopic['postmode']);
     $topictemplate->set_var ('userlink', $userlink);
     $topictemplate->set_var ('lang_forum', $LANG_GF01['FORUM']);
-    $topictemplate->set_var ('user_levelname', $user_levelname);
-    $topictemplate->set_var ('user_level', $user_level);
-    $topictemplate->set_var ('avatar', $avatar);
-    $topictemplate->set_var ('user_status', $user_status);
-    $topictemplate->set_var ('regdate', $regdate);
-    $topictemplate->set_var ('numposts', $numposts);
-    if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_ban')) {
+    if (isset($user_levelname)) {
+        $topictemplate->set_var ('user_levelname', $user_levelname);
+    }
+    if (isset($user_level)) {
+        $topictemplate->set_var ('user_level', $user_level);
+    }
+    if (isset($avatar)) {
+        $topictemplate->set_var ('avatar', $avatar);
+    }
+    if (isset($user_status)) {
+        $topictemplate->set_var ('user_status', $user_status);
+    }
+    if (isset($regdate)) {
+        $topictemplate->set_var ('regdate', $regdate);
+    }
+    if (isset($numposts)) {
+        $topictemplate->set_var ('numposts', $numposts);
+    }
+    if (forum_modPermission($showtopic['forum'],'','mod_ban')) {
 		$topictemplate->set_var ('ip', $showtopic['ip']);
 		if ($showtopic['uid'] == 1) {
 			$topictemplate->parse ('ip_address', 'anon_ip_address');
@@ -437,7 +452,7 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
 	
     $topictemplate->set_var ('topic_comment', $showtopic['comment']);
     $topictemplate->set_var ('comment_minheight', "min-height:{$min_height}px");
-    if (trim($sig) != '') {
+    if (isset($sig) && trim($sig) != '') {
         $topictemplate->set_var ('sig', PLG_replaceTags(($sig)));
         $topictemplate->set_var ('show_sig', '');
         $topictemplate->parse ('user_signature', 'user_signature');

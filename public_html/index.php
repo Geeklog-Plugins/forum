@@ -1319,8 +1319,10 @@ if ($forum > 0) {
 }
 
 $title = $LANG_GF01['FORUM'];
-$forum_id = COM_applyFilter($_REQUEST['forum'],true);
-if (isset($_REQUEST['forum'])) $title = stripslashes(DB_getItem($_TABLES['forum_forums'],'forum_name',"forum_id='{$forum_id}'"));
+if (isset($_REQUEST['forum'])) {
+    $forum_id = COM_applyFilter($_REQUEST['forum'],true);
+    $title = stripslashes(DB_getItem($_TABLES['forum_forums'],'forum_name',"forum_id='{$forum_id}'"));
+}
 if (isset($_REQUEST['category'])) $title = $A['cat_name'];
 
 

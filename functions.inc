@@ -1538,7 +1538,11 @@ function forum_modPermission($forum,$uid='',$permission='') {
     global $_USER,$_TABLES;
 
     if ($uid == '') {
-        $uid = $_USER['uid'];
+        if (isset($_USER['uid'])) {
+            $uid = $_USER['uid'];
+        } else {
+            return FALSE;  // Invalid ID or anonymous user
+        }
     }
 
     if ($uid <=1) {
