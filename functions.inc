@@ -1118,7 +1118,7 @@ function phpblock_forum_newposts() {
                 }
         }
         
-        $cacheInstance = 'forum__newpostsblock_' . $orderby  . '_' . CACHE_security_hash() . '_' . $_USER['theme'];
+        $cacheInstance = 'forum__newpostsblock_' . $orderby  . '_' . CACHE_security_hash() . '_' . $_CONF['theme'];
         $retval = CACHE_check_instance($cacheInstance);
         if ($retval) {
             return $retval;
@@ -1309,7 +1309,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         return;
     }
 
-    $cacheInstance = 'forum__centerblock' . '_' . CACHE_security_hash() . '_' . $_USER['theme'];
+    $cacheInstance = 'forum__centerblock' . '_' . CACHE_security_hash() . '_' . $_CONF['theme'];
     $retval = CACHE_check_instance($cacheInstance);
     if ($retval) {
         return $retval;
