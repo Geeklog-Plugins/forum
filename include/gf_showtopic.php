@@ -354,7 +354,7 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
             }
         }
 
-        if ($userarray['email'] != '' && $showtopic["uid"] > 1) {
+        if (isset($userarray['email']) && $userarray['email'] != '' && $showtopic["uid"] > 1) {
             $email_link = "{$_CONF['site_url']}/profiles.php?uid={$showtopic['uid']}";
             $email_linktext = $LANG_GF09['email'];
             $topictemplate->set_var ('emaillink', $email_link);
@@ -362,7 +362,7 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
             $topictemplate->set_var ('LANG_email', $LANG_GF01['EmailLink']);
             $topictemplate->parse ('email_link', 'email_link');
         }
-        if ($userarray['homepage'] != '') {
+        if (isset($userarray['homepage']) && $userarray['homepage'] != '') {
             $homepage = trim($userarray['homepage']);
             if (strtolower(substr($homepage, 0, 4)) != 'http') {
                 $homepage = 'http://' .$homepage;
@@ -373,7 +373,7 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
             $topictemplate->set_var ('LANG_website', $LANG_GF01['WebsiteLink']);
             $topictemplate->parse ('website_link', 'website_link');
         }
-        if ($userarray['location'] != '' && $showtopic["uid"] > 1) {
+        if (isset($userarray['location']) && $userarray['location'] != '' && $showtopic["uid"] > 1) {
         	$topictemplate->set_var ('user_location', $userarray['location']);
         	$topictemplate->parse ('location', 'location');
 		}
