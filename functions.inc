@@ -1470,14 +1470,12 @@ function stripBBCode($text_to_search) {
 */
 function plugin_getheadercode_forum()
 {
-    global $_SCRIPTS, $CONF_FORUM;
+    global $_SCRIPTS;
 
     $_SCRIPTS->setCSSFile('forum', CTL_plugin_themeFindFile('forum', 'css', 'forum.css'));
     
     // Look for forum templates functions.php for current theme. If exist add in its required javascript and css
     CTL_plugin_setTemplatesFunctions("forum");
-    
-    return $retval;
 }
 
 /**
