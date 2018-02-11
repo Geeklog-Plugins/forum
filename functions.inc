@@ -1108,6 +1108,8 @@ function phpblock_forum_newposts() {
             } elseif ($order == 'posts') {
                 $view_modemsg = sprintf($LANG_GF02['msg76'],$post_limit);
                 $orderby = 'replies';
+            } else { // garbage orderby so just default
+                $orderby = 'date';
             }
         } else {
             $view_modemsg = sprintf($LANG_GF02['msg74'],$post_limit);
