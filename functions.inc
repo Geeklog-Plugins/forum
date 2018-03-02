@@ -1619,6 +1619,7 @@ function plugin_getBlocks_forum($side, $topic='')
                                   'blockorder'     => $CONF_FORUM['sideblock_order'],
                                   'content'        => $display,
                                   'allow_autotags' => false,
+                                  'convert_newlines' => false,
                                   'help'           => '');
 
             }
