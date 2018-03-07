@@ -1639,6 +1639,7 @@ function plugin_getBlocks_forum($side, $topic='')
                               'blockorder'     => $CONF_FORUM['menublock_order'],
                               'content'        => $display,
                               'allow_autotags' => false,
+                              'convert_newlines' => false,
                               'help'           => '');
 
         }
@@ -1678,6 +1679,7 @@ function plugin_getBlocksConfig_forum($side, $topic='')
                               'onleft'         => $CONF_FORUM['sideblock_isleft'],
                               'blockorder'     => $CONF_FORUM['sideblock_order'],
                               'allow_autotags' => false,
+                              'convert_newlines' => false,
                               'help'           => '',
                               'enable'         => $CONF_FORUM['sideblock_enable'],
                               'topic_option'   => $CONF_FORUM['sideblock_topic_option'],
@@ -1703,6 +1705,7 @@ function plugin_getBlocksConfig_forum($side, $topic='')
                           'onleft'         => $CONF_FORUM['menublock_isleft'],
                           'blockorder'     => $CONF_FORUM['menublock_order'],
                           'allow_autotags' => false,
+                          'convert_newlines' => false,
                           'help'           => '',
                           'enable'         => $menublock_enable,
                           'topic_option'   => '',
