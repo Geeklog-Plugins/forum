@@ -345,6 +345,9 @@ function gf_preparefordb($message,$postmode) {
        $message = stripslashes($message);
     }
     
+    // Remove any autotags the user doesn't have permission to use
+    $message = PLG_replaceTags($message, '', true);    
+    
     // Remove Icons if database cannot store them (ie table collation needs to be utf8mb4)
     $message = GLText::remove4byteUtf8Chars($message);
 
@@ -518,6 +521,10 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
 
     $bbcode->setRootParagraphHandling (true);
 
+    if ($mode == 'preview') {
+        // Remove any autotags the user doesn't have permission to use from preview
+        $str = PLG_replaceTags($str, '', true);     
+    }    
     if ($CONF_FORUM['use_censor'] and $mode == 'preview') {
         $str = COM_checkWords($str);
     }
