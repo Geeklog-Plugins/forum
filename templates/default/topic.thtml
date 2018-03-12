@@ -62,7 +62,13 @@
     </td>
 </tr>
 <tr>
-        <td colspan="2" class="pluginSolidOutline"><div style="background:transparent; width:1px; height:10px;"></div></td>
+        <td colspan="2" class="pluginSolidOutline">
+            {!if blocks_showtopic}
+            {blocks_showtopic}
+            {!else}
+            <div style="background:transparent; width:1px; height:10px;"></div>
+            {!endif}           
+        </td>
 </tr>
 
 <!-- BEGIN block_user_name -->

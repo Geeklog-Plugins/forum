@@ -2071,4 +2071,26 @@ function plugin_itemdeleted_forum($id, $type)
     
 }
 
+/**
+ * Return an array of Block Locations in plugin templates
+ */
+function plugin_getBlockLocations_forum()
+{
+    global $LANG_GF20;
+    
+    $block_locations = array();
+
+    // Add any extra block locations for plugin
+    // Remember these locations can only appear in templates that PLG_templateSetVars is used with
+    $block_locations[] = array(
+        'id'                => 'forum_showtopic', // Unique string. No other block location (includes Geeklog itself and any other plugins or themes) can share the same id ("left" and "right" are already taken).
+        'name'              => $LANG_GF20['blocks_showtopic_name'],
+        'description'       => $LANG_GF20['blocks_showtopic_desc'],
+        'template_name'     => 'forum_showtopic',
+        'template_variable' => 'blocks_showtopic'
+    );
+
+    return $block_locations;
+}
+
 ?>

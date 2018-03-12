@@ -91,7 +91,7 @@ function showrank($rank, $rankname)
     return $retval;
 }
 
-function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
+function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 {
     global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09;
     global $highlight;
@@ -471,6 +471,11 @@ function showtopic($showtopic,$mode='',$onetwo=1,$page=1)
 		$topictemplate->parse ('user_name', 'block_anon_user_name');
 		$topictemplate->parse ('user_information', 'block_anon_user_information');
 	}
+    
+    if ($mode != 'preview' && ($postcount %$CONF_FORUM['blocks_showtopic_repeat_after_num_posts'] == 0)) { // Checks remainder if 1 then do not display
+        PLG_templateSetVars('forum_showtopic', $topictemplate);
+    }
+    
     $topictemplate->parse ('output', 'topictemplate');
     $retval = $topictemplate->finish ($topictemplate->get_var('output'));
 

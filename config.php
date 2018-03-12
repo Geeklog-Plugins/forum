@@ -93,8 +93,12 @@ $CONF_FORUM['show_members_perpage'] = 20;
 // Show the members list page to anonymous users
 $CONF_FORUM['show_memberslist_anonymous'] = false;
 
-// View Anonymous Posts - registed users can set this false
+// View Anonymous Posts - register users can set this false
 $CONF_FORUM['show_anonymous_posts'] = 1;
+
+// Tells Forum to show blocks after every x number of forum topic posts displayed
+// Does not display in preview
+$CONF_FORUM['blocks_showtopic_repeat_after_num_posts'] = 3; // Needs to be greater than 1
 
 // Only send Notification once - even if more posts are created since your last visit
 $CONF_FORUM['notify_once'] = 1;

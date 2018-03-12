@@ -33,6 +33,10 @@
 	</div>
 </div>
 
+{!if blocks_showtopic}
+{blocks_showtopic}
+{!endif} 
+
 <!-- BEGIN block_user_name -->
 <h4 class="uk-margin-small-top uk-margin-small-bottom">{userlink}</h4>
 <!-- END block_user_name -->
