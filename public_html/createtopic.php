@@ -737,8 +737,10 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     }
 
     if ($uid >= 2) {
+        $token = SEC_createToken();
         $topicnavbar->set_var('gltoken_name', CSRF_TOKEN);
-        $topicnavbar->set_var('gltoken', SEC_createToken());
+        $topicnavbar->set_var('gltoken', $token);
+        $topicnavbar->set_var('gltoken_msg', SEC_getTokenExpiryNotice($token, $LANG24[91]));
     } else {
         $topicnavbar->set_var('gltoken_name', 'token');
         $topicnavbar->set_var('gltoken', '1');

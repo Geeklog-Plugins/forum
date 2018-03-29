@@ -40,5 +40,6 @@ h_help = "{LANG_hhelp}";
     <input type="hidden" name="editid" value="{hidden_editid}"{xhtml}>
     <input type="hidden" name="page" value="{page}"{xhtml}>
     <input type="hidden" name="{gltoken_name}" value="{gltoken}"{xhtml}>
+    {gltoken_msg}
 
 {# end {templatelocation} #}
