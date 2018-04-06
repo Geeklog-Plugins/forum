@@ -15,7 +15,7 @@
 {# Forum Topic Listing Buttons #}
 
 <!-- BEGIN newtopic_link -->
-<a class="uk-button uk-button-primary uk-text-nowrap" href="{newtopiclink}"><i class="uk-icon-file-o"></i>&nbsp;{newtopiclinktext}</a>
+<a class="uk-button uk-button-primary uk-text-nowrap" href="{newtopiclink}" rel="nofollow"><i class="uk-icon-file-o"></i>&nbsp;{newtopiclinktext}</a>
 <!-- END newtopic_link -->
 
 <!-- BEGIN subscribeforum_link -->
@@ -25,11 +25,11 @@
 {# Topic Listing Buttons #}
 
 <!-- BEGIN replytopic_link -->
-<a class="uk-button uk-button-primary uk-text-nowrap" href="{replytopiclink}"><i class="uk-icon-mail-reply"></i>&nbsp;{replytopiclinktext}</a>
+<a class="uk-button uk-button-primary uk-text-nowrap" href="{replytopiclink}" rel="nofollow"><i class="uk-icon-mail-reply"></i>&nbsp;{replytopiclinktext}</a>
 <!-- END replytopic_link -->
 
 <!-- BEGIN print_link -->
-<li><a href="{printlink}"><i class="uk-icon-print"></i>&nbsp;{printlinktext}</a></li>
+<li><a href="{printlink}" rel="nofollow"><i class="uk-icon-print"></i>&nbsp;{printlinktext}</a></li>
 <li class="uk-nav-divider"></li>
 <!-- END print_link -->
 
@@ -63,7 +63,7 @@
 <!-- END email_link -->
 
 <!-- BEGIN quotetopic_link -->
-<a class="uk-button uk-button-primary" href="{quotelink}"><i class="uk-icon-quote-left"></i>&nbsp;{quotelinktext}</a>
+<a class="uk-button uk-button-primary" href="{quotelink}" rel="nofollow"><i class="uk-icon-quote-left"></i>&nbsp;{quotelinktext}</a>
 <!-- END quotetopic_link -->
 
 <!-- BEGIN edittopic_link -->

@@ -13,7 +13,7 @@
 {# Forum Topic Listing Buttons #}
 
 <!-- BEGIN newtopic_link -->
-  <a class="postbutton" href="{newtopiclink}">
+  <a class="postbutton" href="{newtopiclink}" rel="nofollow">
     <img alt="" src="{newtopiclinkimg}"{xhtml}>
     {newtopiclinktext}
   </a>
@@ -36,7 +36,7 @@
 
 <!-- BEGIN replytopic_link -->
 <!-- {LANG_reply} -->
-  <a class="postbutton" href="{replytopiclink}">
+  <a class="postbutton" href="{replytopiclink}" rel="nofollow">
     <img alt="" src="{replytopiclinkimg}"{xhtml}>
     {replytopiclinktext}
   </a>
@@ -49,7 +49,7 @@
 <!--   Alternative layout -->
 <!--
 <div style="margin: 0; float: right;">
-    <a class="profilebutton" href="{printlink}">{printlinktext}</a>  
+    <a class="profilebutton" href="{printlink}" rel="nofollow">{printlinktext}</a>  
 </div>
 -->  
 <!-- END print_link -->
@@ -100,7 +100,7 @@
 <!-- END email_link -->
 
 <!-- BEGIN quotetopic_link -->
-<td style="padding-top:3px;"><a class="profilebutton" href="{quotelink}"><img style="margin: 0 0.5em 0.1em 0;" src="{site_url}/forum/image_set/quotes.png" alt=""{xhtml}>&nbsp;{quotelinktext}</a></td>
+<td style="padding-top:3px;"><a class="profilebutton" href="{quotelink}" rel="nofollow"><img style="margin: 0 0.5em 0.1em 0;" src="{site_url}/forum/image_set/quotes.png" alt=""{xhtml}>&nbsp;{quotelinktext}</a></td>
 <!-- END quotetopic_link -->
 
 <!-- BEGIN edittopic_link -->
