@@ -437,7 +437,7 @@ function plugin_showstats_forum($showsitestats)
     global $_CONF, $_TABLES, $LANG_GF00,$LANG_GF01, $CONF_FORUM;
 
     // Use themes stats template files
-    if (COM_versionCompare(VERSION, '2.2.0', '<=')) {
+    if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
         $stat_templates = COM_newTemplate(CTL_core_templatePath($_CONF['path_layout'] . 'stats'));
     } else {
         $stat_templates = COM_newTemplate($_CONF['path_layout'] . '/stats');
