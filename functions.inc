@@ -701,7 +701,11 @@ function plugin_getfeedcontent_forum ($feed, &$link, &$update)
         if ($F['content_length'] == 0) {
             $comment = '';
         } elseif ($F['content_length'] > 1) {
-            $comment = COM_truncate($A['comment'], $F['content_length'], '...');
+            if ($A['postmode'] == 'html' || $A['postmode'] == 'HTML') {
+                $comment = COM_truncateHTML($A['comment'], $F['content_length'], '...');
+            } else {
+                $comment = COM_truncate($A['comment'], $F['content_length'], '...');
+            }
         } else {
             $comment = $A['comment'];
             $preface = $LANG_GF01['BY'] . ' ';
