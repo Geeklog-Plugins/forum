@@ -439,7 +439,7 @@ function plugin_showstats_forum($showsitestats)
     // Use themes stats template files
     if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
         $stat_templates = COM_newTemplate(CTL_core_templatePath($_CONF['path_layout'] . 'stats'));
-    } else {
+    } else { // For Geeklog 2.1.3 support
         $stat_templates = COM_newTemplate($_CONF['path_layout'] . '/stats');
     }
     $stat_templates->set_file(array('itemstats'=>'itemstatistics.thtml',

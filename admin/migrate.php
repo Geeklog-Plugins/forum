@@ -35,7 +35,11 @@
 
 
 require_once 'gf_functions.php';
-require_once $_CONF['path_system'] . 'lib-story.php';
+if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
+    require_once $_CONF['path_system'] . 'lib-article.php';
+} else { // For Geeklog 2.1.3 support
+    require_once $_CONF['path_system'] . 'lib-story.php'; 
+}
 
 $page     = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
 $show     = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
