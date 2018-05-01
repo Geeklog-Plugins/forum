@@ -822,6 +822,9 @@ function plugin_upgrade_forum() {
     require_once $_CONF['path'] . 'plugins/forum/autoinstall.php';
     if (!plugin_compatible_with_this_version_forum('forum')) return 3002;
     
+    // Retrieve other plugin info like min geeklog version and homepage 
+    $inst_parms = plugin_autoinstall_forum('forum');        
+    
     $current_version = $installed_version;
 
     // Include the upgrade functions
@@ -895,7 +898,10 @@ function plugin_upgrade_forum() {
         }
     }
 
-    DB_query("UPDATE {$_TABLES['plugins']} SET pi_version = '$code_version', pi_gl_version = '$installed_version' WHERE pi_name = 'forum'");
+    // update plugin version number and other info
+    DB_query("UPDATE {$_TABLES['plugins']} SET pi_version = '$code_version', pi_gl_version = '{$inst_parms['info']['pi_gl_version']}', pi_homepage = '{$inst_parms['info']['pi_homepage']}' WHERE pi_name = 'forum'");
+
+    COM_errorLog( "Updated forum plugin from v$installed_version to v$code_version", 1 );  
     
     // Check if update completed and return a message number to be shown
     if (DB_getItem($_TABLES['plugins'],'pi_version',"pi_name = 'forum'") == $code_version) {
