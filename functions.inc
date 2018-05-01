@@ -925,6 +925,8 @@ function plugin_migrate_forum($old_conf)
     if ($old_conf['site_url'] != $_CONF['site_url']) {
         Installer::updateSiteUrl($old_conf['site_url'], $_CONF['site_url'], $tables);
     }
+    
+    COM_errorLog('Successfully migrated the "forum" plugin');
 
     return true;
 }
