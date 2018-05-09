@@ -51,6 +51,9 @@ $LANG_GF00 = array (
 
 
 $LANG_GF01['FORUM']          = '掲示板';
+$LANG_GF01['FORUMS']         = 'Forums';
+$LANG_GF01['FORUMCATEGORYNAME']  = '%s 掲示板 Category';
+$LANG_GF01['FORUMNAME']      = '%s 掲示板';
 $LANG_GF01['ALL']            = 'すべて';
 $LANG_GF01['YES']            = 'はい';
 $LANG_GF01['NO']             = 'いいえ';

@@ -1,8 +1,10 @@
 {# begin {templatelocation} #}
 
+{block_start}
+
 {navmenu}
 
-<h3>{$LANG_GF92[userpreferences]}</h3>
+<h2>{lang_user_preferences}</h2>
 
 <form class="uk-form uk-form-horizontal" action="{PHP_SELF}" method="post">
 	<input type="hidden" name="{gltoken_name}" value="{gltoken}"{xhtml}>
@@ -86,5 +88,7 @@
 		</div>
 	</div>
 </form>
+
+{block_end}
 
 {# end {templatelocation} #}

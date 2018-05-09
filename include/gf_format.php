@@ -271,6 +271,9 @@ function ForumHeader($forum, $showtopic, &$display) {
     } else {
         $navbar->set_var('navmenu','');
     }
+    
+    $navbar->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+    
     $navbar->parse ('output', 'topicheader');
     $display .= $navbar->finish($navbar->get_var('output'));
 
@@ -731,6 +734,9 @@ function BaseFooter($showbottom=true) {
         $footer->set_var ('search_forum', f_forumsearch() );
         $footer->set_var ('select_forum', f_forumjump() );
         $footer->parse ('output', 'footerblock');
+        
+        $footer->set_var('block_end', COM_endBlock());     
+        
         $retval .= $footer->finish($footer->get_var('output'));
     }
     return $retval;

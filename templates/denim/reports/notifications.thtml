@@ -19,7 +19,11 @@
     //  End -->
 </script>
 
+{block_start}
+
 {navmenu}
+
+<h2>{lang_subscriptions}</h2>
 
 <div class="uk-grid">
   	<div class="uk-width-7-10">
@@ -78,6 +82,8 @@
 {pagenavigation}
 
 {links}
+
+{block_end}
 
 <!-- BEGIN notification_record -->
 <tr>

@@ -50,6 +50,9 @@ $LANG_GF00 = array (
 
 
 $LANG_GF01['FORUM']          = 'Forum';
+$LANG_GF01['FORUMS']         = 'Forums';
+$LANG_GF01['FORUMCATEGORYNAME']  = '%s Forum Category';
+$LANG_GF01['FORUMNAME']      = '%s Forum';
 $LANG_GF01['ALL']            = 'Tous'; 
 $LANG_GF01['YES']            = 'Oui';
 $LANG_GF01['NO']             = 'Non';

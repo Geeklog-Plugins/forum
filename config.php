@@ -33,6 +33,9 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'config.php') !== false) {
     die('This file can not be used on its own.');
 }
 
+// Name of Forums used in Header. Used in headings etc...
+$CONF_FORUM['forums_name'] = $_CONF['site_name'] . ' ' . $LANG_GF01['FORUMS'];
+
 // Set to true if you need to handle previous version 2.5 quotes and new line formatting - setting to false should be faster
 $CONF_FORUM['pre2.5_mode'] = true;
 

@@ -1,6 +1,10 @@
 {# begin {templatelocation} #}
 
+{block_start}
+
 {navmenu}
+
+<h2>{lang_members_report}</h2>
 
 <div class="uk-grid">
 	<div class="uk-width-1-2">
@@ -51,6 +55,8 @@
 {no_records_message}
 
 {pagenavigation}
+
+{block_end}
 			
 <!-- BEGIN report_record -->
 <tr>

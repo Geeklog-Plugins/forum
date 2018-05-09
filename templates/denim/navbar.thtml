@@ -1,5 +1,7 @@
 {# begin {templatelocation} #}
 
+{block_start}
+
 {navmenu}
 
 <div class="uk-panel" data-uk-margin>

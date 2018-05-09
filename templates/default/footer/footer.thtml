@@ -13,4 +13,6 @@
 </table>
 {forum_whosonline}
 </div>
+
+{block_end}
 <!-- end footer.thtml -->

@@ -26,11 +26,19 @@
 	</div>	
 </div>	
 
+{#
 <div class="uk-margin-bottom uk-text-large">
 	<i class="uk-icon-comments-o"></i> <a href="viewtopic.php?showtopic={topic_id}">
 		<span>{subject}</span>
 	</a>
 </div>
+#}
+
+<h2>
+	<i class="uk-icon-comments-o"></i> <a href="viewtopic.php?showtopic={topic_id}">
+		<span>{subject}</span>
+	</a>
+</h2>
 
 <div class="uk-margin-bottom uk-text-right">
 	{topicmenu_link}

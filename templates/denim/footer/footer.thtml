@@ -10,4 +10,6 @@
 	{forum_whosonline}
 </div>
 
+{block_end}
+
 {# end {templatelocation} #}

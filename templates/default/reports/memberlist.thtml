@@ -1,6 +1,11 @@
 {# begin {templatelocation} #}
 
+{block_start}
+
 {navmenu}
+
+<h2>{lang_members_report}</h2>
+
 <form method="post" action="{site_url}/forum/memberlist.php" style="margin:0px;">
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
@@ -24,6 +29,8 @@
     </tr>
 </table>
 </form>
+
+{block_end}
 
 <!-- BEGIN report_record -->
 <tr class="pluginRow{csscode}">

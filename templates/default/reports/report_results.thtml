@@ -1,5 +1,6 @@
 {# begin {templatelocation} #}
 
+{block_start}
 {navmenu}
 {title}
 {report_controls}
@@ -31,6 +32,7 @@
 {no_records_message}
 {pagenavigation}
 {links}
+{block_end}
 
 <!-- BEGIN report_record -->
 		<tr class="pluginRow{csscode}">
@@ -51,7 +53,7 @@
 <!-- END links -->
 
 <!-- BEGIN title -->
-<h3>{report_title}</h3>
+<h2>{report_title}</h2>
 <!-- END title -->
 
 <!-- BEGIN report_controls_popular -->

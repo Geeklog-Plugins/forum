@@ -293,6 +293,9 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
     }
         
     $report->set_var ('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
+    
+    $report->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+    $report->set_var('block_end', COM_endBlock());    
 
     $report->parse ('output', 'report');
     $display .= $report->finish ($report->get_var('output'));
@@ -523,6 +526,9 @@ if ($op == 'search') {
     
     $report->set_var ('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
 
+    $report->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+    $report->set_var('block_end', COM_endBlock());
+    
     $report->parse ('output', 'report');
     $display .= $report->finish($report->get_var('output'));
     $title = $LANG_GF02['forumsearchresults'];
@@ -701,6 +707,9 @@ if ($op == 'popular') {
     
     $report->set_var ('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
     
+    $report->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+    $report->set_var('block_end', COM_endBlock());
+    
     $report->parse ('output', 'report');
     $display .= $report->finish($report->get_var('output'));
     $title = $LANG_GF02['popularforumtopics'] ;
@@ -825,6 +834,7 @@ if ($forum == 0) {
         $forumlisting->set_var ('LANGGF01_TOPICS', $LANG_GF01['TOPICS']);
         $forumlisting->set_var ('LANGGF01_POSTS', $LANG_GF01['POSTS']);
         $forumlisting->set_var ('LANGGF01_LASTPOST', $LANG_GF01['LASTPOST']);
+        $forumlisting->set_var ('cat_name_category', sprintf($LANG_GF01['FORUMCATEGORYNAME'], $A['cat_name']));
 
         //Display all forums under each cat
         $sql = "SELECT * FROM {$_TABLES['forum_forums']} AS f LEFT JOIN {$_TABLES['forum_topic']} AS t ON f.last_post_rec=t.id WHERE forum_cat='{$A['id']}' ";
@@ -1124,6 +1134,7 @@ if ($forum > 0) {
     $topiclisting->set_var ('category_id', $category['id']);
     $topiclisting->set_var ('forum_name', $category['forum_name']);
     $topiclisting->set_var ('forum_id', $forum);
+    $topiclisting->set_var ('forum_name_forum', sprintf($LANG_GF01['FORUMNAME'], $category['forum_name']));
     $topiclisting->set_var ('imgset', $CONF_FORUM['imgset']);
     $topiclisting->set_var ('LANG_TOPIC', $LANG_GF01['TOPICSUBJECT']);
     $topiclisting->set_var ('LANG_STARTEDBY', $LANG_GF01['STARTEDBY']);
@@ -1313,6 +1324,9 @@ if ($forum > 0) {
     } else {
     	$topiclisting->parse ('forummenu_link', 'forummenu_link');
 	}
+    
+    $topiclisting->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+    $topiclisting->set_var('block_end', COM_endBlock());        
     
     $topiclisting->parse ('output', 'topiclisting');
     $display .= $topiclisting->finish ($topiclisting->get_var('output'));
