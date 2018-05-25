@@ -154,7 +154,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             if ($CONF_FORUM['use_spamx_filter'] == 1) {
                 // Check for SPAM
                 $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                $result = PLG_checkforSpam($spamcheck, $_CONF['spamx']);
+                $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+                $result = PLG_checkForSpam(
+                    $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+                    $name
+                );                
                 // Now check the result and redirect to index.php if spam action was taken
                 if ($result > 0) {
                     // then tell them to get lost ...
@@ -270,7 +274,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
                         // Check for SPAM
                         $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                        $result = PLG_checkforSpam($spamcheck, $_CONF['spamx']);
+                        $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+                        $result = PLG_checkForSpam(
+                            $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+                            $name
+                        );                
                         // Now check the result and redirect to index.php if spam action was taken
                         if ($result > 0) {
                             // then tell them to get lost ...
@@ -379,7 +387,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
                         // Check for SPAM
                         $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                        $result = PLG_checkforSpam($spamcheck, $_CONF['spamx']);
+                        $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+                        $result = PLG_checkForSpam(
+                            $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+                            $name
+                        );                
                         // Now check the result and redirect to index.php if spam action was taken
                         if ($result > 0) {
                             // then tell them to get lost ...
