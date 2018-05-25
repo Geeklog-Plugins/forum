@@ -24,9 +24,9 @@
 </div>
 {!endif}  
 <div class="uk-form-row">
-	<div class="uk-form-controls uk-align-right">
+	<div class="uk-form-controls uk-align-right g-recaptcha">
 		<button class="uk-button" type="submit" name="preview" value="{LANG_PREVIEW}">{LANG_PREVIEW}</button>
-		<button class="uk-button g-recaptcha" type="submit" name="submit" value="{LANG_SUBMIT}"{!if invisible_recaptcha}{invisible_recaptcha}{!endif}>{LANG_SUBMIT}</button>
+		<button class="uk-button" type="submit" name="submit" value="{LANG_SUBMIT}"{!if invisible_recaptcha}{invisible_recaptcha}{!endif}>{LANG_SUBMIT}</button>
 		<button class="uk-button" type="submit" name="submit" value="{LANG_CANCEL}">{LANG_CANCEL}</button>
 	</div>
 </div>
