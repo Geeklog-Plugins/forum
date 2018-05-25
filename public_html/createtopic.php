@@ -80,7 +80,7 @@ $quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['
 $showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
 $silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
 $subject     = isset($_POST['subject'])            ? COM_applyFilter($_POST['subject'])                 : '';
-$submit      = isset($_POST['submit'])             ? COM_applyFilter($_POST['submit'])                  : '';
+$submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
 $postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 
 if ($preview == $LANG_GF01['PREVIEW']) {
