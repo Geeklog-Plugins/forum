@@ -29,7 +29,7 @@ h_help = "{LANG_hhelp}";
 //  End -->
 </script>
 
-<form action="{phpself}" method="post" name="forumpost" style="margin:0px;">
+<form id="forumform" action="{phpself}" method="post" name="forumpost" style="margin:0px;">
 <div>
     <input type="hidden" name="forum" value="{forum_id}"{xhtml}>
     <input type="hidden" name="id" value="{hidden_id}"{xhtml}>
