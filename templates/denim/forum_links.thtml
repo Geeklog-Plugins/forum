@@ -47,7 +47,7 @@
 <!-- END nexttopic_link -->
 
 <!-- BEGIN website_link -->
-<a href="{websitelink}" target="_blank" rel="nofollow"><i class="uk-icon-home"></i></a>
+<a href="{websitelink}" target="_blank" rel="nofollow noopener"><i class="uk-icon-home"></i></a>
 <!-- END website_link -->
 
 <!-- BEGIN pm_link -->

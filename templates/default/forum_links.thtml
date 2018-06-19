@@ -84,7 +84,7 @@
 <!-- END nexttopic_link -->
 
 <!-- BEGIN website_link -->
-<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{websitelink}" target="_blank" rel="nofollow">{websitelinktext}</a></td>
+<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{websitelink}" target="_blank" rel="nofollow noopener">{websitelinktext}</a></td>
 <!-- END website_link -->
 
 <!-- BEGIN pm_link -->
