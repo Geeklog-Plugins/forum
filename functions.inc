@@ -368,7 +368,21 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
     }
     $template->parse('last10_blocks', 'last10_block', true);
 
-    $count = DB_count ($_TABLES['forum_topic'], 'uid', $uid);
+    // Cannot take just this as may include posts the user viewing does not have access too see new solution below
+    //$count = DB_count ($_TABLES['forum_topic'], 'uid', $uid);
+    
+    // Taken in part from COM_getPermSQL
+    // Cannot use COM_getPermSQL as it includes other security table columns like owner_id which the forum does not use
+    // Grab current user group access as they can only know of forum posts they have access to about the user they are viewing
+    $UserGroups = SEC_getUserGroups();
+    $sql = "SELECT COUNT(uid) count_uid FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff, {$_TABLES['groups']} g 
+            WHERE ft.forum = ff.forum_id AND ff.grp_id = g.grp_id 
+            AND ft.uid = {$uid} ";
+    $sql .= "AND (g.grp_id = 2 OR (ff.grp_id IN (" . implode(',', $UserGroups) . ")))";
+    $result = DB_query($sql);
+    $A = DB_fetchArray($result);
+    $count = $A['count_uid'];
+    
     $template->set_var ('lang_number_field', $LANG_GF02['msg156']);
     $template->set_var ('number_field', $count);
     $template->parse('field_statistics', 'field_statistic', true);   
