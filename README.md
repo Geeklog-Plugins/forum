@@ -2,9 +2,9 @@
 
 * Current Maintainers: [Geeklog Community Members](https://github.com/orgs/Geeklog-Plugins/people)
 * Original Author: Blaine Lang
-* Release Date: April 12, 2017
+* Release Date: June 22, 2018
 
-**Requires minimum Geeklog version 2.1.2 and MySQL 4.1+**
+**Requires minimum Geeklog version 2.1.3 and MySQL 4.1+**
 
 * Features
 * Changelog
