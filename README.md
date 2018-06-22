@@ -1,4 +1,4 @@
-# Geeklog Forum plugin - version 2.9.2
+# Geeklog Forum plugin - version 2.9.3
 
 * Current Maintainers: [Geeklog Community Members](https://github.com/orgs/Geeklog-Plugins/people)
 * Original Author: Blaine Lang

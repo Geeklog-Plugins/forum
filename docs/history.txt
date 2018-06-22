@@ -1,5 +1,22 @@
 Geeklog Forum Plugin History/Changes:
 
+June 22, 2018 (2.9.3)
+------------
+For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/3?closed=1
+
+- [Feature] Supports updated spam check of Geeklog v2.2.0 which includes the Akismet module.
+- [Feature] Added block header and footer to forum pages which displays forum name.
+- [Feature] Supports Geeklog new Block positions.
+- [Feature] New block position added when viewing topic. Will insert block every x number of posts.
+- [Feature] Forum center block and posts block are now cached.
+- [Feature] Added nofollow to any links to creating or editing a post.
+- [Feature] Combined all forum css files.
+- [Bug] Any open html tags are now closed on save.
+- [Bug] Shows token expiry notice when required on a save of a forum post.
+- [Bug] Fixed autotag permissions being ignored.
+- [Bug] Fixed splitting of forum topic when original topic may be lost.
+- [Bug] Forums are now automatically resynched if deleting posts in Admin Posts List.
+
 April 12, 2017 (2.9.2)
 ------------
 For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/2?closed=1
