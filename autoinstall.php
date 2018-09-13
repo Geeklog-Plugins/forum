@@ -53,7 +53,7 @@ function plugin_autoinstall_forum($pi_name)
     $info = array(
         'pi_name'         => $pi_name,
         'pi_display_name' => $pi_display_name,
-        'pi_version'      => '2.9.3',
+        'pi_version'      => '2.9.4',
         'pi_gl_version'   => '2.1.3',
         'pi_homepage'     => 'https://github.com/Geeklog-Plugins/forum'
     );
