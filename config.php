@@ -146,6 +146,7 @@ $CONF_FORUM['profile']['interests'] = true;
 $CONF_FORUM['profile']['occupation'] = true;
 $CONF_FORUM['profile']['aim'] = false;
 $CONF_FORUM['profile']['yim'] = false;
+$CONF_FORUM['profile']['msnm'] = false;
 $CONF_FORUM['profile']['icq'] = false;
 $CONF_FORUM['profile']['yim'] = false;
 
