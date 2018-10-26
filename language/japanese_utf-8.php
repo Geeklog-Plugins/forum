@@ -363,6 +363,7 @@ $LANG_GF02['PostTopic']   = '新規投稿';
 $LANG_GF02['EditTopic']   = '投稿編集';
 $LANG_GF02['quietforum']  = '掲示板に新規投稿がありません。';
 $LANG_GF02['adminconfirmation']   = '管理者への確認';
+$LANG_GF02['num_forumposts']   = '%s Forum Post(s)';
 
 $LANG_GF03 = array (
     'delete'            => '削除',

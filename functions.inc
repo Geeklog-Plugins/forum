@@ -2129,4 +2129,25 @@ function plugin_getBlockLocations_forum()
     return $block_locations;
 }
 
+
+/**
+ * Did user create any forum posts
+ *
+ * @return   string   number of posts user contributed. If nothing leave blank
+ */
+function plugin_usercontributed_forum($uid)
+{
+    global $_TABLES, $LANG_GF02;
+
+    $retval = '';
+
+    $count = DB_getItem($_TABLES['forum_topic'], 'COUNT(uid)', "uid = {$uid}");
+    
+    if ($count > 0) {
+        $retval = str_replace('%s', $count, $LANG_GF02['num_forumposts']);
+    }
+
+    return $retval;
+}
+
 ?>
