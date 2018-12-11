@@ -63,4 +63,29 @@ function forum_js_files_denim()
     );
 }
 
+/**
+ * Return a list of CSS classes from the requested item
+ *
+ */
+function forum_getCSSClasses_denim($item)
+{
+    $retval = '';
+    
+    switch ($item) {
+        // ***************************
+        // Used for lists by COM_makeList 
+            
+        case 'forum-list-menu': 
+            $retval = ''; // no extra css classes needed for forum menu for this theme
+            break;
+            
+        // ***************************    
+        default:
+           
+           break;
+    }
+    
+    return $retval;
+}
+
 ?>
