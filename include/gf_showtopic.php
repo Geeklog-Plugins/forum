@@ -471,8 +471,8 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 		$topictemplate->parse ('user_name', 'block_anon_user_name');
 		$topictemplate->parse ('user_information', 'block_anon_user_information');
 	}
-    
-    if ($mode != 'preview' && ($postcount %$CONF_FORUM['blocks_showtopic_repeat_after_num_posts'] == 0)) { // Checks remainder if 1 then do not display
+
+    if ($mode != 'preview' && ($postcount % $CONF_FORUM['blocks_showtopic_repeat_after_num_posts'] == 0)) { // Checks remainder if 1 then do not display
         PLG_templateSetVars('forum_showtopic', $topictemplate);
     }
     

@@ -467,7 +467,8 @@ if ($op == 'search') {
 				$order2 = 'ASC';
 			} else {
 				$order2 = 'DESC';
-			}			
+			}
+            $show2 = $show;
 			if ($show2 == 0 AND $CONF_FORUM['show_topics_perpage'] > 0) {
 				$show2 = $CONF_FORUM['show_topics_perpage'];
 			} elseif ($show2 == 0) {
