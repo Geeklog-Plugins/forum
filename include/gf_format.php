@@ -471,9 +471,13 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
     if ( $postmode == 'text') {
         $bbcode->addParser (array ('block', 'inline', 'link', 'listitem'), 'bbcode_htmlspecialchars');
     }
-    if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html')) {
+
+    // This filtering should only happen on save and preview and not when viewed in a topic.
+    // If an Admin adds HTML that he can only use to a post, we then want ALL users to see it.
+    if ( $CONF_FORUM['use_glfilter'] == 1 && $postmode == 'html' && $mode == 'preview') {
         $bbcode->addParser(array('block','inline','link','listitem'), 'gf_checkHTML');      // calls GL's checkHTML on all text blocks
     }
+    
     if ( $postmode == 'text' OR $mode == 'subject') {
     	$bbcode->addParser(array('block','inline','link','listitem'), 'nl2br');
 	}
