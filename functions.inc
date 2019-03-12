@@ -237,12 +237,12 @@ function plugin_profileextrassave_forum($uid = '')
     }
 
     if ($uid > 1) {
-        $aim        = gf_preparefordb($_POST['forum_aim'],'html');
-        $icq        = gf_preparefordb($_POST['forum_icq'],'html');
-        $yim        = gf_preparefordb($_POST['forum_yim'],'html');
-        $msnm       = gf_preparefordb($_POST['forum_msnm'],'html');
-        $interests  = gf_preparefordb($_POST['forum_interests'],'html');
-        $occupation = gf_preparefordb($_POST['forum_occupation'],'html');
+        $aim        = isset($_POST['forum_aim'])        ? gf_preparefordb($_POST['forum_aim'],'html')  : '';
+        $icq        = isset($_POST['forum_icq'])        ? gf_preparefordb($_POST['forum_icq'],'html')  : '';
+        $yim        = isset($_POST['forum_yim'])        ? gf_preparefordb($_POST['forum_yim'],'html')  : '';
+        $msnm       = isset($_POST['forum_msnm'])       ? gf_preparefordb($_POST['forum_msnm'],'html')  : '';
+        $interests  = isset($_POST['forum_interests'])  ? gf_preparefordb($_POST['forum_interests'],'html')  : '';
+        $occupation = isset($_POST['forum_occupation']) ? gf_preparefordb($_POST['forum_occupation'],'html')  : '';
         DB_save ($_TABLES['forum_userinfo'], "uid,aim,yim,icq,msnm,interests,occupation",
                  "'$uid','$aim','$yim','$icq','$msnm','$interests','$occupation'");
    }
