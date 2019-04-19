@@ -196,7 +196,7 @@ if ($type == "category") {
 
 // FORUM Maintenance Section
 if ($type == "forum") {
-    if ($mode == 'add') {
+    if ($mode == 'add' AND $submit != $LANG_GF01['CANCEL']) {
         if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken()) {
             $category    = isset($_POST['category'])    ? COM_applyFilter($_POST['category'],true)    : 0;
             $dscp        = isset($_POST['dscp'])        ? gf_preparefordb($_POST['dscp'],'text')      : '';
