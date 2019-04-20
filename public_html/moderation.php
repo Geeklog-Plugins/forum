@@ -380,7 +380,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             $iplookup = str_replace('*', $ip_address, $_CONF['ip_lookup']);
             $ip_address = COM_createLink($ip_address, $iplookup);
         }
-        $alertmessage .= sprintf($LANG_GF02['msg69'], $ip_address);
+        $alertmessage .= ' ' . sprintf($LANG_GF02['msg69'], $ip_address);
         
 		$page = COM_newTemplate(CTL_plugin_templatePath('forum', 'moderator'));
 		$page->set_file(array('page'=>'ban.thtml'));
