@@ -82,7 +82,6 @@
 <!-- END rankon_icon -->
 
 <!-- BEGIN rankoff_icon -->
-<span uk-icon="icon: phone-landscape"></span>
 <span>■</span>
 <!-- END rankoff_icon -->
 
