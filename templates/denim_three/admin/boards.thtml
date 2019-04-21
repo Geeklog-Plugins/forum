@@ -87,8 +87,8 @@
 		
 			<button class="uk-button uk-button-default uk-button-small" type="submit" name="mode" value="{delete}">{delete}</button>
 			<button class="uk-button uk-button-default uk-button-small" type="submit" name="mode" value="{edit}">{edit}</button><br{xhtml}>
-			<button class="uk-button uk-button-default uk-button-small uk-margin-small-top" type="submit" name="mode" value="{merge}">{merge}</button>
-			<button class="uk-button uk-button-default uk-button-small uk-margin-small-top" type="submit" name="mode" value="{resync}">{resync}</button>
+			<button class="uk-button uk-button-default uk-button-small" type="submit" name="mode" value="{merge}">{merge}</button>
+			<button class="uk-button uk-button-default uk-button-small" type="submit" name="mode" value="{resync}">{resync}</button>
 		</form>
 	</td>
 </tr>
