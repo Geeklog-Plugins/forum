@@ -149,8 +149,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             $name = gf_preparefordb($aname,'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
         } else {
             $name = gf_preparefordb($_POST['name'],'text');
-        }        
-        if (strlen(trim($name)) > $CONF_FORUM['min_username_length'] && strlen(trim($_POST['comment'])) > $CONF_FORUM['min_comment_length']) {
+        }
+        
+        if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
+            strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
+            strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {
+                
             if ($CONF_FORUM['use_spamx_filter'] == 1) {
                 // Check for SPAM
                 $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
@@ -259,10 +263,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                          . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
             }
         }
+        
         if ( $msg == '' ) {
-            if (strlen(trim($name)) > $CONF_FORUM['min_username_length'] AND
-                strlen(trim($_POST['subject'])) > $CONF_FORUM['min_subject_length'] AND
-                strlen(trim($_POST['comment'])) > $CONF_FORUM['min_comment_length']) {
+            if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
+                strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
+                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {
 
                 COM_clearSpeedlimit ($CONF_FORUM['post_speedlimit'], 'forum');
                 $last = COM_checkSpeedlimit ('forum');
@@ -375,7 +380,10 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
             } else {
                 $name = gf_preparefordb($_POST['name'],'text');
             }
-            if ($name != '' && strlen(trim($_POST['comment'])) > $CONF_FORUM['min_comment_length']) {
+            
+            if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND 
+                strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
+                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {            
 
                 COM_clearSpeedlimit ($CONF_FORUM['post_speedlimit'], 'forum');
                 $last = COM_checkSpeedlimit ('forum');
