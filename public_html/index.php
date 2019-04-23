@@ -1172,14 +1172,20 @@ if ($forum > 0) {
             } else {
                  $pages = ceil(($record['replies']+1)/20);
             }
+            
+            // Only display 10 pages. If more than 10 split it up, show first 5 and last 5.
+            $split_pages = false;
+            if ($pages > 10) {
+                $split_pages = true;
+            }
             for ($p=1; $p <= $pages; $p++) {
                 $displaypageslink .= "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum=$forum";
                 $displaypageslink .= "&amp;showtopic={$record['id']}&amp;show={$CONF_FORUM['show_posts_perpage']}&amp;page=$p\">";
-                if ($p > 9) {
-                    $displaypageslink .= '...</a>&nbsp;';
-                    break;
-                } else {
-                    $displaypageslink .= "$p</a>&nbsp;";
+                $displaypageslink .= "$p</a>&nbsp;";
+                
+                if ($split_pages AND $p == 5) {
+                    $displaypageslink .= '...&nbsp;';
+                    $p = $pages - 5;
                 }
             }
         }
