@@ -523,7 +523,8 @@ $LANG_GF93 = array(
     'hideposts' => 'Cacher les nouvelles cobntributions',
     'hidepostsdscp' => 'Les mises à jour ne seront pas montrées dans le bloc des nouvelles contributions ou dans le flux RSS',
     'mod_title' => 'Modérateurs du forum',
-    'allforums' => 'Tous les forums'
+    'allforums' => 'Tous les forums',
+    'namerequired' => 'Name is required.'
 );
 
 $LANG_GF95 = array(

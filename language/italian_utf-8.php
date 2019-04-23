@@ -522,7 +522,8 @@ $LANG_GF93 = array(
     'hideposts' => 'Nascondi i Nuovi Messaggi',
     'hidepostsdscp' => 'Gli aggiornamenti non verranno mostrati nel Blocco dei Nuovi Messaggi o i flussi RSS',
     'mod_title' => 'Moderatori Forum',
-    'allforums' => 'Tutti i Forum'
+    'allforums' => 'Tutti i Forum',
+    'namerequired' => 'Name is required.'
 );
 
 $LANG_GF95 = array(

@@ -1,5 +1,7 @@
 {# begin {templatelocation} #}
 
+{message}
+
 <form action="{PHP_SELF}" method="post" style="margin:0px;">
     <!-- The following is a divider that works across all platforms and browsers -->
     <table width="100%" border="0" cellspacing="1" cellpadding="0" style="margin-top:10px;" class="plugin">
@@ -58,5 +60,9 @@
         </tr>
     </table>
 </form>
+
+<!-- BEGIN message -->
+<p class="pluginAlert">{status_message}</p>
+<!-- END message -->
 
 {# end {templatelocation} #}

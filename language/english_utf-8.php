@@ -566,7 +566,8 @@ $LANG_GF93 = array (
     'hideposts'          => 'Hide New posts',
     'hidepostsdscp'      => 'Updates will not show in the New Posts Blocks or RSS Feeds',
     'mod_title'          => 'Forum Moderators',
-    'allforums'          => 'All Forums'
+    'allforums'          => 'All Forums',
+    'namerequired'       => 'Name is required.'
 );
 
 // Posts

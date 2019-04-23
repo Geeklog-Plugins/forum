@@ -1,5 +1,7 @@
 {# begin {templatelocation} #}
 
+{message}
+
 <form class="uk-form uk-form-horizontal" name="formcatedit" action="{PHP_SELF}" method="post">
 	<input type="hidden" name="type" value="category"{xhtml}>
 	<input type="hidden" name="id" value="{id}"{xhtml}>
@@ -35,6 +37,13 @@
 			</div>			
 		</fieldset>
 	</div>
-</form>			
+</form>
+
+<!-- BEGIN message -->
+<div class="uk-alert uk-alert-warning" data-uk-alert="">
+	<a href="" class="uk-alert-close uk-close"></a>
+	<p>{status_message}</p>
+</div>
+<!-- END message -->	
 
 {# end {templatelocation} #}

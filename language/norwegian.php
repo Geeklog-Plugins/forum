@@ -519,7 +519,8 @@ $LANG_GF93 = array(
     'hideposts' => 'Skjul nye innlegg',
     'hidepostsdscp' => 'Oppdateringer vises ikke i blokker eller RSS Feeds',
     'mod_title' => 'Forum Moderatorer',
-    'allforums' => 'Alle Forum'
+    'allforums' => 'Alle Forum',
+    'namerequired' => 'Name is required.'
 );
 
 $LANG_GF95 = array(

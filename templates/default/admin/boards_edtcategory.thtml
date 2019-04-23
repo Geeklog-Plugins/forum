@@ -1,5 +1,7 @@
 {# begin {templatelocation} #}
 
+{message}
+
 <form action="{PHP_SELF}" method="post">
     <table width="100%" border="0" cellspacing="1" cellpadding="0" style="margin-top:10px;" class="plugin">
         <tr>
@@ -41,5 +43,9 @@
         </tr>
     </table>
 </form>
+
+<!-- BEGIN message -->
+<p class="pluginAlert">{status_message}</p>
+<!-- END message -->
 
 {# end {templatelocation} #}

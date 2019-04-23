@@ -1,5 +1,7 @@
 {# begin {templatelocation} #}
 
+{message}
+
 <form class="uk-form-horizontal" name="formforumedit" action="{PHP_SELF}" method="post">
 	<input type="hidden" name="type" value="forum"{xhtml}>
 	<input type="hidden" name="id" value="{id}"{xhtml}>
@@ -63,6 +65,13 @@
 			</div>					
 		</fieldset>
 	</div>
-</form>				
+</form>
+
+<!-- BEGIN message -->
+<div class="uk-alert-warning" uk-alert>
+	<a class="uk-alert-close" uk-close></a>
+	<p>{status_message}</p>
+</div>
+<!-- END message -->		
 
 {# end {templatelocation} #}

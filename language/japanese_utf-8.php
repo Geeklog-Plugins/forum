@@ -568,7 +568,8 @@ $LANG_GF93 = array (
     'hideposts'          => '新規投稿を隠す',
     'hidepostsdscp'      => '新規投稿ブロックとRSSフィードから投稿を隠す',
     'mod_title'          => 'モデレータ',
-    'allforums'          => 'すべての掲示板'
+    'allforums'          => 'すべての掲示板',
+    'namerequired'       => 'Name is required.'
 );
 
 // Posts

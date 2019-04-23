@@ -519,7 +519,8 @@ $LANG_GF93 = array(
     'hideposts' => 'החביאו הודעות חדשות',
     'hidepostsdscp' => 'עדכונים לא יופיעו בקוביות מידע של הודעות חדשות או בהזנות RSS',
     'mod_title' => 'מפקחי הפורומים',
-    'allforums' => 'כל הפורומים'
+    'allforums' => 'כל הפורומים',
+    'namerequired' => 'Name is required.'
 );
 
 $LANG_GF95 = array(

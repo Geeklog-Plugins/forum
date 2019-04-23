@@ -519,7 +519,8 @@ $LANG_GF93 = array(
     'hideposts' => 'Ocultar mensajjes nuevos',
     'hidepostsdscp' => 'Las actualizaciones no aparecerán en el bloque de mensajes nuevos o alimentaciones RSS',
     'mod_title' => 'Moderadores de foro',
-    'allforums' => 'Todos los foros'
+    'allforums' => 'Todos los foros',
+    'namerequired' => 'Name is required.'
 );
 
 $LANG_GF95 = array(

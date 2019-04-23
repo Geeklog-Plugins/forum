@@ -89,10 +89,23 @@ $display .= $navbar->generate();
 
 // CATEGORY Maintenance Section
 if ($type == "category") {
-
+    // Make sure a name is at least specified
+    if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
+        $name_missing = false;
+        if (($submit == $LANG_GF01['SAVE'])) {
+            $name = isset($_POST['name']) ? gf_preparefordb($_POST['name'],'text') : '';
+            if (empty(trim($name))) {
+                $name_missing = true;
+                if ($mode == 'save') {
+                    $mode = $LANG_GF01['EDIT'];
+                }
+            }
+        }        
+    }
+    
     if ($mode == 'add' AND $submit != $LANG_GF01['CANCEL']) {
-        if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken()) {
-            $name = gf_preparefordb($_POST['name'],'text');
+        if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken() && !$name_missing) {
+            //$name = gf_preparefordb($_POST['name'],'text');
             $dscp = gf_preparefordb($_POST['dscp'],'text');
             DB_query("INSERT INTO {$_TABLES['forum_categories']} (cat_order,cat_name,cat_dscp) VALUES ('$catorder','$name','$dscp')");
             $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=1');
@@ -101,6 +114,13 @@ if ($type == "category") {
         } else {
             $boards_addcategory = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_addcategory->set_file (array ('boards_addcategory'=>'boards_edtcategory.thtml'));
+            $boards_addcategory->set_block('boards_addcategory', 'message');
+            if ($name_missing) {
+                $boards_addcategory->set_var('status_message', $LANG_GF93['namerequired']);
+                $boards_addcategory->parse('message','message');                
+            } else {
+                $boards_addcategory->set_var('message', '');
+            }
             $boards_addcategory->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
             $boards_addcategory->set_var ('title', $LANG_GF93['addcat']);
             $boards_addcategory->set_var ('mode', 'add');
@@ -150,7 +170,7 @@ if ($type == "category") {
         }
 
     } elseif (($mode == 'save') && SEC_checkToken() && ($submit != $LANG_GF01['CANCEL'])) {
-        $name = gf_preparefordb($_POST['name'],'text');
+        //$name = gf_preparefordb($_POST['name'],'text');
         $dscp = gf_preparefordb($_POST['dscp'],'text');
         DB_query("UPDATE {$_TABLES['forum_categories']} SET cat_order='$catorder',cat_name='$name',cat_dscp='$dscp' WHERE id='$id'");
         $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=3');
@@ -162,6 +182,13 @@ if ($type == "category") {
         $E = DB_fetchArray($esql);
         $boards_edtcategory = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
         $boards_edtcategory->set_file (array ('boards_edtcategory'=>'boards_edtcategory.thtml'));
+        $boards_edtcategory->set_block('boards_edtcategory', 'message');
+        if ($name_missing) {
+            $boards_edtcategory->set_var('status_message', $LANG_GF93['namerequired']);
+            $boards_edtcategory->parse('message','message');                
+        } else {
+            $boards_edtcategory->set_var('message', '');
+        }        
         $boards_edtcategory->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
         $boards_edtcategory->set_var ('title', sprintf($LANG_GF93['editcatnote'], stripslashes($E['cat_name'])));
         $boards_edtcategory->set_var ('catname', $E['cat_name']);
@@ -196,13 +223,27 @@ if ($type == "category") {
 
 // FORUM Maintenance Section
 if ($type == "forum") {
+    // Make sure a name is at least specified
+    if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
+        $name_missing = false;
+        if (($submit == $LANG_GF01['SAVE'])) {
+            $name = isset($_POST['name']) ? gf_preparefordb($_POST['name'],'text') : '';
+            if (empty(trim($name))) {
+                $name_missing = true;
+                if ($mode == 'save') {
+                    $mode = $LANG_GF01['EDIT'];
+                }
+            }
+        }        
+    }
+    
     if ($mode == 'add' AND $submit != $LANG_GF01['CANCEL']) {
-        if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken()) {
+        if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken() && !$name_missing) {
             $category    = isset($_POST['category'])    ? COM_applyFilter($_POST['category'],true)    : 0;
             $dscp        = isset($_POST['dscp'])        ? gf_preparefordb($_POST['dscp'],'text')      : '';
             $is_hidden   = isset($_POST['is_hidden'])   ? COM_applyFilter($_POST['is_hidden'],true)   : 0;
             $is_readonly = isset($_POST['is_readonly']) ? COM_applyFilter($_POST['is_readonly'],true) : 0;
-            $name        = isset($_POST['name'])        ? gf_preparefordb($_POST['name'],'text')      : '';
+            //$name        = isset($_POST['name'])        ? gf_preparefordb($_POST['name'],'text')      : '';
             $no_newposts = isset($_POST['no_newposts']) ? COM_applyFilter($_POST['no_newposts'],true) : 0;
             $order       = isset($_POST['order'])       ? COM_applyFilter($_POST['order'],true)       : 0;
             $privgroup   = isset($_POST['privgroup'])   ? COM_applyFilter($_POST['privgroup'],true)   : 0;
@@ -248,6 +289,13 @@ if ($type == "forum") {
             
             $boards_addforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_addforum->set_file (array ('boards_addforum'=>'boards_edtforum.thtml'));
+            $boards_addforum->set_block('boards_addforum', 'message');
+            if ($name_missing) {
+                $boards_addforum->set_var('status_message', $LANG_GF93['namerequired']);
+                $boards_addforum->parse('message','message');                
+            } else {
+                $boards_addforum->set_var('message', '');
+            }            
             $boards_addforum->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
             $boards_addforum->set_var ('title', $LANG_GF93['addforum']);
             $boards_addforum->set_var ('mode', 'add');
@@ -366,7 +414,7 @@ if ($type == "forum") {
     } elseif (($mode == 'save') && SEC_checkToken() && ($submit != $LANG_GF01['CANCEL'])) {
         $category    = isset($_REQUEST['category']) ? COM_applyFilter($_POST['category'],true)    : 0;
         $order       = isset($_POST['order'])       ? COM_applyFilter($_POST['order'],true)       : 0;
-        $name = gf_preparefordb($_POST['name'],'text');
+        //$name = gf_preparefordb($_POST['name'],'text');
         $dscp = gf_preparefordb($_POST['dscp'],'text');
         $is_hidden   = isset($_POST['is_hidden'])   ? COM_applyFilter($_POST['is_hidden'],true)   : 0;
         $is_readonly = isset($_POST['is_readonly']) ? COM_applyFilter($_POST['is_readonly'],true) : 0;
@@ -414,6 +462,13 @@ if ($type == "forum") {
 
         $boards_edtforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
         $boards_edtforum->set_file (array ('boards_edtforum'=>'boards_edtforum.thtml'));
+        $boards_edtforum->set_block('boards_edtforum', 'message');
+        if ($name_missing) {
+            $boards_edtforum->set_var('status_message', $LANG_GF93['namerequired']);
+            $boards_edtforum->parse('message','message');                
+        } else {
+            $boards_edtforum->set_var('message', '');
+        }        
         $boards_edtforum->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
         $boards_edtforum->set_var ('title', sprintf($LANG_GF93['editforumnote'], $forum_name));
         $boards_edtforum->set_var ('id', $id);
