@@ -156,14 +156,16 @@
 
 /* Tablet and bigger */
 @media (min-width: 960px) {
-  .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-1-1@m):nth-child(n+2) {
+  /* .glforum-grid-divider > [class*='uk-width-medium-']:not(.uk-width-medium-1-1):nth-child(n+2) { */
+  .glforum-grid-divider > [class^='uk-width-'],[class$='@m']:not(.uk-width-1-1@m):nth-child(n+2) {
     border-left: 1px solid #ddd;
   }
 }
 
 /* Desktop and bigger */
 @media (min-width: 1200px) {
-  .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-1-1@l):nth-child(n+2) {
+  /* .glforum-grid-divider > [class*='uk-width-large-']:not(.uk-width-large-1-1):nth-child(n+2) { */
+  .glforum-grid-divider > [class^='uk-width-'],[class$='@l']:not(.uk-width-1-1@l):nth-child(n+2) {      
     border-left: 1px solid #ddd;
   }
 }
