@@ -108,6 +108,8 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
             $A = DB_fetchArray($result);
             $forum = $A['forum'];
             $topicparent = $A['pid'];
+            
+            LIKES_deleteActions('forum', $id);
         
             // Delete Record
             DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
@@ -132,6 +134,8 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
         $A = DB_fetchArray($result);
         $forum = $A['forum'];
         $topicparent = $A['pid'];
+        
+        LIKES_deleteActions('forum', $id);
     
         // Delete Record
         DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");

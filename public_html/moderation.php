@@ -90,6 +90,8 @@ if (forum_modPermission($forum,$_USER['uid'])) {
 
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'");
             if ($top == 'yes') {
+                LIKES_deleteActions('forum', $msgid);
+                
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
                 
                 PLG_itemDeleted($msgid, 'forum');
@@ -107,6 +109,8 @@ if (forum_modPermission($forum,$_USER['uid'])) {
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=0 WHERE forum_id=$forum");
                 }
             } else {
+                LIKES_deleteActions('forum', $msgid);
+                
                 DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies-1 WHERE id=$topicparent");
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
                 
