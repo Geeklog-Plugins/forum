@@ -646,6 +646,7 @@ $LANG_confignames['forum'] = array(
     'show_searches_perpage' => 'Nombre de résultats de la recherche par page',
     'showblocks'            => 'Colonne des blocs à montrer dans le forum',
     'usermenu'              => 'Type du menu utilisateur',
+    'likes_forum'           => 'Forum Likes',
     // ----------------------------------
     'show_subject_length'   => 'Longueur maximale du sujet',
     'min_username_length'   => 'Longueur minimale du nom d\'utiliateur',
@@ -739,7 +740,7 @@ $LANG_configselects['forum'] = array(
     12 => array('Pas d\'accès' => 0, 'Lecture-Seule' => 2, 'Lecture-Ecriture' => 3),
     13 => array('Pas d\'accès' => 0, 'Utiliser' => 2),
     14 => array('Pas d\'accès' => 0, 'Lecture-seule' => 2),
-    15 => array('All' => TOPIC_ALL_OPTION, 'Page d\'accueil seulement' => TOPIC_HOMEONLY_OPTION, 'Choisir les catégories' => TOPIC_SELECTED_OPTION)
-
+    15 => array('All' => TOPIC_ALL_OPTION, 'Page d\'accueil seulement' => TOPIC_HOMEONLY_OPTION, 'Choisir les catégories' => TOPIC_SELECTED_OPTION),
+    41 => array('False' => 0, 'Likes and Dislikes' => 1, 'Likes Only' => 2)
 );
 ?>

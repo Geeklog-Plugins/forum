@@ -649,6 +649,7 @@ $LANG_confignames['forum'] = array(
     'show_searches_perpage' => 'Number of Search Results per Page',
     'showblocks'            => 'Block Columns to Show with Forum',
     'usermenu'              => 'Type of User Menu',
+    'likes_forum'           => 'Forum Likes',
     // ----------------------------------
     'show_subject_length'   => 'Max Length of Subject',
     'min_username_length'   => 'Min Length of Username',
@@ -732,7 +733,7 @@ $LANG_fs['forum'] = array(
     'fs_menublock_permissions' => 'Block Permissions'    
 );
 
-// Note: entries 0, 1, and 12 are the same as in $LANG_configselects['Core']
+// Note: entries 0, 1, 12, and 41 are the same as in $LANG_configselects['Core']
 $LANG_configselects['forum'] = array(
     0 => array('True' => 1, 'False' => 0),
     1 => array('True' => TRUE, 'False' => FALSE),
@@ -742,6 +743,7 @@ $LANG_configselects['forum'] = array(
     12 => array('No access' => 0, 'Read-Only' => 2, 'Read-Write' => 3),
     13 => array('No access' => 0, 'Use' => 2),
     14 => array('No access' => 0, 'Read-Only' => 2),
-    15 => array('All' => TOPIC_ALL_OPTION, 'Homepage Only' => TOPIC_HOMEONLY_OPTION, 'Select Topics' => TOPIC_SELECTED_OPTION)
+    15 => array('All' => TOPIC_ALL_OPTION, 'Homepage Only' => TOPIC_HOMEONLY_OPTION, 'Select Topics' => TOPIC_SELECTED_OPTION),
+    41 => array('False' => 0, 'Likes and Dislikes' => 1, 'Likes Only' => 2)
 );
 ?>

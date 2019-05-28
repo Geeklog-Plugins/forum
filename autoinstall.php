@@ -209,7 +209,11 @@ function plugin_compatible_with_this_version_forum($pi_name)
 
 	if (!function_exists('CTL_plugin_templatePath')) {
         return false;
-    }    
+    }   
+
+	if (!function_exists('LIKES_control')) {
+        return false;
+    }     
 
     return true;
 }

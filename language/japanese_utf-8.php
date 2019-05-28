@@ -651,6 +651,7 @@ $LANG_confignames['forum'] = array(
     'show_searches_perpage' => '検索結果の1ページあたり表示数',
     'showblocks'            => '掲示板で表示するブロックカラム',
     'usermenu'              => 'ユーザーメニューの種類',
+    'likes_forum'           => 'Forum Likes',
     // ----------------------------------
     'show_subject_length'   => '件名の最大文字数',
     'min_username_length'   => 'ユーザ名の最小文字数',
@@ -744,6 +745,7 @@ $LANG_configselects['forum'] = array(
     12 => array('アクセス不可' => 0, '表示' => 2, '表示・編集' => 3),
     13 => array('アクセス不可' => 0, '利用する' => 2),
     14 => array('アクセス不可' => 0, '表示' => 2),
-    15 => array('すべて' => TOPIC_ALL_OPTION, 'ホームページのみ' => TOPIC_HOMEONLY_OPTION, '話題を選択' => TOPIC_SELECTED_OPTION)
+    15 => array('すべて' => TOPIC_ALL_OPTION, 'ホームページのみ' => TOPIC_HOMEONLY_OPTION, '話題を選択' => TOPIC_SELECTED_OPTION),
+    41 => array('False' => 0, 'Likes and Dislikes' => 1, 'Likes Only' => 2)
 );
 ?>

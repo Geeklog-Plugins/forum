@@ -228,4 +228,12 @@ function upgrade_293() {
     COM_errorLog("Success - Completed Forum plugin version 2.9.3 update",1);
     return 0;
 }
+
+function upgrade_294() {
+    forum_update_ConfValues_2_9_4();
+
+    COM_errorLog("Success - Completed Forum plugin version 2.9.4 update",1);
+    return 0;
+}
+
 ?>

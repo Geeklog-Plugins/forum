@@ -52,6 +52,11 @@
                 <td class="alignright" style="float:right; white-space:nowrap;">
                     <table border="0" cellspacing="0" cellpadding="0">
                         <tr>
+                            {!if likes_control}
+                            <td style="padding-top:3px; padding-right:3px;">
+                                {likes_control}
+                            </td>                            
+                            {!endif}
                             {edittopic_link}
                             {quotetopic_link}
                         </tr>

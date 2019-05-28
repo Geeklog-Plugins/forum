@@ -2150,4 +2150,48 @@ function plugin_usercontributed_forum($uid)
     return $retval;
 }
 
+/**
+ * Is Likes system enabled for forum posts
+ *
+ * @return   int    0 = disabled, 1 = Likes and Dislikes, 2 = Likes only
+ */
+function plugin_likesenabled_forum()
+{
+    global $_CONF, $CONF_FORUM;
+
+    $retval = false;
+    
+    if ($_CONF['likes_enabled'] AND $CONF_FORUM['likes_forum'] > 0) {
+        $retval = $CONF_FORUM['likes_forum'];
+    }
+
+    return $retval;
+}
+
+/**
+ * Can user perform a like action on item
+ *
+ * @return   bool
+ */
+function plugin_canuserlike_forum($id, $uid, $ip)
+{
+    global $_TABLES;
+
+    $retval = false;
+
+    $sql = "SELECT uid, ip FROM {$_TABLES['forum_topic']} WHERE id = ".$id;
+    $result = DB_query($sql);
+    if (DB_numRows($result) > 0) {
+        list ($owner_id, $owner_ip) = DB_fetchArray($result);
+        if ($owner_id != $uid) {
+            $retval = true;
+        } elseif ($uid == 1 AND $owner_id == 1 AND $ip != $owner_ip) {
+            $retval = true;
+        } 
+
+    }   
+    
+    return $retval;
+}
+
 ?>
