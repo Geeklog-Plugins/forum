@@ -5,23 +5,11 @@
 	<div class="uk-panel uk-margin-bottom">
 		
 	  	<div class="uk-float-left">
-			<div itemscope itemtype="http://schema.org/BreadcrumbList">
-				<ul class="uk-breadcrumb uk-margin-small">
-					<li><i class="uk-icon-folder-o"></i></li>
-					<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-						<a itemprop="item" href="{site_url}/forum/index.php">
-							<span itemprop="name">{forum_home}</span>
-						</a>
-						<meta itemprop="position" content="1" />
-					</li>
-					<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-						<a itemprop="item" href="{site_url}/forum/index.php?category={category_id}">
-							<span itemprop="name">{cat_name}</span>
-						</a>
-						<meta itemprop="position" content="2" />
-					</li>
-				</ul>
-			</div>
+            <ul class="uk-breadcrumb uk-margin-small">
+                <li><i class="uk-icon-folder-o"></i></li>
+                <li><a href="{site_url}/forum/index.php">{forum_home}</a></li>
+                <li><a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a></li>
+            </ul>
 	    </div>
 		
 	  	{#

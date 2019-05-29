@@ -950,6 +950,14 @@ if ($forum == 0) {
         }
 
         if ($numForumsDisplayed > 0) {
+            // Categories are only displayed if forums are found
+            $forum_bc_id = "forum-cat-" . $A['id'];
+            $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+            $url = "{$_CONF['site_url']}/forum/index.php";
+            $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+            $url = "{$_CONF['site_url']}/forum/index.php?category={$A['id']}";
+            $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $A['cat_name']);            
+            
             if (!COM_isAnonUser()) {
                 $link = $_CONF['site_url'] . '/forum/index.php?op=markallread&amp;cat_id=' . $A['id'];
                 $forumlisting->set_var ('markreadlink', $link);
@@ -1026,14 +1034,6 @@ if ($forum > 0) {
     $topiclisting->parse ('img_desc3', 'sort_desc');
     $topiclisting->parse ('img_desc4', 'sort_desc');
     $topiclisting->parse ('img_desc5', 'sort_desc');
-    
-    if (function_exists('prj_getSessionProject')) {
-        $projectid = prj_getSessionProject();
-        if ($projectid > 0) {
-            $link = "<a href=\"{$_CONF['site_url']}/projects/viewproject.php?pid=$projectid\">{$strings['RETURN2PROJECT']}</a>";
-            $topiclisting->set_var ('return2project',$link);
-        }
-    }
 
     switch($sort) {
         case 1:
@@ -1158,6 +1158,15 @@ if ($forum > 0) {
     }
 
     $displaypostpages = $LANG_GF01['PAGES'] .':'; // FIXME: is this used anywhere?
+    
+    $forum_bc_id = "forum-" . $forum;
+    $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+    $url = "{$_CONF['site_url']}/forum/index.php";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+    $url = "{$_CONF['site_url']}/forum/index.php?category={$category['id']}";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $category['cat_name']);
+    $url = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 3, $url, $category['forum_name']);    
 
     while ($record = DB_fetchArray($topicResults,false)) {
 

@@ -211,6 +211,8 @@ function plugin_compatible_with_this_version_forum($pi_name)
         return false;
     }   
 
+    // As of Geeklog v2.2.1
+    // Likes Control and Structured Data Class now required
 	if (!function_exists('LIKES_control')) {
         return false;
     }     

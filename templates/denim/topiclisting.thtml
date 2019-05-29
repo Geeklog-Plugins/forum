@@ -1,28 +1,13 @@
 {# begin {templatelocation} #}
 
 <div class="uk-margin-large">
-
 	<div class="uk-panel">
 	  	<div class="uk-float-left uk-margin-bottom">
-			<ul class="uk-breadcrumb uk-margin-small" itemscope itemtype="http://schema.org/BreadcrumbList">
+			<ul class="uk-breadcrumb uk-margin-small">
 				<li><i class="uk-icon-folder-o"></i></li>
-				<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-					<a itemprop="item" href="{site_url}/forum/index.php">
-						<span itemprop="name">{forum_home}</span>
-					</a>
-				</li>
-				<li itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-					<a itemprop="item" href="{site_url}/forum/index.php?category={category_id}">
-						<span itemprop="name">{cat_name}</span>
-					</a>
-					<meta itemprop="position" content="2" />
-				</li>
-				<li class="uk-active" itemprop="itemListElement" itemscope itemtype="http://schema.org/ListItem">
-					<a itemprop="item" href="{site_url}/forum/index.php?forum={forum_id}">
-						<span itemprop="name">{forum_name}</span>
-					</a>
-					<meta itemprop="position" content="3" />
-				</li>
+				<li><a href="{site_url}/forum/index.php">{forum_home}</a></li>
+				<li><a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a></li>
+				<li class="uk-active"><a href="{site_url}/forum/index.php?forum={forum_id}">{forum_name}</a></li>
 			</ul>
 		</div>
 

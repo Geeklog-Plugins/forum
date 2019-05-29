@@ -192,6 +192,9 @@ if (empty($show) AND $CONF_FORUM['show_posts_perpage'] > 0) {
     $show = 20;
 }
 
+// See if Forum has topic assigned to it
+TOPIC_getTopic('forum', $showtopic);
+
 $sql  = "SELECT a.forum,a.pid,a.locked,a.subject,a.replies,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name ";
 $sql .= "FROM {$_TABLES['forum_topic']} a ";
 $sql .= "LEFT JOIN {$_TABLES['forum_forums']} b ON b.forum_id=a.forum ";
@@ -246,8 +249,8 @@ if ($numpages > 1) {
 }
 
 // Stop timer and print elapsed time
-//$intervalTime = $mytimer->stopTimer();
-//COM_errorLog("Start Topic Display Time: $intervalTime");
+// $intervalTime = $mytimer->stopTimer();
+// COM_errorLog("Start Topic Display Time: $intervalTime");
 
 if ($mode != 'preview') {
 
@@ -347,20 +350,6 @@ if ($mode != 'preview') {
 
     }
 
-    /* Blaine: Commented out this section of code that will trim the displayed title */
-    //if (strlen($viewtopic['subject']) > $CONF_FORUM['show_subject_length'])  {
-    //    $viewtopic['subject'] = substr($viewtopic['subject'], 0, $CONF_FORUM['show_subject_length']);
-    //   $viewtopic['subject'] .= "..";
-    //}
-
-    if (function_exists('prj_getSessionProject')) {
-        $projectid = prj_getSessionProject();
-        if ($projectid > 0) {
-            $link = "<a href=\"{$_CONF['site_url']}/projects/viewproject.php?pid=$projectid\">{$strings['RETURN2PROJECT']}</a>";
-            $topicnavbar->set_var ('return2project',$link);
-        }
-    }
-
     $topicnavbar->set_var ('printlink', "{$_CONF['site_url']}/forum/print.php?id=$showtopic");
     $topicnavbar->set_var ('printlinktext', $LANG_GF01['PRINTABLE']);
     $topicnavbar->set_var ('LANG_print', $LANG_GF01['PRINTABLE']);
@@ -371,9 +360,19 @@ if ($mode != 'preview') {
     $topicnavbar->set_var ('navtopicimg','<img alt="" src="'.gf_getImage('nav_topic').'"' . XHTML . '>');
     $topicnavbar->set_var ('forum_home',$LANG_GF01['INDEXPAGE']);
     $topicnavbar->set_var ('category_id', $viewtopic['forum_cat']);
-    $topicnavbar->set_var ('cat_name', DB_getItem($_TABLES['forum_categories'],"cat_name","id={$viewtopic['forum_cat']}"));
+    $cat_name = DB_getItem($_TABLES['forum_categories'],"cat_name","id={$viewtopic['forum_cat']}");
+    $topicnavbar->set_var ('cat_name', $cat_name);
     $topicnavbar->set_var ('forum_id', $forum);
     $topicnavbar->set_var ('forum_name', $viewtopic['forum_name']);
+    
+    $forum_bc_id = "forum-" . $forum;
+    $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+    $url = "{$_CONF['site_url']}/forum/index.php";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+    $url = "{$_CONF['site_url']}/forum/index.php?category={$viewtopic['forum_cat']}";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $cat_name);
+    $url = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
+    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 3, $url, $viewtopic['forum_name']);
 
     $topicnavbar->set_var ('topic_id', $replytopic_id);
 
