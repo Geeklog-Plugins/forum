@@ -109,6 +109,9 @@ $CONF_FORUM['notify_once'] = 1;
 // When this value is true, set the sort order of the topic view list in ASC.
 $CONF_FORUM['sort_order_asc'] = true;
 
+// Default Geeklog Topic to assign to most forum pages (must be only 1 Topic ID or TOPIC_ALL_OPTION)
+$CONF_FORUM['gl_topic_default'] = TOPIC_ALL_OPTION;
+
 // Mapping of Group Names to badges that can optionally be displayed in Forum Post under user avatar
 // Place images in the directory /forum/forum/image_set/badges
 // Note Root needs a unique mapping since if you are in the Root group, then you are in all groups

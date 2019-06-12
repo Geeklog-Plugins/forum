@@ -36,6 +36,17 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'functions.inc') !== false) {
     die('This file can not be used on its own.');
 }
 
+// used for Likes and Topic controls
+define("PLUGIN_NAME_FORUM", 'forum');
+
+// Forum topic type for Likes
+define("LIKES_TYPE_FORUM_POST", 'post');
+
+// Forum types for Geeklog Topic assignments
+define("TOPIC_TYPE_FORUM_TOPIC", 'topic');
+define("TOPIC_TYPE_FORUM_FORUM", 'forum');
+define("TOPIC_TYPE_FORUM_CATEGORY", 'category');
+
 /**
 * Include language file
 */
@@ -1555,6 +1566,134 @@ function plugin_getdocumentationurl_forum($file)
 }
 
 /**
+* See if topic, forum or category has a Geeklog topic assigned to it and set
+*
+* @param    int     $type   If it is a topic, forum, or category
+* @param    int     $id     Id of forum item
+*
+* @return   
+*
+*/
+function forum_getGeeklogTopic($type, $id) {
+    global $_TABLES, $topic;
+    
+    // If topic assignment not found at current level then check next higher level
+    switch ($type) {
+        case TOPIC_TYPE_FORUM_TOPIC:
+            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+            if (empty($topic)) {
+                $id = DB_getItem($_TABLES['forum_topic'],"forum","id=$id");
+            } else {
+                break;
+            }
+        
+        case TOPIC_TYPE_FORUM_FORUM:
+            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_FORUM);
+
+            if (empty($topic)) {
+                $id = DB_getItem($_TABLES['forum_forums'],"forum_cat","forum_id=$id");
+            } else {
+                break;
+            }
+            
+        case TOPIC_TYPE_FORUM_CATEGORY:
+            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_CATEGORY);
+            
+        default:
+            if (empty($topic) AND !empty($CONF_FORUM['topic_default'])) {
+                // should we set topic like this? maybe create a function
+                $topic = $CONF_FORUM['topic_default'];
+            }
+    }
+ 
+}
+
+// Show Topic assignment label to forum admins and mods and if it was a directly assigned or inherited
+function forum_getGeeklogTopicLabel($sub_type, $id) {
+    global $CONF_FORUM, $_TABLES, $LANG21, $LANG_GF02;
+    
+    $retval = '';
+    $end = 3;
+    $have_id = true;
+    
+    switch ($sub_type) {
+        case TOPIC_TYPE_FORUM_TOPIC:
+            $start = 1;
+            break;
+            
+        case TOPIC_TYPE_FORUM_FORUM:
+            $start = 2;
+            break;
+        
+        case TOPIC_TYPE_FORUM_CATEGORY:
+            $start = 3;
+            break;
+    }
+    
+    $lang_inherited = '';
+    for($i = $start; $i <= $end; ++$i) {
+        switch ($i) {
+            case 2:
+                if (!$have_id) {
+                    $sub_type = TOPIC_TYPE_FORUM_FORUM;
+                    $id = DB_getItem($_TABLES['forum_topic'],"forum","id=$id");
+                }
+                break;
+            
+            case 3:
+                if (!$have_id) {
+                    $sub_type = TOPIC_TYPE_FORUM_CATEGORY;
+                    $id = DB_getItem($_TABLES['forum_forums'],"forum_cat","forum_id=$id");
+                }
+                break;
+        }
+            
+        $sql = "SELECT t.tid, t.topic FROM {$_TABLES['topics']} t, {$_TABLES['topic_assignments']} ta 
+                WHERE t.tid = ta.tid 
+                AND ta.type = '" . PLUGIN_NAME_FORUM . "' 
+                AND ta.subtype = '" . $sub_type . "' AND ta.id = '" . $id . "'" . COM_getPermSQL('AND', 0, 2, 't');
+
+        $result = DB_query($sql);
+        $nrows  = DB_numRows($result);
+        if ($nrows == 0) {
+            // $retval = $LANG21[47]; // None
+        } elseif($nrows == 1) {
+            list ($tid,$topic_name) = DB_fetchARRAY($result);
+            $retval = $topic_name;
+        } else {
+            $retval = $LANG21[44]; // Multiple
+        }
+        
+        if (!empty($retval)) {
+            // See if inherited and from where
+            if ($i != $start AND $i == 2) {
+                $retval = sprintf($LANG_GF02['gl_topics_inherit_forum'], $retval);
+            } elseif ($i != $start AND $i == 3) {
+                $retval = sprintf($LANG_GF02['gl_topics_inherit_category'], $retval);
+            }
+
+            break;
+        } else {
+            $have_id = false;
+        }
+    }
+
+    if (empty($retval) AND !empty($CONF_FORUM['gl_topic_default']) AND $CONF_FORUM['gl_topic_default'] != TOPIC_ALL_OPTION) {
+        $sql = "SELECT tid, topic FROM {$_TABLES['topics']}
+                WHERE tid = '" . $CONF_FORUM['gl_topic_default'] . "'" . COM_getPermSQL('AND');
+
+        $result = DB_query($sql);
+        $nrows  = DB_numRows($result);
+        if ($nrows == 1) {
+            $A = DB_fetchArray($result);
+            $retval = sprintf($LANG_GF02['gl_topics_inherit_config'], $A['topic']);
+        }
+    }        
+    
+    return $retval;
+}
+
+/**
 * Provides text for a Configuration tooltip
 *
 * @param    string  $id     Id of config value
@@ -1586,28 +1725,33 @@ function forum_modPermission($forum,$uid='',$permission='') {
     if ($uid <=1) {
         return FALSE;  // Invalid ID or anonymous user
     }
-
-    /* Retrieve all moderator records for this forum */
-    $modrecords = DB_query("SELECT * FROM {$_TABLES['forum_moderators']} WHERE mod_forum='$forum'");
-    while ($A = DB_fetchArray($modrecords)) {
-        if ($A['mod_groupid'] > 0) {
-            if (SEC_inGroup($A['mod_groupid'],$uid)) {
-                if ($permission != '') {
-                    if ($A[$permission] == '1') {
+    
+    if (SEC_hasRights('forum.edit')) {
+        // If user is part of forum Admin user group then he should automatically be assumed a moderator
+        return TRUE;
+    } else {
+        /* Retrieve all moderator records for this forum */
+        $modrecords = DB_query("SELECT * FROM {$_TABLES['forum_moderators']} WHERE mod_forum='$forum'");
+        while ($A = DB_fetchArray($modrecords)) {
+            if ($A['mod_groupid'] > 0) {
+                if (SEC_inGroup($A['mod_groupid'],$uid)) {
+                    if ($permission != '') {
+                        if ($A[$permission] == '1') {
+                            return TRUE;
+                        }
+                    } else {
                         return TRUE;
                     }
-                } else {
-                    return TRUE;
                 }
-            }
-        } else {
-            if ($A['mod_uid'] == $uid) {
-                if ($permission != '') {
-                    if ($A[$permission] == '1') {
+            } else {
+                if ($A['mod_uid'] == $uid) {
+                    if ($permission != '') {
+                        if ($A[$permission] == '1') {
+                            return TRUE;
+                        }
+                    } else {
                         return TRUE;
                     }
-                } else {
-                    return TRUE;
                 }
             }
         }
@@ -2155,7 +2299,7 @@ function plugin_usercontributed_forum($uid)
  *
  * @return   int    0 = disabled, 1 = Likes and Dislikes, 2 = Likes only
  */
-function plugin_likesenabled_forum()
+function plugin_likesenabled_forum($sub_type)
 {
     global $_CONF, $CONF_FORUM;
 
@@ -2173,7 +2317,7 @@ function plugin_likesenabled_forum()
  *
  * @return   bool
  */
-function plugin_canuserlike_forum($id, $uid, $ip)
+function plugin_canuserlike_forum($sub_type, $id, $uid, $ip)
 {
     global $_TABLES;
 

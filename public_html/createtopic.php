@@ -121,7 +121,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 
     $editAllowed = false;
     $moderator_anon_post = false;
+    $editmoderator = false;
     if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
+        $editmoderator = true;
         $editAllowed = true;
         if (DB_getItem($_TABLES['forum_topic'],'uid',"id='$id'") == 1) {
             $moderator_anon_post = true;
@@ -193,6 +195,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$editid'");
             if ($topicparent == 0) {
                 $topicparent = $editid;
+                
+                // If moderator and a root post
+                if ($editmoderator) {
+                    TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $editid, TOPIC_TYPE_FORUM_TOPIC);
+                }                
             }
 
             //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
@@ -267,7 +274,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
         if ( $msg == '' ) {
             if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
                 strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
-                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {
+                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length'] AND
+                TOPIC_hasMultiTopicAccess('topic') > 2) {
+                // Note: TOPIC_checkTopicSelectionControl not required since Geeklog topics not required
 
                 COM_clearSpeedlimit ($CONF_FORUM['post_speedlimit'], 'forum');
                 $last = COM_checkSpeedlimit ('forum');
@@ -312,9 +321,14 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     $sql .= "VALUES ('$forum','$name','$date',$date,'$subject','$comment', ";
                     $sql .= "'$postmode','$REMOTE_ADDR','$mood','$uid','0','$sticky','$locked')";
                     DB_query($sql);
-
+                    
                     // Find the id of the last inserted topic
                     list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+                    
+                    // If moderator on a root post
+                    if ($editmoderator) {
+                        TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_TOPIC);
+                    }
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
@@ -689,11 +703,11 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $topicnavbar->set_var ('LANG_hhelp', $LANG_GF01['h_help']);
 
     if ((!COM_isAnonUser() AND forum_modPermission($forum, $_USER['uid'], 'mod_edit')) OR SEC_inGroup( 'Root' )) {
-        $editmoderator = TRUE;
+        $editmoderator = true;
         $topicnavbar->set_var ('hidden_modedit', '1');
     } else {
         $topicnavbar->set_var ('hidden_modedit', '0');
-        $editmoderator = FALSE;
+        $editmoderator = false;
     }
 
     if ($method == 'newtopic') {
@@ -773,7 +787,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $submissionform_main->set_file (array ('submissionform_main'=>'submissionform_main.thtml', 
     									   'submissionform_bbcode_help'=>'submissionform_bbcode_help.thtml'));
     
-    $blocks = array('submissionform_anontop', 'submissionform_membertop', 'submissionform_moods', 'submissionform_code', 'submissionform_smilies', 'submissionform_options', 'submissionform_option');
+    $blocks = array('submissionform_anontop', 'submissionform_membertop', 'submissionform_moods', 'submissionform_code', 'submissionform_smilies', 'submissionform_options', 'submissionform_option', 'submissionform_gl_topics');
     foreach ($blocks as $block) {
         $submissionform_main->set_block('submissionform_main', $block);
     }      
@@ -845,6 +859,29 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $submissionform_main->parse ('moods', 'submissionform_moods');
     } else {
         $submissionform_main->set_var('moods', '');
+    }
+    
+    // Only for Forum Admins and Moderators on editing the root parent forum topic or a new root parent forum topic post
+    if (($method == 'newtopic' OR ($method == 'edit' AND $edittopic['pid'] == 0)) AND $editmoderator) {
+        if ( $preview != 'Preview' ) {
+            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
+        } else {
+            // Since preview make sure grab topic selection from control
+            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
+        }
+        // If empty then no edit access to any topics so don't show
+        if (!empty($topic_selection_control)) {
+            $submissionform_main->set_var('LANG_TOPIC', $LANG_ADMIN['topic']);
+            $submissionform_main->set_var('LANG_GL_TOPICS_DESC', $LANG_GF02['gl_topics_desc']);
+
+            // When $method = 'newtopic' then $id will = ''
+            $submissionform_main->set_var('topic_selection', $topic_selection_control);
+            $submissionform_main->parse ('gl_topics', 'submissionform_gl_topics');
+        } else {
+            $submissionform_main->set_var('gl_topics', '');            
+        }
+    } else {
+        $submissionform_main->set_var('gl_topics', '');
     }
 
     $sub_dot = '...';

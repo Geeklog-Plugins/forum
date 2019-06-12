@@ -34,6 +34,10 @@
 				</form>
 			</div>
 		</div>
+        
+        {!if geeklog_topic_category}
+        <div class="uk-text-small">{lang_geeklog_topic} {geeklog_topic_category}</div>
+        {!endif}          
 		
 		<div class="uk-margin-top uk-text-right">	
             <a class="uk-button uk-button-primary" href="{phpself}?mode=add&amp;type=forum&amp;category={catid}&amp;catname={catname}">{addforum}</a>
@@ -64,6 +68,9 @@
 	<td>
 		<a href="messages.php?forum={forumid}&amp;forumname={forumname}">{forumname}</a><br{xhtml}>
 		{forumdscp}
+        {!if geeklog_topic_forum}
+        <div class="uk-text-small">{lang_geeklog_topic} {geeklog_topic_forum}</div>
+        {!endif}           
 	</td>
 	<td class="uk-text-center">{messagecount}</td>
 	<td class="uk-text-center">

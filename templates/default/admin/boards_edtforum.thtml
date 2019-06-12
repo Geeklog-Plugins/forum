@@ -39,6 +39,7 @@
                         <td style="width:50%;" class="pluginCellSubTitle">{LANG_hideposts}</td>
                         <td class="pluginCellText pluginCellFill"><input type="checkbox" name="no_newposts" id="no_newposts" value="1" {chk_newposts}{xhtml}><label for="no_newposts"><span style="padding-left:20px;">{LANG_hidepostsdscp}</span></label></td>
                     </tr>
+                    {gl_topics}
                 </table>
             </td>
         </tr>
@@ -64,5 +65,15 @@
 <!-- BEGIN message -->
 <p class="pluginAlert">{status_message}</p>
 <!-- END message -->
+
+<!-- BEGIN gl_topics_row -->
+<tr>
+    <td style="width:50%;" class="pluginCellSubTitle">{LANG_TOPIC}</td>
+    <td class="pluginCellText pluginCellFill">
+        {topic_selection}
+        {LANG_GL_TOPICS_DESC}
+    </td>
+</tr>
+<!-- END gl_topics_row -->
 
 {# end {templatelocation} #}

@@ -3,7 +3,12 @@
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
         <td style="width:16px;">{navbreadcrumbsimg}</td>
-        <td class="alignleft" style="white-space:nowrap;">&nbsp;<a href="{site_url}/forum/index.php">{forum_home}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?forum={forum_id}">{forum_name}</a></td>
+        <td class="alignleft" style="white-space:nowrap;">
+            &nbsp;<a href="{site_url}/forum/index.php">{forum_home}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a>&nbsp;&#62;&nbsp;<a href="{site_url}/forum/index.php?forum={forum_id}">{forum_name}</a>
+            {!if geeklog_topic}
+            <br><span style="font-size: smaller;">{lang_geeklog_topic} {geeklog_topic}</span>
+            {!endif}  
+        </td>
         <td class="alignright" style="padding-right:10px; white-space:nowrap;">{newtopic_link}</td>
     </tr>
 </table>

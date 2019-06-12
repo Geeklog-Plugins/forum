@@ -55,7 +55,6 @@ $display .= gf_showVariables();
 $confirmbanip     = isset($_POST['confirmbanip'])     ? COM_applyFilter($_POST['confirmbanip'])          : '';
 $confirm_move     = isset($_POST['confirm_move'])     ? COM_applyFilter($_POST['confirm_move'])          : '';
 $fortopicid       = isset($_REQUEST['fortopicid'])    ? COM_applyFilter($_REQUEST['fortopicid'],true)    : '';
-$fortopicid       = isset($_REQUEST['fortopicid'])    ? COM_applyFilter($_REQUEST['fortopicid'],true)    : '';
 $forum            = isset($_REQUEST['forum'])         ? COM_applyFilter($_REQUEST['forum'],true)         : '';
 $hostip           = isset($_POST['hostip'])           ? COM_applyFilter($_POST['hostip'])                : '';
 $modconfirmdelete = isset($_POST['modconfirmdelete']) ? COM_applyFilter($_POST['modconfirmdelete'])      : '';
@@ -90,7 +89,9 @@ if (forum_modPermission($forum,$_USER['uid'])) {
 
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'");
             if ($top == 'yes') {
-                LIKES_deleteActions('forum', $msgid);
+                LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $msgid);
+                
+                TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $msgid, TOPIC_TYPE_FORUM_TOPIC);
                 
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
                 
@@ -109,7 +110,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=0 WHERE forum_id=$forum");
                 }
             } else {
-                LIKES_deleteActions('forum', $msgid);
+                LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $msgid);
                 
                 DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies-1 WHERE id=$topicparent");
                 DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");

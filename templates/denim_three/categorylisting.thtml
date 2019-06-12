@@ -21,6 +21,9 @@
 	    #}
         <h2 class="clearboth">{cat_name_category}</h2>
         
+        {!if geeklog_topic}
+        <div class="uk-text-small">{lang_geeklog_topic} {geeklog_topic}</div>
+        {!endif}         
 
 	  	<div class="uk-float-right uk-text-right">
 			{categorymenu_link}

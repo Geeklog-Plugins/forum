@@ -361,6 +361,13 @@ $LANG_GF02 = array(
     'EditTopic' => '덧글편집',
     'quietforum' => '게시판에 신규덧글은 없습니다'
 );
+$LANG_GF02['adminconfirmation']   = 'Administrator Confirmation';
+$LANG_GF02['num_forumposts']   = '%s Forum Post(s)';
+$LANG_GF02['gl_topics_desc']   = '<em>Important:</em> These are Geeklog Topics (which you have Edit access for) which can be assigned to the root parent forum topic post (which then applies to the entire fourm topic) or the Forum, or Category itself. If Geeklog Topics are assigned to the Category or Forum they will then be inherited by and items below it (unless that item is assigned to another Geeklog Topic).<br' . XHTML . '><br' . XHTML . '>Since Blocks (and their positions) are assigned to Geeklog Topics this allows you to select the Geeklog Topic you want and then have these Blocks display for the forum topic. This also allows the blocks postion "Forum Show Topic" to be used more effectively.<br' . XHTML . '><br' . XHTML . '>The Geeklog Topic assignment(s) for forum topics does not affect the permissions of the forum (like it does with articles). If the visitor has access to view the forum post but not the topic assigned to it then "All Topics" is assumed. If no Geeklog Topics are assigned to the forum topic then the default "All Topics" is assumed.';
+$LANG_GF02['gl_topics_inherit_category'] = '%s (inherited from Category)';
+$LANG_GF02['gl_topics_inherit_forum'] = '%s (inherited from Forum)';
+$LANG_GF02['gl_topics_inherit_config'] = '%s (inherited from Config)';
+$LANG_GF02['gl_topics_assigned']   = 'Geeklog Topic Assigned:';
 
 $LANG_GF03 = array(
     'delete' => '삭제',

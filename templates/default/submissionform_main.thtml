@@ -20,6 +20,7 @@
             </tr>
             {captcha}
             {options}
+            {gl_topics}
             <tr>
                 <td class="pluginCellSubTitle" style="padding:15px 5px 15px 10px; vertical-align:center;">{LANG_SUBMIT}</td>
                 <td class="pluginCellText pluginCellFill alignright">
@@ -136,5 +137,15 @@
 	{option_extra}
 </td>
 <!-- END submissionform_option -->
+
+<!-- BEGIN submissionform_gl_topics -->
+<tr>
+    <td class="pluginCellSubTitle">&nbsp;{LANG_TOPIC}:</td>
+    <td class="pluginCellText pluginCellFill">
+        {topic_selection}
+        {LANG_GL_TOPICS_DESC}
+    </td>
+</tr>
+<!-- END submissionform_gl_topics -->
 
 {# end {templatelocation} #}

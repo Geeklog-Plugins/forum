@@ -12,7 +12,11 @@
 		</div>
 
         <h2 class="clearboth">{forum_name_forum}</h2>
-            
+        
+        {!if geeklog_topic}
+        <div class="uk-text-small">{lang_geeklog_topic} {geeklog_topic}</div>
+        {!endif}
+        
 		<div class="uk-float-right uk-text-right uk-margin-bottom">
 			{forummenu_link}
 			{newtopic_link}

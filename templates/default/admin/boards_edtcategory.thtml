@@ -22,6 +22,7 @@
                         <td class="pluginCellSubTitle">{LANG_DESCRIPTION}</td>
                         <td class="pluginCellText pluginCellFill"><input type="text" name="dscp" value="{catdscp}" size="70"{xhtml}></td>
                     </tr>
+                    {gl_topics}
                 </table>
             </td>
         </tr>
@@ -47,5 +48,15 @@
 <!-- BEGIN message -->
 <p class="pluginAlert">{status_message}</p>
 <!-- END message -->
+
+<!-- BEGIN gl_topics_row -->
+<tr>
+    <td class="pluginCellSubTitle">{LANG_TOPIC}</td>
+    <td class="pluginCellText pluginCellFill">
+        {topic_selection}
+        {LANG_GL_TOPICS_DESC}
+    </td>
+</tr>
+<!-- END gl_topics_row -->
 
 {# end {templatelocation} #}

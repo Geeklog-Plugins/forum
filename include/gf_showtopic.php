@@ -474,7 +474,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 
     if ($mode != 'preview') { // Still allow for locked topics and read only forums
         if ($_CONF['likes_enabled'] != 0 && $CONF_FORUM['likes_forum'] != 0) {
-            $topictemplate->set_var('likes_control',LIKES_control('forum', $showtopic['id'], $CONF_FORUM['likes_forum']));
+            $topictemplate->set_var('likes_control',LIKES_control(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $showtopic['id'], $CONF_FORUM['likes_forum']));
         } else {
             $topictemplate->set_var('likes_control', '');
         }

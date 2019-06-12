@@ -109,7 +109,11 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
             $forum = $A['forum'];
             $topicparent = $A['pid'];
             
-            LIKES_deleteActions('forum', $id);
+            LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
+            
+            if ($topicparent == 0) { // Root Forum Topic Post
+                TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+            }            
         
             // Delete Record
             DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
@@ -135,7 +139,11 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
         $forum = $A['forum'];
         $topicparent = $A['pid'];
         
-        LIKES_deleteActions('forum', $id);
+        LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
+        
+        if ($topicparent == 0) { // Root Forum Topic Post
+            TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+        }
     
         // Delete Record
         DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");

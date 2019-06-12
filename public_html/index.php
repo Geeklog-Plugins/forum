@@ -795,6 +795,9 @@ if ($forum == 0) {
 		COM_handle404($base_url);    
 	}
     
+    // Find topic assignment if exists for forum or at a higher level
+    forum_getGeeklogTopic(TOPIC_TYPE_FORUM_CATEGORY, $category);
+    
     $forumlisting = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $forumlisting->set_file (array (
             'forumlisting'         => 'homepage.thtml',
@@ -836,6 +839,15 @@ if ($forum == 0) {
         $forumlisting->set_var ('LANGGF01_POSTS', $LANG_GF01['POSTS']);
         $forumlisting->set_var ('LANGGF01_LASTPOST', $LANG_GF01['LASTPOST']);
         $forumlisting->set_var ('cat_name_category', sprintf($LANG_GF01['FORUMCATEGORYNAME'], $A['cat_name']));
+        
+        $geeklog_topic = '';
+        if (SEC_hasRights('forum.edit')) {
+            $geeklog_topic = forum_getGeeklogTopicLabel(TOPIC_TYPE_FORUM_CATEGORY, $A['id']);
+            if (!empty($geeklog_topic)) {
+                $forumlisting->set_var ('lang_geeklog_topic', $LANG_GF02['gl_topics_assigned']);
+            }
+        }
+        $forumlisting->set_var ('geeklog_topic', $geeklog_topic);        
 
         //Display all forums under each cat
         $sql = "SELECT * FROM {$_TABLES['forum_forums']} AS f LEFT JOIN {$_TABLES['forum_topic']} AS t ON f.last_post_rec=t.id WHERE forum_cat='{$A['id']}' ";
@@ -998,7 +1010,10 @@ if ($forum == 0) {
 
  // Display Forums
 if ($forum > 0) {
-
+    // Check Geeklog Topic after we make sure user has access
+    // Find topic assignment if exists for forum or at a higher level
+    forum_getGeeklogTopic(TOPIC_TYPE_FORUM_FORUM, $forum);
+ 
     $topiclisting = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $topiclisting->set_file (array (
             'topiclisting'         => 'topiclisting.thtml',
@@ -1136,6 +1151,16 @@ if ($forum > 0) {
     $topiclisting->set_var ('forum_name', $category['forum_name']);
     $topiclisting->set_var ('forum_id', $forum);
     $topiclisting->set_var ('forum_name_forum', sprintf($LANG_GF01['FORUMNAME'], $category['forum_name']));
+    
+    $geeklog_topic = '';
+    if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
+        $geeklog_topic = forum_getGeeklogTopicLabel(TOPIC_TYPE_FORUM_FORUM, $forum);
+        if (!empty($geeklog_topic)) {
+            $topiclisting->set_var ('lang_geeklog_topic', $LANG_GF02['gl_topics_assigned']);
+        }
+    }
+    $topiclisting->set_var ('geeklog_topic', $geeklog_topic);
+    
     $topiclisting->set_var ('imgset', $CONF_FORUM['imgset']);
     $topiclisting->set_var ('LANG_TOPIC', $LANG_GF01['TOPICSUBJECT']);
     $topiclisting->set_var ('LANG_STARTEDBY', $LANG_GF01['STARTEDBY']);

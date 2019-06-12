@@ -3,7 +3,12 @@
 <table width="100%" border="0" cellspacing="0" cellpadding="0" style="padding-right:15px;" class="pluginHeader">
     <tr class="pluginLinks" style="vertical-align: middle; height:25px;">
         <td style="height:22px; width:22px">{forumindeximg}</td>
-        <td class="pluginHeader alignleft" style="width:95%; white-space:nowrap">&nbsp;<a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a></td>
+        <td class="pluginHeader alignleft" style="width:95%; white-space:nowrap">
+            &nbsp;<a href="{site_url}/forum/index.php?category={category_id}">{cat_name}</a>
+            {!if geeklog_topic}
+            <br><span style="font-size: smaller;">{lang_geeklog_topic} {geeklog_topic}</span>
+            {!endif}          
+        </td>
         {newposts_link}
         <td>&nbsp;</td>
         {markread_link}

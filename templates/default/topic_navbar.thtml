@@ -6,7 +6,12 @@
         <td rowspan="2" class="alignright" style="padding-left:5px; white-space:nowrap;">{newtopic_link} {replytopic_link}</td>
     </tr>
     <tr>
-        <td colspan="2" style="padding-bottom:5px;">{navtopicimg}&nbsp;<b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b></td>
+        <td colspan="2" style="padding-bottom:5px;">
+            {navtopicimg}&nbsp;<b><a href="viewtopic.php?showtopic={topic_id}">{subject}</a></b>
+            {!if geeklog_topic}
+            <br><span style="font-size: smaller;">{lang_geeklog_topic} {geeklog_topic}</span>
+            {!endif}         
+        </td>
     </tr>
 </table>
 <table border="0" cellspacing="0" cellpadding="2" width="100%">

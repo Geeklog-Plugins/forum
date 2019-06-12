@@ -16,6 +16,7 @@
 	</div>	
 </div>
 {options}
+{gl_topics}
 {!if captcha}
 <div class="uk-margin">
     <div class="uk-align-right">
@@ -151,5 +152,17 @@
 		{LANG_OPTION}
 	</label>
 <!-- END submissionform_option -->
+
+<!-- BEGIN submissionform_gl_topics -->
+<hr>
+<div class="uk-margin">
+	<label class="uk-form-label" for="form-forum-topics">{LANG_TOPIC}</label>
+	<div class="uk-form-controls">
+        {topic_selection}
+        {LANG_GL_TOPICS_DESC}
+	</div>
+</div>
+<hr>
+<!-- END submissionform_gl_topics -->
 
 {# end {templatelocation} #}

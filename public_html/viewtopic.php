@@ -192,8 +192,8 @@ if (empty($show) AND $CONF_FORUM['show_posts_perpage'] > 0) {
     $show = 20;
 }
 
-// See if Forum has topic assigned to it
-TOPIC_getTopic('forum', $showtopic);
+// Find topic assignment if exists for topic or at a higher level
+forum_getGeeklogTopic(TOPIC_TYPE_FORUM_TOPIC, $showtopic);
 
 $sql  = "SELECT a.forum,a.pid,a.locked,a.subject,a.replies,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name ";
 $sql .= "FROM {$_TABLES['forum_topic']} a ";
@@ -387,6 +387,15 @@ if ($mode != 'preview') {
     $topicnavbar->set_var ('subject', $viewtopic['subject']);
     $topicnavbar->set_var ('LANG_HOME', $LANG_GF01['HOMEPAGE']);
     $topicnavbar->set_var ('pagenavigation', $pagenavigation);
+    
+    $geeklog_topic = '';
+    if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
+        $geeklog_topic = forum_getGeeklogTopicLabel(TOPIC_TYPE_FORUM_TOPIC, $replytopic_id);
+        if (!empty($geeklog_topic)) {
+            $topicnavbar->set_var ('lang_geeklog_topic', $LANG_GF02['gl_topics_assigned']);
+        }
+    }
+    $topicnavbar->set_var ('geeklog_topic', $geeklog_topic);      
     
 	$topicnavbar->parse ('topicmenu_link', 'topicmenu_link');
     

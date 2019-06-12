@@ -23,6 +23,10 @@
 	</a>
 </h2>
 
+{!if geeklog_topic}
+<div class="uk-text-small">{lang_geeklog_topic} {geeklog_topic}</div>
+{!endif} 
+
 <div class="uk-margin-bottom uk-text-right">
 	{topicmenu_link}
 	{newtopic_link}

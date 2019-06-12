@@ -15,8 +15,12 @@
                 <tr>
                     <td style="height:8px; width:10px;"><img alt="" src="{imgset}/forumindex.png" style="border:none;"{xhtml}></td>
                     <td class="pluginHeader alignleft" style="white-space:nowrap;">&nbsp;{catname}:</td>
+                    <td class="alignleft">{catdesc}</td>
                     <td class="alignright" style="white-space:nowrap;">{LANG_catorder}:&nbsp;{catorder}&nbsp;&nbsp;</td>
                 </tr>
+                {!if geeklog_topic_category}
+                <tr><td colspan="2"></td><td colspan="2">{lang_geeklog_topic} {geeklog_topic_category}</td></tr>
+                {!endif}                  
             </table>
         </td>
     </tr>
@@ -81,7 +85,12 @@
 			</table>
 		</form>
 	</td>
-	<td class="pluginCellText pluginCellFill" style="vertical-align:top;text-align:left;"><a href="messages.php?forum={forumid}&amp;forumname={forumname}">{forumname}</a><br{xhtml}>{forumdscp}</td>
+	<td class="pluginCellText pluginCellFill" style="vertical-align:top;text-align:left;"><a href="messages.php?forum={forumid}&amp;forumname={forumname}">{forumname}</a><br{xhtml}>{forumdscp}
+        {!if geeklog_topic_forum}
+        <br{xhtml}>{lang_geeklog_topic} {geeklog_topic_forum}
+        {!endif}     
+    
+    </td>
 	<td class="pluginCellText pluginCellFill aligncenter" style="white-space:nowrap;">{messagecount}</td>
 	<td class="pluginCellText pluginCellFill" style="padding:0 6px; white-space:nowrap;">
 		<!-- CHANGE FORUM ORDER -->
