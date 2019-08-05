@@ -724,7 +724,7 @@ function forum_addForum($name,$category,$dscp="",$order="",$grp_id=2,$is_readonl
     list ($forumid) = DB_fetchArray($query);
     $modquery = DB_query("SELECT * FROM {$_TABLES['forum_moderators']} WHERE mod_uid='{$_USER['uid']}' AND mod_forum='$forumid'");
     if (DB_numrows($modquery) < 1){
-        DB_query("INSERT INTO {$_TABLES['forum_moderators']} (mod_uid,mod_username,mod_forum,mod_delete,mod_ban,mod_edit,mod_move,mod_stick) VALUES ('{$_USER['uid']}','{$_USER[username]}', '$forumid','1','1','1','1','1')");
+        DB_query("INSERT INTO {$_TABLES['forum_moderators']} (mod_uid,mod_username,mod_forum,mod_delete,mod_ban,mod_edit,mod_move,mod_stick) VALUES ('{$_USER['uid']}','{$_USER['username']}', '$forumid','1','1','1','1','1')");
     }
     
     // Must have Edit access to all topics selected
