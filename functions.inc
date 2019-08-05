@@ -2338,4 +2338,71 @@ function plugin_canuserlike_forum($sub_type, $id, $uid, $ip)
     return $retval;
 }
 
+/**
+ * Return list of Forum Topics for the Related Items block
+ *
+ * @param    array $tids list of topic ids
+ * @param    int   $max  maximum number of items to return
+ * @param    int   $trim max length of text
+ * @return   array   array of links to related staticpages with unix timestamp as key
+ */
+function plugin_getrelateditems_forum($tids, $max, $trim)
+{
+    global $_CONF, $_TABLES, $_GROUPS;
+    
+    // Note: This function currently only returns related forum topics that have been assigned directly to a topic 
+    // and inherited from a forum. It does not return topics inherited from a category or if defaulted using the forum config.
+
+    $newforumtopics = array();
+
+/*        
+    // Find newest Forum Topics user has access too
+    $sql = "SELECT ft.id, ft.subject title, ft.date forum_date  
+        FROM {$_TABLES['topic_assignments']} ta, {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
+        WHERE ta.type = '" . PLUGIN_NAME_FORUM . "' AND ta.subtype = '" . TOPIC_TYPE_FORUM_TOPIC . "' AND ta.id = ft.id AND (ta.tid IN ('" . implode("','", $tids) . "'))
+        AND ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 AND ft.pid = 0
+        GROUP BY ft.id ORDER BY forum_date DESC LIMIT {$max}";        
+*/
+
+    // Find newest Forum Topics user has access too. Check both forum topics and the forum itself
+    $sql = "SELECT ft.id, ft.subject title, ft.date forum_date  
+        FROM {$_TABLES['topic_assignments']} ta, {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
+        WHERE ta.type = '" . PLUGIN_NAME_FORUM . "' 
+        AND ((ta.subtype = '" . TOPIC_TYPE_FORUM_TOPIC . "' AND ta.id = ft.id)  
+        OR (ta.subtype = '" . TOPIC_TYPE_FORUM_FORUM . "' AND ta.id = ft.forum))
+        AND (ta.tid IN ('" . implode("','", $tids) . "'))
+        AND ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 AND ft.pid = 0
+        GROUP BY ft.id ORDER BY forum_date DESC LIMIT {$max}";
+    $result = DB_query($sql);
+    $nrows = DB_numRows($result);
+
+    if ($nrows > 0) {
+        $newforumtopics = array();
+
+        for ($x = 0; $x < $nrows; $x++) {
+            $A = DB_fetchArray($result);
+
+            $url = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+
+            $title = COM_undoSpecialChars(stripslashes($A['title']));
+            if ($trim > 0) {
+                $titletouse = COM_truncate($title, $trim, '...');
+            } else {
+                $titletouse = $title;
+            }
+            if ($title != $titletouse) {
+                $attr = array('title' => htmlspecialchars($title));
+            } else {
+                $attr = array();
+            }
+            $aforumtopic = str_replace('$', '&#36;', $titletouse);
+            $aforumtopic = str_replace(' ', '&nbsp;', $aforumtopic);
+
+            $newforumtopics[$A['forum_date']] = COM_createLink($aforumtopic, $url, $attr);
+        }
+    }
+
+    return $newforumtopics;
+}
+
 ?>
