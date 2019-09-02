@@ -90,7 +90,10 @@
                     {!if avatar}
                     <div style="padding-top:3px;">{avatar}<br{xhtml}>{user_status}</div>
                     {!else}
-                    <div style="padding-top:3px;max-width:120px"><img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto" style="width:100%;"{xhtml}><br{xhtml}>{user_status}</div>
+                    {# Require avatar image no matter how Geeklog is configured to ensure proper looking layout #}
+                    <div style="padding-top:3px;max-width:120px">
+                        <img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto" style="width:100%;"{xhtml}><br{xhtml}>{user_status}
+                    </div>
                     {!endif}
                     {member_badge}<br{xhtml}>
                     {regdate}<br{xhtml}>
@@ -107,7 +110,8 @@
 <!-- BEGIN block_anon_user_information -->
         <div>
                     {mood_icon}
-                    <div style="padding-top:3px;max-width:130px"><img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto" style="width:100%;"{xhtml}></div>
+                    {# Require avatar image for consistency with actual users #}
+                    <div style="padding-top:3px;max-width:130px"><img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto" style="width:100%;"{xhtml}></div>
                     {!if ip_address}<div style="text-align: center">{ip_address}{!endif}
         </div>
 <!-- END block_anon_user_information -->

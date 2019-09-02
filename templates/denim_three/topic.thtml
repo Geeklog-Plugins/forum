@@ -51,7 +51,8 @@
 					<div class="uk-panel">
 						<div class="uk-inline-clip uk-transition-toggle">
 							<figure class="forum-userphoto">
-		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto"{xhtml}>{!endif}
+                                {# Require avatar image no matter how Geeklog is configured since overlay is used #}
+		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 		                    </figure>
 							<div class="uk-transition-fade uk-position-cover uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle">
                                 {profile_link}
@@ -93,8 +94,9 @@
 			<div class="uk-clearfix glforum-userinfo-container">
 				<div class="glforum-userinfo-thumbnail">
 					<div class="uk-panel">
+                        {# Require avatar image for consistency with actual users #}
 						<figure class="forum-userphoto">
-	                    	<img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto"{xhtml}>
+	                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 	                    </figure>
 					</div>
 				</div>

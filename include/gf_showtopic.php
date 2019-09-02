@@ -188,15 +188,6 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
             }
         }
 
-        // Still allow photo to be shown for users 
-        if ($showtopic['uid'] > 1 AND ($userarray['photo'] != "" OR !empty($_CONF['default_photo']))) {
-            $avatar = USER_getPhoto($showtopic['uid'],'','',$CONF_FORUM['avatar_width']);
-            $min_height = $min_height + 50;
-        } else {
-			$avatar = '';
-            $user_status = '';
-		}
-
         $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate']));
         $numposts = $LANG_GF01['POSTS']. ': ' .$posts;
         if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
@@ -214,6 +205,12 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     } else {
         $uservalid = false;
         $userlink = urldecode($showtopic['name']);
+    }
+    
+    // As of Geeklog 2.2.1 it now returns a photo for anonymous user if configured
+    $avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
+    if (!empty($avatar)) {
+        $min_height = $min_height + 50;
     }
 
     if ($CONF_FORUM['show_moods'] &&  $showtopic['mood'] != "") {
@@ -591,4 +588,5 @@ function gf_chkpostmode($postmode,$postmode_switch) {
     
     return $postmode;
 }
+
 ?>

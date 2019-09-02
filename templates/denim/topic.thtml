@@ -50,8 +50,9 @@
 				<div class="glforum-userinfo-thumbnail">
 					<div class="uk-thumbnail uk-overlay-toggle uk-border-square">
 						<div class="uk-overlay uk-overlay-hover">
+                            {# Require avatar image no matter how Geeklog is configured since overlay is used #}
 							<figure class="uk-align-center forum-userphoto">
-		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto"{xhtml}>{!endif}
+		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 		                    </figure>
 							<div class="uk-overlay-area uk-border-square">
 								<div class="uk-overlay-area-content">
@@ -95,8 +96,9 @@
 			<div class="uk-clearfix glforum-userinfo-container">
 				<div class="glforum-userinfo-thumbnail">
 					<div class="uk-thumbnail uk-border-square">
+                        {# Require avatar image for consistency with actual users #}
 						<figure class="forum-userphoto">
-	                    	<img src="{site_url}/forum/image_set/avatar.png" alt="" class="userphoto"{xhtml}>
+	                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 	                    </figure>
 					</div>
 				</div>
