@@ -53,6 +53,7 @@ $_CONF_VALIDATE['forum']['usermenu']              = array(
 $_CONF_VALIDATE['forum']['likes_forum'] = array(
     'rule' => array('inList', array(0, 1, 2), false)
 );  
+$_CONF_VALIDATE['forum']['recaptcha'] = ['rule' => ['inList', ['0', '1', '2'], true]];
 
 // Topic Posting Settings
 $_CONF_VALIDATE['forum']['show_subject_length']   = array('rule' => 'numeric');

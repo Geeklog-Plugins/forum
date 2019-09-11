@@ -615,6 +615,7 @@ $LANG_confignames['forum'] = array(
     'showblocks' => 'Block Columns to Show with Forum',
     'usermenu' => 'Tipo del Menu Utente',
     'likes_forum' => 'Forum Likes',
+    'recaptcha' => 'reCAPTCHA',
     'show_subject_length' => 'Mass Lunghezza del Oggetto',
     'min_username_length' => 'Min Lunghezza del Nome Utente',
     'min_subject_length' => 'Min Lunghezza del Oggetto',
@@ -704,6 +705,7 @@ $LANG_configselects['forum'] = array(
     13 => array('No access' => 0, 'Use' => 2),
     14 => array('No access' => 0, 'Read-Only' => 2),
     15 => array('All' => 'TOPIC_ALL_OPTION', 'Homepage Only' => 'TOPIC_HOMEONLY_OPTION', 'Select Topics' => 'TOPIC_SELECTED_OPTION'),
+    16 => array('Disabled' => RECAPTCHA_NO_SUPPORT, 'reCAPTCHA V2' => RECAPTCHA_SUPPORT_V2, 'reCAPTCHA V2 Invisible' => RECAPTCHA_SUPPORT_V2_INVISIBLE),
     41 => array('False' => 0, 'Likes and Dislikes' => 1, 'Likes Only' => 2)
 );
 

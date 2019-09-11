@@ -57,7 +57,8 @@ $_FORUM_DEFAULT = array(
     'show_searches_perpage' => '20',
     'showblocks'            => 'leftblocks', // Added
     'usermenu'              => 'blockmenu',  // Added
-    'likes_forum'           => '1',  
+    'likes_forum'           => '1',
+    'recaptcha'             => RECAPTCHA_SUPPORT_V2, // Possible values are: RECAPTCHA_SUPPORT_NONE, RECAPTCHA_SUPPORT_V2, RECAPTCHA_SUPPORT_V2_INVISIBLE
     'use_themes_template'   => '0',          // Now removed but left in as may be need if user is upgrading from a really old version
     // ----------------------------------
     'show_subject_length'   => '75',
@@ -155,6 +156,7 @@ function plugin_initconfig_forum()
         $c->add('usermenu',              $_FORUM_DEFAULT['usermenu'],              'select',   0, 0, 7,    $o++, true, $n, $t);
         //$c->add('use_themes_template',   $_FORUM_DEFAULT['use_themes_template'],   'select',   0, 0, 0,    $o++, true, $n, $t);
         $c->add('likes_forum',           $_FORUM_DEFAULT['likes_forum'],           'select',   0, 0, 41,   $o++, true, $n, $t);
+        $c->add('recaptcha',             $_FORUM_DEFAULT['recaptcha'],             'select',   0, 0, 16,   $o++, true, $n, $t);
         // ----------------------------------
         $t = 1;
         $c->add('tab_topicposting',      NULL,                                     'tab',      0, $t, NULL, 0,   true, $n, $t);
@@ -454,11 +456,15 @@ function forum_update_ConfValues_2_9_4()
 	$c = config::get_instance();
 
     $n = 'forum';
-    $o = 59;
-    $t = 0;
-    
+
     // Add Likes System config value
+    $o = 59;
+    $t = 0;    
     $c->add('likes_forum',           $_FORUM_DEFAULT['likes_forum'],           'select',   0, 0, 41,   $o, true, $n, $t);
+    // Add reCAPTCHA plugin v1.2.1+ support
+    $o = 60;
+    $t = 0;    
+    $c->add('recaptcha',             $_FORUM_DEFAULT['recaptcha'],             'select',   0, 0, 16,   $o++, true, $n, $t);
     
 	return true;	
 }

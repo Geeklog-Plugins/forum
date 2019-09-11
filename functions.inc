@@ -2405,4 +2405,28 @@ function plugin_getrelateditems_forum($tids, $max, $trim)
     return $newforumtopics;
 }
 
+/**
+ * Return the info asked by PLG_collectRecaptchaInfo().
+ *
+ * @return  array of type => [
+ *              'type'     => type               // required, passed as the 1st parameter to
+ *                                                  plugin_templatesetvars_xxx()
+ *              'version'  => reCAPTCHA version, // required: RECAPTCHA_NO_SUPPORT(0), RECAPTCHA_SUPPORT_V2(1),
+ *                                                  RECAPTCHA_SUPPORT_V2_INVISIBLE(2)
+ *              'form_id'  => form id,           // required only for reCAPTCHA V2 Invisible
+ *           ]
+ */
+function plugin_supportsRecaptcha_forum()
+{
+    global $CONF_FORUM;
+
+    return [
+        [
+            'type'    => 'forum',
+            'version' => (isset($CONF_FORUM['recaptcha']) ? (int) $CONF_FORUM['recaptcha'] : RECAPTCHA_SUPPORT_V2_INVISIBLE),
+            'form_id' => 'forumform',
+        ],
+    ];
+}
+
 ?>
