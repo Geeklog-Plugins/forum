@@ -1108,6 +1108,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 		$submissionform_main->parse ('smilies', 'submissionform_smilies');
 	}
     $submissionform_main->set_var ('hide_notify', ($uid == 1) ? 'none' : '');
+    /*
     if ( function_exists('plugin_templatesetvars_captcha') ) {
         plugin_templatesetvars_captcha('forum', $submissionform_main);
     } else {
@@ -1117,6 +1118,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             $submissionform_main->set_var ('captcha','');
         }
     }
+    */
+    PLG_templateSetVars('forum', $submissionform_main); // Instead of calling plugin_templatesetvars_captcha directly for captcha etc...
 
     if ($method == 'edit') {
         if ($CONF_FORUM['allow_smilies']) {
