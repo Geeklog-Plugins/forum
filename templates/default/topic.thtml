@@ -39,6 +39,7 @@
     <td style="padding-left:6px; padding-right:6px;">
         <table width="100%" border="0" cellspacing="0" cellpadding="0">
             <tr>
+                {!!if {profile_link} != '' OR {email_link} != '' OR {website_link} != '' OR {pm_link} != '' !!}
                 <td style="white-space:nowrap;">
                     <table border="0" cellspacing="0" cellpadding="0">
                         <tr>
@@ -49,6 +50,7 @@
                         </tr>
                     </table>
                 </td>
+                {!endif}
                 <td class="alignright" style="float:right; white-space:nowrap;">
                     <table border="0" cellspacing="0" cellpadding="0">
                         <tr>

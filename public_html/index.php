@@ -926,7 +926,8 @@ if ($forum == 0) {
                 $lastpostmsgDate  = '<span class="forumtxt">' . $LANG_GF01['ON']. '</span>' .$lastdate;
                 if ($B['uid'] > 1) {
                     $lastposterName = COM_getDisplayName($B['uid']);
-                    $by = '<a href="' .$_CONF['site_url']. '/users.php?mode=profile&amp;uid=' .$B['uid']. '">' .$lastposterName. '</a>';
+                    //$by = '<a href="' .$_CONF['site_url']. '/users.php?mode=profile&amp;uid=' .$B['uid']. '">' .$lastposterName. '</a>';
+                    $by = COM_getProfileLink($B['uid'], $lastposterName);
                 } else {
                     $by = $B['name'];
                 }
@@ -1226,9 +1227,10 @@ if ($forum > 0) {
 
         // Check if user is an anonymous poster
         if ($record['uid'] > 1) {
-            $showuserlink = '<span class="replypagination">';
-            $showuserlink .= "<a href=\"{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$record['uid']}\">{$record['name']}";
-            $showuserlink .= '</a></span>';
+            //$showuserlink = '<span class="replypagination">';
+            //$showuserlink .= "<a href=\"{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$record['uid']}\">{$record['name']}";
+            //$showuserlink .= '</a></span>';
+            $showuserlink = COM_getProfileLink($record['uid'], $record['name']);
         } else {
             $showuserlink= $record['name'];
         }

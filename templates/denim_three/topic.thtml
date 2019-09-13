@@ -54,12 +54,14 @@
                                 {# Require avatar image no matter how Geeklog is configured since overlay is used #}
 		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 		                    </figure>
+                            {!!if {profile_link} != '' OR {email_link} != '' OR {website_link} != '' OR {pm_link} != '' !!}
 							<div class="uk-transition-fade uk-position-cover uk-overlay uk-overlay-default uk-flex uk-flex-center uk-flex-middle">
                                 {profile_link}
                                 {email_link}
                                 {website_link}
                                 {pm_link}
 							</div>
+                            {!endif}
 						</div>
 					</div>
 					<div class="uk-text-small">{user_status}</div>

@@ -54,6 +54,7 @@
 							<figure class="uk-align-center forum-userphoto">
 		                    	{!if avatar}{avatar}{!else}<img src="{site_url}/forum/image_set/avatar.jpg" alt="" class="userphoto"{xhtml}>{!endif}
 		                    </figure>
+                            {!!if {profile_link} != '' OR {email_link} != '' OR {website_link} != '' OR {pm_link} != '' !!}
 							<div class="uk-overlay-area uk-border-square">
 								<div class="uk-overlay-area-content">
 									{profile_link}
@@ -62,6 +63,7 @@
 									{pm_link}
 								</div>
 							</div>
+                            {!endif}
 						</div>
 					</div>
 					<div class="uk-text-small">{user_status}</div>

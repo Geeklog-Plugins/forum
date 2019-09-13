@@ -93,7 +93,7 @@ function showrank($rank, $rankname)
 
 function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 {
-    global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09;
+    global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09, $LANG28;
     global $highlight;
     global $oldPost;
 
@@ -151,11 +151,15 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     		AND u.uid = '{$showtopic['uid']}'";
     
     $userQuery = DB_query($sql);
+    $isUserBanned = false;
     if ($showtopic['uid'] > 1 AND DB_numRows($userQuery) == 1) {
+        $isUserBanned = USER_isBanned($showtopic['uid']);
         $userarray = DB_fetchArray($userQuery);
         $username = COM_getDisplayName($showtopic['uid']);
-        $userlink = "<a href=\"{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$showtopic['uid']}\" ";
-        $userlink .= "class=\"authorname {$onetwo}\"><b>{$username}</b></a>";
+        //$userlink = "<a href=\"{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$showtopic['uid']}\" ";
+        //$userlink .= "class=\"authorname {$onetwo}\"><b>{$username}</b></a>";
+        $userlink = COM_getProfileLink($showtopic['uid'], $username);
+        
         $uservalid = true;
         $postcount = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE uid='{$showtopic['uid']}'");
         $posts = DB_numRows($postcount);
@@ -190,10 +194,14 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 
         $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate']));
         $numposts = $LANG_GF01['POSTS']. ': ' .$posts;
-        if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
-            $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
+        if ($isUserBanned) {
+            $user_status = $LANG_GF01['STATUS']. ' ' . $LANG28[42];
         } else {
-            $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
+            if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
+                $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
+            } else {
+                $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
+            }
         }
 
         if ($userarray['sig'] != '') {
@@ -265,7 +273,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     //$intervalTime = $mytimer->stopTimer();
     //COM_errorLog("Show Topic Display Time2: $intervalTime");
 
-    if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid'])) {
+    if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid']) && !$isUserBanned) {
         /* Check if user can still edit this post - within allowed edit timeframe */
         $editAllowed = false;
         if ($CONF_FORUM['allowed_editwindow'] > 0) {
@@ -333,7 +341,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
 
         $topictemplate->set_var ('topic_post_id', $showtopic['id']);
 
-        if ($showtopic['uid'] > 1 && $uservalid) {
+        if ($showtopic['uid'] > 1 && $uservalid && !$isUserBanned) {
             $profile_link = "{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$showtopic['uid']}";
             $profile_linktext = $LANG_GF09['profile'];
             $topictemplate->set_var ('profilelink', $profile_link);
@@ -352,31 +360,31 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
                     $topictemplate->parse ('pm_link', 'pm_link');
                 }
             }
-        }
 
-        if (isset($userarray['email']) && $userarray['email'] != '' && $showtopic["uid"] > 1) {
-            $email_link = "{$_CONF['site_url']}/profiles.php?uid={$showtopic['uid']}";
-            $email_linktext = $LANG_GF09['email'];
-            $topictemplate->set_var ('emaillink', $email_link);
-            $topictemplate->set_var ('emaillinktext', $email_linktext);
-            $topictemplate->set_var ('LANG_email', $LANG_GF01['EmailLink']);
-            $topictemplate->parse ('email_link', 'email_link');
-        }
-        if (isset($userarray['homepage']) && $userarray['homepage'] != '') {
-            $homepage = trim($userarray['homepage']);
-            if (strtolower(substr($homepage, 0, 4)) != 'http') {
-                $homepage = 'http://' .$homepage;
+            if (isset($userarray['email']) && $userarray['email'] != '' && $showtopic["uid"] > 1) {
+                $email_link = "{$_CONF['site_url']}/profiles.php?uid={$showtopic['uid']}";
+                $email_linktext = $LANG_GF09['email'];
+                $topictemplate->set_var ('emaillink', $email_link);
+                $topictemplate->set_var ('emaillinktext', $email_linktext);
+                $topictemplate->set_var ('LANG_email', $LANG_GF01['EmailLink']);
+                $topictemplate->parse ('email_link', 'email_link');
             }
-            $homepagetext = $LANG_GF09['website'];
-            $topictemplate->set_var ('websitelink', $homepage);
-            $topictemplate->set_var ('websitelinktext', $homepagetext);
-            $topictemplate->set_var ('LANG_website', $LANG_GF01['WebsiteLink']);
-            $topictemplate->parse ('website_link', 'website_link');
+            if (isset($userarray['homepage']) && $userarray['homepage'] != '') {
+                $homepage = trim($userarray['homepage']);
+                if (strtolower(substr($homepage, 0, 4)) != 'http') {
+                    $homepage = 'http://' .$homepage;
+                }
+                $homepagetext = $LANG_GF09['website'];
+                $topictemplate->set_var ('websitelink', $homepage);
+                $topictemplate->set_var ('websitelinktext', $homepagetext);
+                $topictemplate->set_var ('LANG_website', $LANG_GF01['WebsiteLink']);
+                $topictemplate->parse ('website_link', 'website_link');
+            }
+            if (isset($userarray['location']) && $userarray['location'] != '' && $showtopic["uid"] > 1) {
+                $topictemplate->set_var ('user_location', $userarray['location']);
+                $topictemplate->parse ('location', 'location');
+            }
         }
-        if (isset($userarray['location']) && $userarray['location'] != '' && $showtopic["uid"] > 1) {
-        	$topictemplate->set_var ('user_location', $userarray['location']);
-        	$topictemplate->parse ('location', 'location');
-		}
 
     } else {
         if (isset($_GET['onlytopic']) AND $_GET['onlytopic'] != 1) {
