@@ -27,7 +27,10 @@
                     <table border="0" cellspacing="0" cellpadding="0" style="float:right;">
                         <tr>
                             <td><input type="submit" name="preview" value="{LANG_PREVIEW}" tabindex="7"{xhtml}></td>
-                            <td style="padding-left:6px;padding-right:6px;"><input type="submit" name="submitmode" value="{LANG_SUBMIT}" tabindex="8" class="g-recaptcha"{!if invisible_recaptcha}{invisible_recaptcha}{!endif}{xhtml}></td>
+                            <td style="padding-left:6px;padding-right:6px;">
+                                <input type="submit" name="submitmode" value="{LANG_SUBMIT}" tabindex="8" class="g-recaptcha"{!if invisible_recaptcha}{invisible_recaptcha}{!endif}{xhtml}>
+                                <input type="hidden" name="submitmode" value="{LANG_SUBMIT}"{xhtml}> {# Needed for Invisible reCaptcha Error message #}
+                            </td>
                             <td style="padding-left:6px;padding-right:6px;"><input type="submit" name="submitmode" value="{LANG_CANCEL}" tabindex="9"{xhtml}></td>
                         </tr>
                     </table>
