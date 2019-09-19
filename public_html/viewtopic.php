@@ -108,29 +108,9 @@ if ($onlytopic == 1) {
     $display .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$LANG_CHARSET\"" . XHTML . ">" . LB;
     $display .= '<meta name="robots" content="NOINDEX"' . XHTML . '>' . LB;
     $display .= '<title>Forum Preview</title>' . LB;
-    if (version_compare($_CONF['supported_version_theme'], '2.0.0', '>=')) {
-    	/*
-        $func = "theme_css_" . $_CONF['theme'];
-        if (function_exists($func)) {
-            $FORUM_SCRIPTS = new scripts();
-            foreach ($func() as $info) {
-                $file = $info['file'];
-                $name = md5($file);
-                $constant   = (!empty($info['constant']))   ? $info['constant']   : true;
-                $attributes = (!empty($info['attributes'])) ? $info['attributes'] : array();
-                $FORUM_SCRIPTS->setCssFile($name, $file, $constant, $attributes);
-            }
-            
-            $display .= $FORUM_SCRIPTS->getHeader();
-        }
-        */
-		// need to call this incase plugin doesnt use script class OR headercode function is used to set css file
-		$display .= PLG_getHeaderCode();
-		$display .= $_SCRIPTS->getHeader();
-        $display .= '</head>' . LB;
-    } else {
-        $display .= "<link rel=\"stylesheet\" type=\"text/css\" href=\"{$_CONF['site_url']}/layout/{$_CONF['theme']}/style.css\"></head>\n";
-    }
+	$display .= $_SCRIPTS->getHeader();
+    $display .= '</head>' . LB;
+        
     $display .= '<body class="glforum-preview-body">';
 } else {
     //Check is anonymous users can access
