@@ -161,8 +161,8 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $userlink = COM_getProfileLink($showtopic['uid'], $username);
         
         $uservalid = true;
-        $postcount = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE uid='{$showtopic['uid']}'");
-        $posts = DB_numRows($postcount);
+        $postcountQuery = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE uid='{$showtopic['uid']}'");
+        $posts = DB_numRows($postcountQuery);
         // STARS CODE
         if (SEC_inGroup(1,$showtopic['uid'])) {
             $user_level = showrank(7, $LANG_GF01['admin']);
