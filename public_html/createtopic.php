@@ -33,6 +33,8 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
+use Geeklog\Input;
+
 require_once '../lib-common.php'; // Path to your lib-common.php
 
 if (!in_array('forum', $_PLUGINS)) {
@@ -311,9 +313,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     $comment = gf_preparefordb($_POST['comment'],$postmode);
                     $locked = 0;
                     $sticky = 0;
-                    if ($_POST['modedit'] == 1) {
-                        if ($_POST['locked_switch'] == 1)  $locked = 1;
-                        if ($_POST['sticky_switch'] == 1)  $sticky = 1;
+                    if (Input::post('modedit', 0) == 1) {
+                        if (Input::post('locked_switch', 0) == 1)  $locked = 1;
+                        if (Input::post('sticky_switch', 0) == 1)  $sticky = 1;
                     }
 
                     $fields = "forum,name,date,lastupdated,subject,comment,postmode,ip,mood,uid,pid,sticky,locked";

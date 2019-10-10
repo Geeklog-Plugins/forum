@@ -471,7 +471,8 @@ $LANG_GF92 = array(
     'topicsppdscp' => 'Antallet af emner der skal vises på forum startsiden',
     'postspp' => 'Indlæg per Side:',
     'postsppdscp' => 'Antallet af indlæg der skal vises pr. side',
-    'setsavemsg' => 'Indstillinger gemt.'
+    'setsavemsg' => 'Indstillinger gemt.',
+    'gfsettings'         => 'Settings'
 );
 
 $LANG_GF93 = array(

@@ -810,6 +810,11 @@ function f_forumtime() {
     $forum_time = COM_newTemplate(CTL_plugin_templatePath('forum', 'footer'));
     $forum_time->set_file (array ('forum_time'=>'forum_time.thtml'));
     $timezone = strftime('%Z');
+	if (($_CONF['language'] === 'japanese_utf-8') &&
+		(strpos(PHP_OS, 'WIN') === 0) &&
+		is_callable('mb_convert_encoding')) {
+		$timezone = mb_convert_encoding($timezone, COM_getCharset(), 'cp932');
+	}
     $time = strftime('%I:%M %p');
     $forum_time->set_var ('imgset', $CONF_FORUM['imgset']);
     $forum_time->set_var ('message', sprintf($LANG_GF02['msg121'],$timezone,$time));

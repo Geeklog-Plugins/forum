@@ -508,6 +508,7 @@ $LANG_GF92 = array (
     'notifyoodscp'   	 => 'Notifications will only be sent once for forums and topics which have multiple new posts since your last visit.', 
     'showiframe'         => 'Show Topic Review',
     'showiframedscp'     => 'Show Topic Review frame at bottom when replying to a topic'
+    'gfsettings'         => 'Forum Settings'
 );
 
 // Board Admin

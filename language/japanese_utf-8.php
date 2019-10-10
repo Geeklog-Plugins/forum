@@ -509,7 +509,8 @@ $LANG_GF92 = array (
     'notifyoo'           => '1度だけメール通知',
     'notifyoodscp'       => 'あなたが最後に訪れてから複数回投稿した掲示板やトピックのメール通知を1度だけ送信します',
     'showiframe'         => 'トピックレビュー表示',
-    'showiframedscp'     => 'トピックに新しく書き込む場合、下にトピックの内容を表示します'
+    'showiframedscp'     => 'トピックに新しく書き込む場合、下にトピックの内容を表示します',
+    'gfsettings'         => '掲示板設定'
 );
 
 // Board Admin
