@@ -346,13 +346,13 @@ if ($mode != 'preview') {
     $topicnavbar->set_var ('forum_name', $viewtopic['forum_name']);
     
     $forum_bc_id = "forum-" . $forum;
-    $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+    $_STRUCT_DATA->add_BreadcrumbList('forum-breadcrumb', $forum_bc_id);
     $url = "{$_CONF['site_url']}/forum/index.php";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
     $url = "{$_CONF['site_url']}/forum/index.php?category={$viewtopic['forum_cat']}";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $cat_name);
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $cat_name);
     $url = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 3, $url, $viewtopic['forum_name']);
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 3, $url, $viewtopic['forum_name']);
 
     $topicnavbar->set_var ('topic_id', $replytopic_id);
 

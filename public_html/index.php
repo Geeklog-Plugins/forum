@@ -965,11 +965,11 @@ if ($forum == 0) {
         if ($numForumsDisplayed > 0) {
             // Categories are only displayed if forums are found
             $forum_bc_id = "forum-cat-" . $A['id'];
-            $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+            $_STRUCT_DATA->add_BreadcrumbList('forum-breadcrumb', $forum_bc_id);
             $url = "{$_CONF['site_url']}/forum/index.php";
-            $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+            $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
             $url = "{$_CONF['site_url']}/forum/index.php?category={$A['id']}";
-            $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $A['cat_name']);            
+            $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $A['cat_name']);            
             
             if (!COM_isAnonUser()) {
                 $link = $_CONF['site_url'] . '/forum/index.php?op=markallread&amp;cat_id=' . $A['id'];
@@ -1186,13 +1186,13 @@ if ($forum > 0) {
     $displaypostpages = $LANG_GF01['PAGES'] .':'; // FIXME: is this used anywhere?
     
     $forum_bc_id = "forum-" . $forum;
-    $_STRUCT_DATA->add_BreadcrumbList('breadcrumb', $forum_bc_id);
+    $_STRUCT_DATA->add_BreadcrumbList('forum-breadcrumb', $forum_bc_id);
     $url = "{$_CONF['site_url']}/forum/index.php";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
     $url = "{$_CONF['site_url']}/forum/index.php?category={$category['id']}";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 2, $url, $category['cat_name']);
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $category['cat_name']);
     $url = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
-    $_STRUCT_DATA->set_breadcrumb_item('breadcrumb', $forum_bc_id, 3, $url, $category['forum_name']);    
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 3, $url, $category['forum_name']);    
 
     while ($record = DB_fetchArray($topicResults,false)) {
 
