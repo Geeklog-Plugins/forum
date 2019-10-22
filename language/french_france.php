@@ -475,7 +475,8 @@ $LANG_GF92 = array(
     'topicsppdscp' => 'Nombre de sujets à afficher quand le forum est affiché',
     'postspp' => 'Contributions par Page :',
     'postsppdscp' => 'Nombre de contributions affichées par page',
-    'setsavemsg' => 'Préférences sauvées.'
+    'setsavemsg' => 'Préférences sauvées.',
+    'gfsettings'         => 'Settings'
 );
 
 $LANG_GF93 = array(
