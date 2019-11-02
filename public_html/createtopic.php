@@ -118,6 +118,8 @@ if ($submit == $LANG_GF01['CANCEL']) {
 }
 
 // ADD EDITED TOPIC
+$editmoderator = false;
+
 if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken()) {
     $date = time();
 
@@ -261,7 +263,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
             if ( function_exists('plugin_itemPreSave_captcha') ) {
                 $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
             } else {
-                $msg = plugin_itemPreSave_recaptcha('forum',$_POST['captcha']);
+                $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
                 $preview = 'Preview';
@@ -377,7 +379,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
             if ( function_exists('plugin_itemPreSave_captcha') ) {
                 $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
             } else {
-                $msg = plugin_itemPreSave_recaptcha('forum',$_POST['captcha']);
+                $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
                 $preview = 'Preview';

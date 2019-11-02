@@ -88,7 +88,9 @@ $navbar->set_selected($LANG_GF06['3']);
 $display .= $navbar->generate();
 
 // CATEGORY Maintenance Section
-if ($type == "category") {
+if ($type === 'category') {
+    $name_missing = false;
+
     // Make sure a name is at least specified
     if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
         $name_missing = false;
@@ -742,6 +744,8 @@ function forum_addForum($name,$category,$dscp="",$order="",$grp_id=2,$is_readonl
 * @return       boolean            Returns true
 */
 function forum_deleteCategory($id) {
+    global $_TABLES;
+
     // Cycle through each forum in category
     $query = DB_query("SELECT forum_id FROM {$_TABLES['forum_forums']} WHERE forum_cat='$id'");
     while (list($forum_id) = DB_fetchArray($query)) {
