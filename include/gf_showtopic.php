@@ -214,9 +214,13 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $uservalid = false;
         $userlink = urldecode($showtopic['name']);
     }
-    
+
     // As of Geeklog 2.2.1 it now returns a photo for anonymous user if configured
-    $avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
+	if ($showtopic['uid'] == 1) {
+		$avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width'], '', $showtopic['name']);
+	} else {
+		$avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
+	}
     if (!empty($avatar)) {
         $min_height = $min_height + 50;
     }

@@ -64,10 +64,10 @@ function forum_js_files_denim()
 }
 
 /**
- * Return a list of CSS classes from the requested item
- *
+ * Return information for the request item location
+ * CSS Classes, Styles, etc... can be passed
  */
-function forum_getCSSClasses_denim($item)
+function forum_getThemeItem_denim($item)
 {
     $retval = '';
     
@@ -75,7 +75,7 @@ function forum_getCSSClasses_denim($item)
         // ***************************
         // Used for lists by COM_makeList 
             
-        case 'forum-list-menu': 
+        case 'forum-css-list-menu': 
             $retval = ''; // no extra css classes needed for forum menu for this theme
             break;
             
