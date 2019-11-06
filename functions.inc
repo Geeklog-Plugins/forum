@@ -105,7 +105,7 @@ $plg_config = config::get_instance();
 $temp = $plg_config->get_config('forum');
 if (is_array($temp)) {
     $CONF_FORUM = array_merge($CONF_FORUM, $temp);
-    $CONF_FORUM['recaptcha'] = (int) $CONF_FORUM['recaptcha'];
+    $CONF_FORUM['recaptcha'] = (isset($CONF_FORUM['recaptcha'])) ? (int) $CONF_FORUM['recaptcha'] : 0;
 }
 
 /**
@@ -1607,7 +1607,7 @@ function forum_getGeeklogTopic($type, $id) {
 
         default:
             $current_topic = TOPIC_currentTopic(); // since TOPIC_getTopic called again need to get current topioc again since it may have changed
-            
+
             if (empty($current_topic) AND !empty($CONF_FORUM['topic_default'])) {
                 TOPIC_setTopic($CONF_FORUM['topic_default']);
             }
