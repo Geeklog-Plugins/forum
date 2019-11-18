@@ -486,7 +486,7 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
     }
     $bbcode->addParser(array('block','inline','link','listitem'), 'gf_fixtemplate');
     if ( $mode != 'subject' ) {
-        $bbcode->addParser(array('block','inline','link','listitem'), 'PLG_replacetags');
+//        $bbcode->addParser(array('block','inline','link','listitem'), 'PLG_replacetags');
     }
 
     $bbcode->addParser ('list', 'bbcode_stripcontents');
@@ -535,7 +535,56 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
     if ($CONF_FORUM['use_censor'] and $mode == 'preview') {
         $str = COM_checkWords($str);
     }
-    $str = $bbcode->parse ($str);
+
+    // Replace autotags with random strings to prevent them from being parsed
+    $markers = [];
+    $simpleTags = [
+        '[b]', '[/b]',
+        '[i]', '[/i]',
+        '[u]', '[/u]',
+        '[s]', '[/s]',
+        '[img]', '[/img]',
+        '[quote]', '[/quote]',
+        '[list]', '[/list]',
+        '[*]',
+        '[/url]',
+        '[/size]',
+        '[/color]',
+        '[/code]',
+    ];
+
+    if (preg_match_all('/\[[^\]]+?\]/', $str, $matches, PREG_SET_ORDER)) {
+        foreach ($matches as $match) {
+            $content = strtolower($match[0]);
+
+            if (in_array($content, $simpleTags)) {
+                continue;
+            } elseif ((strpos($content, '[img ') === 0) ||
+                    (strpos($content, '[url=') === 0) ||
+                    (strpos($content, '[size=') === 0) ||
+                    (strpos($content, '[color=') === 0) ||
+                    (strpos($content, '[list=') === 0) ||
+                    (strpos($content, '[code=') === 0)) {
+                continue;
+            }
+
+            $replace = '___' . bin2hex(random_bytes(10)) . '___';
+            $markers[] = ['search' => $match[0], 'replace' => $replace];
+            $str = str_replace($match[0], $replace, $str);
+        }
+    }
+
+    $str = $bbcode->parse($str);
+
+    // Restore original autotags
+    if (count($markers) > 0) {
+        foreach ($markers as $marker) {
+            $str = str_replace($marker['replace'], $marker['search'], $str);
+        }
+    }
+    
+    // Replace autotags
+    $str = PLG_replacetags($str);
 
     return $str;
 }
