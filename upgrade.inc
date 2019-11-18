@@ -230,6 +230,9 @@ function upgrade_293() {
 }
 
 function upgrade_294() {
+	global $_CONF, $_TABLES;
+	
+	require_once $_CONF['path'] . 'plugins/forum/install_defaults.php';
     forum_update_ConfValues_2_9_4();
 
     COM_errorLog("Success - Completed Forum plugin version 2.9.4 update",1);
