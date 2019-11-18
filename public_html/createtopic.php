@@ -838,7 +838,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $moodoptions = '';
         if ($mood != '') {
             $edittopic['mood'] = $mood;
-        } else {
+        } elseif ($method !== 'edit') {
             $edittopic['mood'] = '';
             $moodoptions = '<option value="" selected="selected">' . $LANG_GF01['NOMOOD'] . "</option>\n";
         }
