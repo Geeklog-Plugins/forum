@@ -547,7 +547,7 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
         '[quote]', '[/quote]',
         '[list]', '[/list]',
         '[*]',
-        '[/url]',
+        '[url]', '[/url]',
         '[/size]',
         '[/color]',
         '[/code]',
