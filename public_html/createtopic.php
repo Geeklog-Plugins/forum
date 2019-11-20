@@ -77,17 +77,12 @@ $mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['
 $mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
 $notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
 $page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['page'],true)            : '';
-$preview     = isset($_REQUEST['preview'])         ? COM_applyFilter($_REQUEST['preview'])              : '';
 $quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
 $showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
 $silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
 $subject     = isset($_POST['subject'])            ? COM_applyFilter($_POST['subject'])                 : '';
 $submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
 $postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
-
-if ($preview == $LANG_GF01['PREVIEW']) {
-    $preview = 'Preview';
-}
 
 // Debug Code to show variables
 $display .= gf_showVariables();
@@ -266,7 +261,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
-                $preview = 'Preview';
+                $submit = $LANG_GF01['PREVIEW'];
                 $subject = COM_stripslashes($_POST['subject']);
                 $display .= COM_startBlock ($LANG03[17], '',
                               COM_getBlockTemplate ('_msg_block', 'header'))
@@ -382,7 +377,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
-                $preview = 'Preview';
+                $submit = $LANG_GF01['PREVIEW'];
                 $subject = COM_stripslashes($_POST['subject']);
                 $display .= COM_startBlock ($LANG03[17], '',
                               COM_getBlockTemplate ('_msg_block', 'header'))
@@ -559,7 +554,7 @@ if ($method == 'edit') {
 $_SCRIPTS->setJavaScriptFile('forum_creattopic', CTL_plugin_themeFindFile('forum', 'javascript', 'createtopic.js'));
 
 // PREVIEW TOPIC
-if ($preview == 'Preview') {
+if ($submit == $LANG_GF01['PREVIEW']) {
     $previewitem = array();
     if ($method == 'edit') {
         $previewitem['uid']  = $edittopic['uid'];
@@ -619,8 +614,8 @@ if ($preview == 'Preview') {
 }
 
 // NEW TOPIC OR REPLY
-if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($preview == 'Preview')) {
-    if ( $preview == 'Preview' ) {
+if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($submit == $LANG_GF01['PREVIEW'])) {
+    if ($submit == $LANG_GF01['PREVIEW']) {
         $edittopic['subject'] = COM_stripslashes($_POST['subject']);
     }
     // validate the forum is actually the forum the topic belongs in...
@@ -721,7 +716,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     } elseif ($method == 'postreply') {
         $postmessage = $LANG_GF02['PostReply'];
         $topicnavbar->set_var ('hidden_method', 'postreply');
-        if ( $preview != 'Preview' ) {
+        if ($submit != $LANG_GF01['PREVIEW']) {
             $subject = $LANG_GF01['RE'] . $subject;
         }
         $edittopic['mood'] = '';
@@ -758,7 +753,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         }
 
         $subject = $edittopic['subject'];
-        if ($preview != 'Preview') {
+        if ($submit != $LANG_GF01['PREVIEW']) {
             $comment = str_ireplace('</textarea>','&lt;/textarea&gt;',$edittopic['comment']);
             $postmode = $edittopic['postmode'];
         } else {
@@ -836,10 +831,15 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 
     if ($CONF_FORUM['show_moods']) {
         $moodoptions = '';
-        if ($mood != '') {
+        if ($mood != '' OR $submit == $LANG_GF01['PREVIEW']) {
             $edittopic['mood'] = $mood;
-        } elseif ($method !== 'edit') {
+			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
+		} elseif ($edittopic['mood'] != '') {
+			$mood = $edittopic['mood'];
+			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
+        } else {
             $edittopic['mood'] = '';
+			$mood = '';
             $moodoptions = '<option value="" selected="selected">' . $LANG_GF01['NOMOOD'] . "</option>\n";
         }
         if ($dir = @opendir("{$CONF_FORUM['imgset_path']}/moods")) {
@@ -867,7 +867,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     
     // Only for Forum Admins and Moderators on editing the root parent forum topic or a new root parent forum topic post
     if (($method == 'newtopic' OR ($method == 'edit' AND $edittopic['pid'] == 0)) AND $editmoderator) {
-        if ( $preview != 'Preview' ) {
+        if ($submit != $LANG_GF01['PREVIEW']) {
             $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
         } else {
             // Since preview make sure grab topic selection from control
@@ -957,13 +957,12 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     }
 
     // if this is the first time showing the new submission form - then check if notify option should be on
-    if (!isset($_POST['preview'])) {
+	if ($submit != $LANG_GF01['PREVIEW']) {
         if ($editpid > 0) {
             $notifyTopicid = $editpid;
         } else {
             $notifyTopicid = $id;
         }
-
 
         // If not new topic then check if user has unsubscribed
         if ($notifyTopicid != '') {
@@ -1152,7 +1151,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $topicfooter->set_var ('site_url', $_CONF['site_url']);
 	
     //Topic Review
-    if (($method != 'newtopic' && $editpost != 'yes') && ($method == 'postreply' || $preview == 'Preview')) {
+    if (($method != 'newtopic' && $editpost != 'yes') && ($method == 'postreply' || $submit == $LANG_GF01['PREVIEW'])) {
         if ($CONF_FORUM['show_topicreview']) {
         	$topicfooter->set_var ('topic_id', $id);
         	$topicfooter->parse ('topic_review', 'topic_review');
