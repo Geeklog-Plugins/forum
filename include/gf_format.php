@@ -539,6 +539,7 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
     // Replace autotags with random strings to prevent them from being parsed
     $markers = [];
     $simpleTags = [
+		'[p]', '[/p]',
         '[b]', '[/b]',
         '[i]', '[/i]',
         '[u]', '[/u]',
@@ -550,7 +551,7 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
         '[url]', '[/url]',
         '[/size]',
         '[/color]',
-        '[/code]',
+        '[code]', '[/code]',
     ];
 
     if (preg_match_all('/\[[^\]]+?\]/', $str, $matches, PREG_SET_ORDER)) {
