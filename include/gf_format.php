@@ -489,6 +489,8 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
 //        $bbcode->addParser(array('block','inline','link','listitem'), 'PLG_replacetags');
     }
 
+	// Docs http://christian-seiler.de/projekte/php/bbcode/doc/en/chapter1.php
+
     $bbcode->addParser ('list', 'bbcode_stripcontents');
     $bbcode->addCode ('b', 'simple_replace', null, array ('start_tag' => '<b>', 'end_tag' => '</b>'),
                       'inline', array ('listitem', 'block', 'inline', 'link'), array ());
@@ -500,9 +502,11 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
                       'inline', array ('listitem', 'block', 'inline', 'link'), array ());
     $bbcode->addCode ('s', 'simple_replace', null, array ('start_tag' => '<del>', 'end_tag' => '</del>'),
                       'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('size', 'usecontent?', 'do_bbcode_size', array ('usercontent_param' => 'default'),
+	// Below was 'usecontent?' but switched to 'callback_replace' since size always requires to be equal something ie [size=15] and we want the bbcode within the size tag to be parsed
+    $bbcode->addCode ('size', 'callback_replace', 'do_bbcode_size', array ('usercontent_param' => 'default'),
                       'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('color', 'usecontent?', 'do_bbcode_color', array ('usercontent_param' => 'default'),
+	// Below was 'usecontent?' but switched to 'callback_replace' since color always requires to be equal something ie [color=red] and we want the bbcode within the size tag to be parsed
+    $bbcode->addCode ('color', 'callback_replace', 'do_bbcode_color', array ('usercontent_param' => 'default'),
                       'inline', array ('listitem', 'block', 'inline', 'link'), array ());
     if ( $mode != 'subject' ) {                      
         $bbcode->addCode ('list', 'callback_replace', 'do_bbcode_list', array ('usecontent_param' => 'default'),
