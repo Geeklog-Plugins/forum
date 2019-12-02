@@ -799,7 +799,7 @@ function plugin_feedupdatecheck_forum ($feed, $topic, $update_data, $limit)
 {
     global $_TABLES;
 
-    $sql = "SELECT id,forum.grp_id FROM {$_TABLES['forum_topic']} topic LEFT JOIN {$_TABLES['forum_forums']} forum ON topic.forum=forum.forum_id " . forum_buildFeedsSql ($topic, $limits);
+    $sql = "SELECT id,forum.grp_id FROM {$_TABLES['forum_topic']} topic LEFT JOIN {$_TABLES['forum_forums']} forum ON topic.forum=forum.forum_id " . forum_buildFeedsSql ($topic, $limit);
     $result = DB_query ($sql);
     $num = DB_numRows ($result);
 
