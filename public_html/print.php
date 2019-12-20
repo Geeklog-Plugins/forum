@@ -85,9 +85,7 @@ if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
 
 //Check is anonymous users can access
 if ($id == 0 OR DB_count($_TABLES['forum_topic'],"id","$id") == 0) {
-    $display = COM_refresh($_CONF['site_url'] . "/forum/index.php?msg=2&amp;forum=$forum");
-    COM_output($display);
-    exit;
+    COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=2&amp;forum=$forum");
 }
 
 $forum = DB_getItem($_TABLES['forum_topic'],"forum","id='{$id}'");
@@ -168,4 +166,3 @@ $display .= "
 </html>";
 
 COM_output($display);
-?>

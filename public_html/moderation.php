@@ -83,8 +83,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
     //Moderator check OK, everything dealing with moderator permissions go here.
     if ($modconfirmdelete == 1 && $msgid != '') {
         if ($submit == $LANG_GF01['CANCEL']) {
-            echo COM_refresh("viewtopic.php?showtopic=$msgpid");
-            exit();
+            COM_redirect("viewtopic.php?showtopic=$msgpid");
         } else {
 
             $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'");
@@ -151,31 +150,25 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             CACHE_remove_instance($cacheInstance);
 
             if ($top == 'yes') {
-                $display = COM_refresh($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");
+                COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");
             } else {
-                $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=5&amp;showtopic=$msgpid");
+                COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=5&amp;showtopic=$msgpid");
             }
-            echo $display;
-            exit();
         }
     }
 
     if ($confirmbanip == '1') {
         if ($submit == $LANG_GF01['CANCEL']) {
-            echo COM_refresh("viewtopic.php?showtopic=$fortopicid");
-            exit();
+            COM_redirect("viewtopic.php?showtopic=$fortopicid");
         } else {
             DB_query("INSERT INTO {$_TABLES['forum_banned_ip']} (host_ip) VALUES ('$hostip')");
-            $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=6&amp;showtopic=$fortopicid");
-            echo $display;
-            exit();
+            COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=6&amp;showtopic=$fortopicid");
         }
     }
 
     if ($confirm_move == '1' AND forum_modPermission($forum,$_USER['uid'],'mod_move') AND $moveid != 0) {
         if ($submit == $LANG_GF01['CANCEL']) {
-            echo COM_refresh("viewtopic.php?showtopic=$moveid");
-            exit();
+            COM_redirect("viewtopic.php?showtopic=$moveid");
         } else {
             $date = time();
             $movetoforum = gf_preparefordb($movetoforum,'text');
@@ -231,8 +224,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=topic_count-1, post_count=post_count-$numreplies WHERE forum_id=$forum");
                 }
                 
-                $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=7&amp;showtopic=$moveid");
-
+                $destUrl = $_CONF['site_url'] . "/forum/viewtopic.php?msg=7&amp;showtopic=$moveid";
             } else {  // Move complete topic
                 $moveResult = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE pid=$moveid");
                 $postCount = DB_numRows($moveResult) +1;  // Need to account for the parent post
@@ -256,7 +248,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
                 // Remove any lastviewed records in the log so that the new updated topic indicator will appear
                 DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$moveid'");
                 
-                $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=8&amp;showtopic=$moveid");
+                $destUrl = $_CONF['site_url'] . "/forum/viewtopic.php?msg=8&amp;showtopic=$moveid";
             }
             
             COM_rdfUpToDateCheck('forum'); // forum rss feeds update
@@ -265,10 +257,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             CACHE_remove_instance($cacheInstance);
             $cacheInstance = 'forum__centerblock_';
             CACHE_remove_instance($cacheInstance);
-            
-            echo $display;
-            exit();
-
+            COM_redirect($destUrl);
         }
     }
 
@@ -294,11 +283,9 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         
         $display .= alertMessage($alertmessage, $LANG_GF02['msg182'], $promptform);
     } elseif ($modfunction == 'editpost' AND forum_modPermission($forum,$_USER['uid'],'mod_edit') AND $fortopicid != 0) {
-        echo COM_refresh("createtopic.php?method=edit&amp;id=$fortopicid&amp;page=$page");
-        exit();
+        COM_redirect("createtopic.php?method=edit&amp;id=$fortopicid&amp;page=$page");
     } elseif ($modfunction == 'lockedpost' AND forum_modPermission($forum,$_USER['uid'],'mod_edit') AND $fortopicid != 0) {
-        echo COM_refresh("createtopic.php?method=postreply&amp;id=$fortopicid");
-        exit();
+        COM_redirect("createtopic.php?method=postreply&amp;id=$fortopicid");
     } elseif ($modfunction == 'movetopic' AND forum_modPermission($forum,$_USER['uid'],'mod_move') AND $fortopicid != 0) {
         $SECgroups = SEC_getUserGroups();  // Returns an Associative Array - need to parse out the group id's
         $modgroups = '';
@@ -365,13 +352,11 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         
         if (BAN_for_plugins_ban_found($ip_address)) {
 			BAN_for_plugins_ban_ip($ip_address, 'forum', false);
-			$display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=11&amp;showtopic=$msgpid");
+			COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=11&amp;showtopic=$msgpid");
 		} else {
 			BAN_for_plugins_ban_ip($ip_address, 'forum');
-			$display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=10&amp;showtopic=$msgpid");
+			COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=10&amp;showtopic=$msgpid");
 		}
-		COM_output($display);
-		exit;
     } elseif ($modfunction == 'banippost' AND forum_modPermission($forum,$_USER['uid'],'mod_ban') AND $fortopicid != 0) {
         $iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='$fortopicid'");
         $forumpostipnum = DB_fetchArray($iptobansql);
@@ -387,16 +372,16 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         }
         $alertmessage .= ' ' . sprintf($LANG_GF02['msg69'], $ip_address);
         
-		$page = COM_newTemplate(CTL_plugin_templatePath('forum', 'moderator'));
-		$page->set_file(array('page'=>'ban.thtml'));
-		
-		$page->set_var('hostip', $forumpostipnum['ip']);
-		$page->set_var('forum', $forum);
-		$page->set_var('fortopicid', $fortopicid);
+        $page = COM_newTemplate(CTL_plugin_templatePath('forum', 'moderator'));
+        $page->set_file(array('page'=>'ban.thtml'));
+
+        $page->set_var('hostip', $forumpostipnum['ip']);
+        $page->set_var('forum', $forum);
+        $page->set_var('fortopicid', $fortopicid);
  
-		$page->parse('output', 'page');
-		$promptform = $page->finish($page->get_var('output'));     
- 
+        $page->parse('output', 'page');
+        $promptform = $page->finish($page->get_var('output'));     
+
         $display .= alertMessage($alertmessage, $LANG_GF02['msg182'], $promptform);
 
     } else {
@@ -410,4 +395,3 @@ if (forum_modPermission($forum,$_USER['uid'])) {
 $display = gf_createHTMLDocument($display);
 
 COM_output($display);
-?>

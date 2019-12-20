@@ -88,10 +88,9 @@ if ($migrate == $LANG_GF01['MIGRATE_NOW'] && $selforum != "select"
     $cacheInstance = 'forum__centerblock_';
     CACHE_remove_instance($cacheInstance);
     
-    echo COM_refresh($_CONF['site_admin_url']
+    COM_redirect($_CONF['site_admin_url']
                      . "/plugins/forum/migrate.php?num_stories="
                      . $num_stories . "&num_posts=" . $num_posts);
-    exit;
 }
 
 function migratetopic($forum, $sid, $storydate, $uid, $subject, $introtext, $bodytext, $hits)

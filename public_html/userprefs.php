@@ -81,9 +81,7 @@ if (isset($_POST['submit']) && SEC_checkToken()) {
         showiframe='$xshowiframe'
      WHERE uid='{$_USER['uid']}'");
 
-    $display = COM_refresh($_CONF['site_url'] .'/forum/userprefs.php?msg=1');
-    COM_output($display);
-    exit;
+    COM_redirect($_CONF['site_url'] .'/forum/userprefs.php?msg=1');
 }
 
 
@@ -186,5 +184,3 @@ if (!isset($_POST['$submit'])) {
 $display = gf_createHTMLDocument($display);
 
 COM_output($display);
-
-?>

@@ -119,9 +119,7 @@ if ($type === 'category') {
                 TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_CATEGORY);
             }
             
-            $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=1');
-            COM_output($display);
-            exit();
+            COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=1');
         } else {
             $boards_addcategory = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_addcategory->set_file (array ('boards_addcategory'=>'boards_edtcategory.thtml'));
@@ -170,9 +168,7 @@ if ($type === 'category') {
             // Deletes Category and any forums and topics within it
             forum_deleteCategory($id);
             
-            $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=2');
-            COM_output($display);
-            exit();
+            COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=2');
         } else {
             $catname = DB_getItem($_TABLES['forum_categories'], "cat_name","id=$id");
             $boards_delcategory = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
@@ -204,10 +200,7 @@ if ($type === 'category') {
             TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_CATEGORY);
         }
         
-        $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=3');
-        COM_output($display);
-        exit();
-
+        COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=3');
     } elseif ($mode == $LANG_GF01['EDIT']) {
         $esql = DB_query("SELECT * FROM {$_TABLES['forum_categories']} WHERE (id='$id')");
         $E = DB_fetchArray($esql);
@@ -293,16 +286,13 @@ if ($type == "forum") {
             $privgroup   = isset($_POST['privgroup'])   ? COM_applyFilter($_POST['privgroup'],true)   : 0;
             if ($privgroup == 0) $privgroup = 2;
             if (forum_addForum($name,$category,$dscp,$order,$privgroup,$is_readonly,$is_hidden,$no_newposts) > 0 ) {
-                $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=4');
+                COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=4');
             } else {
-                $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=5');
+                COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=5');
             }
-            COM_output($display);
-            exit();
-
         } else {
-			$grouplist = '';
-			$groupname = '';
+            $grouplist = '';
+            $groupname = '';
             $result    = DB_query("SELECT DISTINCT grp_id, grp_name FROM {$_TABLES['groups']}");
             $nrows    = DB_numRows($result);
             if ($nrows > 0) {
@@ -389,9 +379,7 @@ if ($type == "forum") {
         if (($confirm == 1) && SEC_checkToken()) {
             $new_id   = isset($_REQUEST['new_id'])   ? COM_applyFilter($_POST['new_id'],true)   : '';
             forum_mergeForum($id, $new_id);
-            $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=9');
-            COM_output($display);
-            exit();
+            COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=9');
         } else {
             $result = DB_query("SELECT forum_id, forum_name FROM {$_TABLES['forum_forums']} ORDER BY forum_cat, forum_order");
             $nrows = DB_numRows($result);
@@ -399,8 +387,8 @@ if ($type == "forum") {
                 $boards_mergeforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
                 $boards_mergeforum->set_file (array ('boards_mergeforum'=>'boards_merge.thtml'));
                 $boards_mergeforum->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
-				$boards_mergeforum->set_var ('alert_title', $LANG_GF02['adminconfirmation']);
-				$boards_mergeforum->set_var ('alert_message', sprintf($LANG_GF93['mergeforumnote'],  COM_applyFilter($_POST['forumname'])));
+                $boards_mergeforum->set_var ('alert_title', $LANG_GF02['adminconfirmation']);
+                $boards_mergeforum->set_var ('alert_message', sprintf($LANG_GF93['mergeforumnote'],  COM_applyFilter($_POST['forumname'])));
                 $boards_mergeforum->set_var ('id', $id);
                 $boards_mergeforum->set_var ('type', 'forum');
                 $forumlist = '';
@@ -428,20 +416,18 @@ if ($type == "forum") {
                 $display .= $boards_mergeforum->finish ($boards_mergeforum->get_var('output'));
                 $display .= COM_endBlock();
                 $display = COM_createHTMLDocument($display);
+                COM_output($display);
+                exit();
             } else {
-                $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=10');
+                COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=10');
             }
-            COM_output($display);
-            exit();
         }
 
     } elseif ($mode == $LANG_GF01['DELETE'] AND $submit != $LANG_GF01['CANCEL']) {
         if (($confirm == 1) && SEC_checkToken()) {
             // Delete Forum and all topics within it
             forum_deleteForum($id);
-            $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=6');
-            COM_output($display);
-            exit();
+            COM_redirec($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=6');
         } else {
             $boards_delforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_delforum->set_file (array ('boards_delforum'=>'boards_delete.thtml'));
@@ -465,10 +451,7 @@ if ($type == "forum") {
     } elseif (($mode == $LANG_GF01['EDIT'] && isset($_POST['what']) && COM_applyFilter($_POST['what']) == 'order') && SEC_checkToken()) {
         $order = COM_applyFilter($_POST['order'],true);
         DB_query("UPDATE {$_TABLES['forum_forums']} SET forum_order='$order' WHERE forum_id='$id'");
-        $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=7');
-        COM_output($display);
-        exit();
-
+        COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=7');
     } elseif (($mode == 'save') && SEC_checkToken() && ($submit != $LANG_GF01['CANCEL'])) {
         $category    = isset($_REQUEST['category']) ? COM_applyFilter($_POST['category'],true)    : 0;
         $order       = isset($_POST['order'])       ? COM_applyFilter($_POST['order'],true)       : 0;
@@ -485,13 +468,9 @@ if ($type == "forum") {
         // Must have Edit access to all topics selected
         if (TOPIC_hasMultiTopicAccess('topic') > 2 OR !TOPIC_checkTopicSelectionControl()) {
             TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_FORUM);
-        }                
-                
-                
-        $display = COM_refresh($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=8');
-        COM_output($display);
-        exit();
-
+        }
+        
+        COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=8');
     } elseif ($mode == $LANG_GF01['RESYNC'])  {
         gf_resyncforum($id);
 

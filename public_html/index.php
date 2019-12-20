@@ -91,8 +91,8 @@ if (!COM_isAnonUser() && $op == 'markallread') {
             }
         }
     }
-    echo COM_refresh($_CONF['site_url'] .'/forum/index.php');
-    exit();
+
+    COM_redirect($_CONF['site_url'] .'/forum/index.php');
 }
 
 // Debug Code to show variables
@@ -724,9 +724,7 @@ if ($op == 'subscribe') {
         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','0','{$_USER['uid']}', now() )");
         // Delete all individual topic notification records
         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' and topic_id > '0' " );
-        $display = COM_refresh($_CONF['site_url'] .'/forum/index.php?msg=1&amp;forum=' .$forum);
-        COM_output($display);
-        exit();
+        COM_redirect($_CONF['site_url'] .'/forum/index.php?msg=1&amp;forum=' .$forum);
     } else {
         $display .= alertMessage($LANG_GF02['msg136'], $LANG_GF01['ERROR']);
     }

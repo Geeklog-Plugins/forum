@@ -97,19 +97,16 @@ if (empty($_USER['uid']) OR $_USER['uid'] == 1 ) {
 
 // CHECK TO SEE IF CANCELED
 if ($submit == $LANG_GF01['CANCEL']) {
-	if (!empty($id)) {
-		// Cancel Reply
-		$display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=9&amp;showtopic=$id");
-	} elseif (!empty($forum)) {
-		// Cancel New Topic
-		$display = COM_refresh($_CONF['site_url'] . "/forum/index.php?msg=9&amp;forum=$forum");
-	} else {
-		// Something wrong so just go back
-		$display = COM_refresh($_CONF['site_url'] . "/forum/index.php?msg=9");
-	}
-	
-	COM_output($display);
-	exit;	
+    if (!empty($id)) {
+        // Cancel Reply
+        COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=9&amp;showtopic=$id");
+    } elseif (!empty($forum)) {
+        // Cancel New Topic
+        COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=9&amp;forum=$forum");
+    } else {
+        // Something wrong so just go back
+        COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=9");
+    }
 }
 
 // ADD EDITED TOPIC
@@ -227,10 +224,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             CACHE_remove_instance($cacheInstance);
 
             $link = $_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$topicparent&amp;page=$page#$editid";
-            $display = COM_refresh($link);
-            COM_output($display);
-            exit;
-
+            COM_redirect($link);
         } else {
             $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
         }
@@ -359,9 +353,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     if ($uid != '1') {
                         DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$_USER['uid']}','$forum','$lastid','$date')");
                     }
-                    $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
-                    COM_output($display);
-                    exit;
+                    COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
                 }
 
             } else {
@@ -470,10 +462,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nid','$uid',now() )");
                     }
                     COM_updateSpeedlimit ('forum');
-                    $display = COM_refresh($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$id&amp;lastpost=true#$lastid");
-                    COM_output($display);
-                    exit;
-
+                    COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$id&amp;lastpost=true#$lastid");
                 }
 
             } else {

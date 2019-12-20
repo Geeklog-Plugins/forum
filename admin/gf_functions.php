@@ -39,8 +39,7 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'gf_functions.php') !== false) {
 require_once '../../../lib-common.php';
 
 if (!in_array('forum', $_PLUGINS)) {
-    echo COM_refresh($_CONF['site_url'] . '/index.php');
-    exit;
+    COM_redirect($_CONF['site_url'] . '/index.php');
 }
 
 /**
