@@ -32,8 +32,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-use Geeklog\Input;
-
 require_once '../lib-common.php'; // Path to your lib-common.php
 
 if (!in_array('forum', $_PLUGINS)) {
@@ -53,11 +51,7 @@ function gf_FormatForPrint( $str, $postmode='html' ) {
             $showtopic['comment'] = str_replace('<pre>','[code]',$showtopic['comment']);
             $showtopic['comment'] = str_replace('</pre>','[/code]',$showtopic['comment']);
         }
-        $showtopic['comment'] = str_replace(
-            ["<br />\r\n", "<br />\n\r", "<br />\r", "<br />\n", "<br>\r\n", "<br>\n\r", "<br>\r", "<br>\n"],
-            '<br' . XHTML . '>',
-            $showtopic['comment']
-        );
+        $showtopic['comment'] = str_replace(array("<br />\r\n","<br />\n\r","<br />\r","<br />\n","<br>\r\n","<br>\n\r","<br>\r","<br>\n"), '<br' . XHTML . '>', $showtopic['comment'] );
         $showtopic['comment'] = preg_replace("/\[QUOTE\sBY=\s(.+?)\]/i","[QUOTE] Quote by $1:",$showtopic['comment']);
         /* Reformat code blocks - version 2.3.3 and prior */
         $showtopic['comment'] = str_replace( '<pre class="forumCode">', '[code]', $showtopic['comment'] );
@@ -75,7 +69,7 @@ function gf_FormatForPrint( $str, $postmode='html' ) {
 }
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$id = (int) Input::fRequest('id', 0);
+$id = isset($_REQUEST['id']) ? COM_applyFilter($_REQUEST['id'],true) : '';
 
 $display = '';
 

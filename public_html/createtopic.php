@@ -50,7 +50,7 @@ $display = '';
 
 // Check if anonymouse users can access
 if ($CONF_FORUM['registered_to_post'] && COM_isAnonUser()) {
-    forum_chkUsercanAccess(true);
+	forum_chkUsercanAccess(true);
 }
 
 // Check if IP of user has been banned
@@ -66,23 +66,23 @@ if ($numRows > 0) {
 }
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$aname       = strip_tags(Input::post('aname', ''));
-$editid      = (int) Input::fPost('editid', 0);
-$editpid     = (int) Input::fPost('editpid', 0);
-$editpost    = (int) Input::fPost('editpost', 0);
-$forum       = (int) Input::fRequest('forum', 0);
-$id          = (int) Input::fRequest('id', 0);
-$method      = Input::fRequest('method'], '');
-$mode_switch = (int) Input::fRequest('postmode_switch', 0);
-$mood        = Input::fPost('mood', '');
-$notify      = Input::fPost('notify', '');
-$page        = (int) Input::fRequest('page', 0);
-$quoteid     = (int) Input::fRequest('quoteid', 0);
-$showtopic   = (int) Input::fRequest('showtopic', 0);
-$silentedit  = (int) Input::fPost('silentedit', 0);
-$subject     = Input::fPost('subject', '');
-$submit      = Input::fPost('submitmode', '');
-$postmode    = Input::fPost('postmode', '');
+$aname       = isset($_POST['aname'])              ? strip_tags($_POST['aname'])                        : '';
+$editid      = isset($_POST['editid'])             ? COM_applyFilter($_POST['editid'],true)             : '';
+$editpid     = isset($_POST['editpid'])            ? COM_applyFilter($_POST['editpid'],true)            : '';
+$editpost    = isset($_POST['editpost'])           ? COM_applyFilter($_POST['editpost'])                : '';
+$forum       = isset($_REQUEST['forum'])           ? COM_applyFilter($_REQUEST['forum'],true)           : '';
+$id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : '';
+$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : '';
+$mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
+$mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
+$notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
+$page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['page'],true)            : '';
+$quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
+$showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
+$silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
+$subject     = isset($_POST['subject'])            ? COM_applyFilter($_POST['subject'])                 : '';
+$submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
+$postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 
 // Debug Code to show variables
 $display .= gf_showVariables();
@@ -138,7 +138,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
     }
 
     if (($editpid < 1) && (trim($_POST['subject']) == '')) {
-        $display .= alertMessage($LANG_GF02['msg18'], '');
+		$display .= alertMessage($LANG_GF02['msg18'], '');
     } elseif (!$editAllowed) {
         $link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$id}";
         $display .= alertMessage('',$LANG_GF02['msg189'], sprintf($LANG_GF02['msg187'],$link));
@@ -146,7 +146,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
         if ($moderator_anon_post) {
             $name = gf_preparefordb($aname,'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
         } else {
-            $name = gf_preparefordb(Input::post('name', ''),'text');
+            $name = gf_preparefordb($_POST['name'],'text');
         }
         
         if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
@@ -171,8 +171,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
                 }
             }
             $postmode = gf_chkpostmode($postmode,$mode_switch);
-            $subject  = gf_preparefordb(strip_tags(Input::post('subject', ''), 'text'));
-            $comment  = gf_preparefordb(Input::post('comment', ''), $postmode);
+            $subject  = gf_preparefordb(strip_tags($_POST['subject']),'text');
+            $comment  = gf_preparefordb($_POST['comment'],$postmode);
 
             // If user has moderator edit rights only
             $locked = 0;
@@ -239,24 +239,24 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
     $msg = '';
     $date = time();
-    $REMOTE_ADDR = Input::server('REMOTE_ADDR');
+    $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
 
     if ($method == 'newtopic') {
         if ($aname != '') {
             $name = gf_preparefordb($aname,'text');
         } else {
-            $name = gf_preparefordb(Input::post('name', ''), 'text');
+            $name = gf_preparefordb($_POST['name'],'text');
         }
 
         if ( function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha') ) {
             if ( function_exists('plugin_itemPreSave_captcha') ) {
-                $msg = plugin_itemPreSave_captcha('forum', Input::post('captcha'));
+                $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
             } else {
                 $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
                 $submit = $LANG_GF01['PREVIEW'];
-                $subject = Input::post('subject');
+                $subject = COM_stripslashes($_POST['subject']);
                 $display .= COM_startBlock ($LANG03[17], '',
                               COM_getBlockTemplate ('_msg_block', 'header'))
                          . $msg
@@ -296,12 +296,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                         }
                     }
                     $postmode = gf_chkpostmode($postmode,$mode_switch);
-                    $subject = gf_preparefordb(strip_tags(Input::post('subject', '')), 'text');
+                    $subject = gf_preparefordb(strip_tags($_POST['subject']),'text');
 
                     if (mb_strlen($subject) > 100) {
                         $subject = COM_truncate($subject, 99, '...');
                     }
-                    $comment = gf_preparefordb(Input::post('comment', ''), $postmode);
+                    $comment = gf_preparefordb($_POST['comment'],$postmode);
                     $locked = 0;
                     $sticky = 0;
                     if (Input::post('modedit', 0) == 1) {
@@ -364,13 +364,13 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
      } elseif ($method == 'postreply') {
         if ( function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha') ) {
             if ( function_exists('plugin_itemPreSave_captcha') ) {
-                $msg = plugin_itemPreSave_captcha('forum', Input::post('captcha', ''));
+                $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
             } else {
                 $msg = plugin_itemPreSave_recaptcha('forum');
             }
             if ( $msg != '' ) {
                 $submit = $LANG_GF01['PREVIEW'];
-                $subject = Input::post('subject', '');
+                $subject = COM_stripslashes($_POST['subject']);
                 $display .= COM_startBlock ($LANG03[17], '',
                               COM_getBlockTemplate ('_msg_block', 'header'))
                          . $msg
@@ -381,9 +381,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
         if ( $msg == '' ) {
             //Add Reply
             if ($aname != '') {
-                $name = gf_preparefordb($aname, 'text');
+                $name = gf_preparefordb($aname,'text');
             } else {
-                $name = gf_preparefordb(Input::post('name', ''), 'text');
+                $name = gf_preparefordb($_POST['name'],'text');
             }
             
             if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND 
@@ -408,7 +408,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                         // Now check the result and redirect to index.php if spam action was taken
                         if ($result > 0) {
                             // then tell them to get lost ...
-                            $display .= COM_showMessage($result, 'spamx');
+                            $display .= COM_showMessage( $result, 'spamx' );
                             $display = gf_createHTMLDocument($display);
                             COM_output($display);
                             exit;
@@ -419,8 +419,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     // Check for any users subscribed notifications
                     gf_chknotifications($forum,$id,$uid);
                     $postmode = gf_chkpostmode($postmode,$mode_switch);
-                    $subject = gf_preparefordb(Input::post('subject', ''), 'text');
-                    $comment = gf_preparefordb(Input::post('comment', ''), $postmode);
+                    $subject = gf_preparefordb($_POST['subject'],'text');
+                    $comment = gf_preparefordb($_POST['comment'],$postmode);
 
                     $fields = "name,date,subject,comment,postmode,ip,mood,uid,pid,forum";
                     $sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
@@ -480,7 +480,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
 
 // EDIT MESSAGE
-$comment = Input::post('comment', '');
+$comment = isset($_POST['comment']) ? COM_stripslashes( $_POST['comment'] ) : '';
 
 if ($id > 0) {
     $sql  = "SELECT a.forum,a.pid,a.comment,a.date,a.locked,a.subject,a.mood,a.sticky,a.uid,a.name,a.postmode,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name,c.id ";
@@ -525,10 +525,10 @@ if ($method == 'edit') {
     // Moderator or logged-in User is editing their topic post
     if (!COM_isAnonUser() AND $editAllowed) {
         // Check to see if user has this topic or complete forum is selected for notifications
-        $fields1 = ['topic_id', 'uid']);
-        $values1 = [$id, $edittopic['uid']];
-        $fields2 = ['topic_id', 'forum_id', 'uid'];
-        $values2 = [0, $edittopic['forum'], $edittopic['uid']];
+        $fields1 = array( 'topic_id','uid' );
+        $values1 = array( $id,$edittopic['uid'] );
+        $fields2 = array( 'topic_id','forum_id','uid' );
+        $values2 = array( 0,$edittopic['forum'],$edittopic['uid']);
         // Check if there are any notification records for the topic or the forum - topic_id = 0
         if ((DB_count($_TABLES['forum_watch'],$fields1,$values1) > 0) OR (DB_count($_TABLES['forum_watch'],$fields2,$values2) > 0)) {
             $notify_val= 'checked="checked"';
@@ -544,7 +544,7 @@ $_SCRIPTS->setJavaScriptFile('forum_creattopic', CTL_plugin_themeFindFile('forum
 
 // PREVIEW TOPIC
 if ($submit == $LANG_GF01['PREVIEW']) {
-    $previewitem = [];
+    $previewitem = array();
     if ($method == 'edit') {
         $previewitem['uid']  = $edittopic['uid'];
         if ($edittopic['uid'] == 1 AND $aname != '') { // Means mod is editing an anonymous post so update anonymous name if not blank
@@ -576,16 +576,16 @@ if ($submit == $LANG_GF01['PREVIEW']) {
 
     $preview_header = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $preview_header->set_file (array ('preview_header'=>'submissionform_preview_header.thtml'));
-    $preview_header->set_var('imgset', $CONF_FORUM['imgset']);
-    $preview_header->parse('output', 'preview_header');
+    $preview_header->set_var ('imgset', $CONF_FORUM['imgset']);
+    $preview_header->parse ('output', 'preview_header');
     $display .= $preview_header->finish($preview_header->get_var('output'));
 
     $display .= showtopic($previewitem,'preview');
 
     $preview_footer = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $preview_footer->set_file (array ('preview_footer'=>'submissionform_preview_footer.thtml'));
-    $preview_footer->set_var('imgset', $CONF_FORUM['imgset']);
-    $preview_footer->parse('output', 'preview_footer');
+    $preview_footer->set_var ('imgset', $CONF_FORUM['imgset']);
+    $preview_footer->parse ('output', 'preview_footer');
     $display .= $preview_footer->finish($preview_footer->get_var('output'));
 
     // If Moderator and editing the parent topic - see if form has skicky or locked checkbox on
@@ -605,12 +605,12 @@ if ($submit == $LANG_GF01['PREVIEW']) {
 // NEW TOPIC OR REPLY
 if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($submit == $LANG_GF01['PREVIEW'])) {
     if ($submit == $LANG_GF01['PREVIEW']) {
-        $edittopic['subject'] = Input::post('subject', '');
+        $edittopic['subject'] = COM_stripslashes($_POST['subject']);
     }
     // validate the forum is actually the forum the topic belongs in...
     if ( $method == 'postreply' || $method=='edit') {
         if ( ($forum != 0) && $forum != $edittopic['forum'] ) {
-            $display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
+        	$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
             $display = gf_createHTMLDocument($display);
             COM_output($display);
             
@@ -645,66 +645,66 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 
     $topicnavbar = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $topicnavbar->set_file (array ('topicnavbar'=>'submissionform_header.thtml'));
-    $topicnavbar->set_var('imgset', $CONF_FORUM['imgset']);
-    $topicnavbar->set_var('navbreadcrumbsimg','<img alt="" src="'.gf_getImage('nav_breadcrumbs').'"' . XHTML . '>');
-    $topicnavbar->set_var('navtopicimg','<img alt="" src="'.gf_getImage('nav_topic').'"' . XHTML . '>');
-    $topicnavbar->set_var('layout_url', $CONF_FORUM['layout_url']);
-    $topicnavbar->set_var('phpself', $_CONF['site_url'] .'/forum/createtopic.php');
+    $topicnavbar->set_var ('imgset', $CONF_FORUM['imgset']);
+    $topicnavbar->set_var ('navbreadcrumbsimg','<img alt="" src="'.gf_getImage('nav_breadcrumbs').'"' . XHTML . '>');
+    $topicnavbar->set_var ('navtopicimg','<img alt="" src="'.gf_getImage('nav_topic').'"' . XHTML . '>');
+    $topicnavbar->set_var ('layout_url', $CONF_FORUM['layout_url']);
+    $topicnavbar->set_var ('phpself', $_CONF['site_url'] .'/forum/createtopic.php');
 
     if ($method == 'newtopic' AND $forum > 0 ) {  // User creating a newtopic
-        $topicnavbar->set_var('category_id', $newtopic['id']);
-        $topicnavbar->set_var('forum_id', $forum);
-        $topicnavbar->set_var('cat_name',$newtopic['cat_name']);
-        $topicnavbar->set_var('forum_name', $newtopic['forum_name']);
+    	$topicnavbar->set_var ('category_id', $newtopic['id']);
+        $topicnavbar->set_var ('forum_id', $forum);
+        $topicnavbar->set_var ('cat_name',$newtopic['cat_name']);
+        $topicnavbar->set_var ('forum_name', $newtopic['forum_name']);
     } else {
-        $topicnavbar->set_var('category_id', $edittopic['id']);
-        $topicnavbar->set_var('forum_id', $edittopic['forum']);
-        $topicnavbar->set_var('cat_name',$edittopic['cat_name']);
-        $topicnavbar->set_var('forum_name', $edittopic['forum_name']);
+    	$topicnavbar->set_var ('category_id', $edittopic['id']);
+        $topicnavbar->set_var ('forum_id', $edittopic['forum']);
+        $topicnavbar->set_var ('cat_name',$edittopic['cat_name']);
+        $topicnavbar->set_var ('forum_name', $edittopic['forum_name']);
     }
     // run the subject through the HTML filter to ensure no XSS
     // issues.
     $subject = gf_checkHTML($subject);
-    $topicnavbar->set_var('topic_id', $id);
-    $topicnavbar->set_var('subject', $subject);
-    $topicnavbar->set_var('LANG_HOME', $LANG_GF01['HOMEPAGE']);
+    $topicnavbar->set_var ('topic_id', $id);
+    $topicnavbar->set_var ('subject', $subject);
+    $topicnavbar->set_var ('LANG_HOME', $LANG_GF01['HOMEPAGE']);
     $topicnavbar->set_var('forum_home',$LANG_GF01['INDEXPAGE']);
-    $topicnavbar->set_var('hidden_id', $id);
-    $topicnavbar->set_var('hidden_editpost','');
-    $topicnavbar->set_var('hidden_editpid', '');
-    $topicnavbar->set_var('hidden_editid', '');
-    $topicnavbar->set_var('hidden_method', '');
-    $topicnavbar->set_var('page', $page);
+    $topicnavbar->set_var ('hidden_id', $id);
+    $topicnavbar->set_var ('hidden_editpost','');
+    $topicnavbar->set_var ('hidden_editpid', '');
+    $topicnavbar->set_var ('hidden_editid', '');
+    $topicnavbar->set_var ('hidden_method', '');
+    $topicnavbar->set_var ('page', $page);
 
-    $topicnavbar->set_var('LANG_bhelp', $LANG_GF01['b_help']);
-    $topicnavbar->set_var('LANG_ihelp', $LANG_GF01['i_help']);
-    $topicnavbar->set_var('LANG_uhelp', $LANG_GF01['u_help']);
-    $topicnavbar->set_var('LANG_qhelp', $LANG_GF01['q_help']);
-    $topicnavbar->set_var('LANG_chelp', $LANG_GF01['c_help']);
-    $topicnavbar->set_var('LANG_lhelp', $LANG_GF01['l_help']);
-    $topicnavbar->set_var('LANG_ohelp', $LANG_GF01['o_help']);
-    $topicnavbar->set_var('LANG_phelp', $LANG_GF01['p_help']);
-    $topicnavbar->set_var('LANG_whelp', $LANG_GF01['w_help']);
-    $topicnavbar->set_var('LANG_ahelp', $LANG_GF01['a_help']);
-    $topicnavbar->set_var('LANG_shelp', $LANG_GF01['s_help']);
-    $topicnavbar->set_var('LANG_fhelp', $LANG_GF01['f_help']);
-    $topicnavbar->set_var('LANG_hhelp', $LANG_GF01['h_help']);
+    $topicnavbar->set_var ('LANG_bhelp', $LANG_GF01['b_help']);
+    $topicnavbar->set_var ('LANG_ihelp', $LANG_GF01['i_help']);
+    $topicnavbar->set_var ('LANG_uhelp', $LANG_GF01['u_help']);
+    $topicnavbar->set_var ('LANG_qhelp', $LANG_GF01['q_help']);
+    $topicnavbar->set_var ('LANG_chelp', $LANG_GF01['c_help']);
+    $topicnavbar->set_var ('LANG_lhelp', $LANG_GF01['l_help']);
+    $topicnavbar->set_var ('LANG_ohelp', $LANG_GF01['o_help']);
+    $topicnavbar->set_var ('LANG_phelp', $LANG_GF01['p_help']);
+    $topicnavbar->set_var ('LANG_whelp', $LANG_GF01['w_help']);
+    $topicnavbar->set_var ('LANG_ahelp', $LANG_GF01['a_help']);
+    $topicnavbar->set_var ('LANG_shelp', $LANG_GF01['s_help']);
+    $topicnavbar->set_var ('LANG_fhelp', $LANG_GF01['f_help']);
+    $topicnavbar->set_var ('LANG_hhelp', $LANG_GF01['h_help']);
 
     if ((!COM_isAnonUser() AND forum_modPermission($forum, $_USER['uid'], 'mod_edit')) OR SEC_inGroup( 'Root' )) {
         $editmoderator = true;
-        $topicnavbar->set_var('hidden_modedit', '1');
+        $topicnavbar->set_var ('hidden_modedit', '1');
     } else {
-        $topicnavbar->set_var('hidden_modedit', '0');
+        $topicnavbar->set_var ('hidden_modedit', '0');
         $editmoderator = false;
     }
 
     if ($method == 'newtopic') {
         $postmessage = $LANG_GF02['PostTopic'];
-        $topicnavbar->set_var('hidden_method', 'newtopic');
+        $topicnavbar->set_var ('hidden_method', 'newtopic');
         $editpid = 0;
     } elseif ($method == 'postreply') {
         $postmessage = $LANG_GF02['PostReply'];
-        $topicnavbar->set_var('hidden_method', 'postreply');
+        $topicnavbar->set_var ('hidden_method', 'postreply');
         if ($submit != $LANG_GF01['PREVIEW']) {
             $subject = $LANG_GF01['RE'] . $subject;
         }
@@ -733,8 +733,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 
     } elseif ($method == 'edit') {
         $postmessage = $LANG_GF02['EditTopic'];
-        $topicnavbar->set_var('hidden_method', 'edit');
-        $topicnavbar->set_var('hidden_editpost','yes');
+        $topicnavbar->set_var ('hidden_method', 'edit');
+        $topicnavbar->set_var ('hidden_editpost','yes');
         if ($editmoderator) {
             $username = COM_getDisplayName($edittopic['uid']);
         } elseif ($uid > 1) {
@@ -753,8 +753,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             $comment = htmlspecialchars($comment,ENT_QUOTES, $CONF_FORUM['charset']);
         }
         $editpid = $edittopic['pid'];
-        $topicnavbar->set_var('hidden_editpid', $editpid);
-        $topicnavbar->set_var('hidden_editid', $id);
+        $topicnavbar->set_var ('hidden_editpid', $editpid);
+        $topicnavbar->set_var ('hidden_editid', $id);
 
     }
 
@@ -768,28 +768,28 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $topicnavbar->set_var('gltoken', '1');
     }
 
-    $topicnavbar->parse('output', 'topicnavbar');
+    $topicnavbar->parse ('output', 'topicnavbar');
     $display .= $topicnavbar->finish($topicnavbar->get_var('output'));
     
     $submissionform_main = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $submissionform_main->set_file (array ('submissionform_main'=>'submissionform_main.thtml', 
-                                           'submissionform_bbcode_help'=>'submissionform_bbcode_help.thtml'));
+    									   'submissionform_bbcode_help'=>'submissionform_bbcode_help.thtml'));
     
-    $blocks = ['submissionform_anontop', 'submissionform_membertop', 'submissionform_moods', 'submissionform_code', 'submissionform_smilies', 'submissionform_options', 'submissionform_option', 'submissionform_gl_topics'];
+    $blocks = array('submissionform_anontop', 'submissionform_membertop', 'submissionform_moods', 'submissionform_code', 'submissionform_smilies', 'submissionform_options', 'submissionform_option', 'submissionform_gl_topics');
     foreach ($blocks as $block) {
         $submissionform_main->set_block('submissionform_main', $block);
     }      
 
-    $submissionform_main->set_var('layout_url', $CONF_FORUM['layout_url']);
-    $submissionform_main->set_var('post_message', $postmessage);
-    $submissionform_main->set_var('LANG_NAME', $LANG_GF02['msg33']);
+	$submissionform_main->set_var ('layout_url', $CONF_FORUM['layout_url']);
+	$submissionform_main->set_var ('post_message', $postmessage);
+	$submissionform_main->set_var ('LANG_NAME', $LANG_GF02['msg33']);
     
-    // Keep track if submission options have been added
-    $options_exist = false;
+	// Keep track if submission options have been added
+	$options_exist = false;
 
     if ($uid < 2) {
-        $submissionform_main->set_var('name', stripcslashes($aname));
-        $submissionform_main->parse('user_name', 'submissionform_anontop');
+        $submissionform_main->set_var ('name', stripcslashes($aname));
+        $submissionform_main->parse ('user_name', 'submissionform_anontop');
     } else {
         if (!isset($username) OR $username == '') {
             if ($method == 'edit') {
@@ -812,23 +812,23 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
         }
 
-        $submissionform_main->set_var('username', $username);
-        $submissionform_main->set_var('xusername', $username);
-        $submissionform_main->set_var('aname', $aname);
-        $submissionform_main->parse('user_name', 'submissionform_membertop');
+        $submissionform_main->set_var ('username', $username);
+        $submissionform_main->set_var ('xusername', $username);
+        $submissionform_main->set_var ('aname', $aname);
+        $submissionform_main->parse ('user_name', 'submissionform_membertop');
     }
 
     if ($CONF_FORUM['show_moods']) {
         $moodoptions = '';
         if ($mood != '' OR $submit == $LANG_GF01['PREVIEW']) {
             $edittopic['mood'] = $mood;
-            $moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
-        } elseif ($edittopic['mood'] != '') {
-            $mood = $edittopic['mood'];
-            $moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
+			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
+		} elseif ($edittopic['mood'] != '') {
+			$mood = $edittopic['mood'];
+			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
         } else {
             $edittopic['mood'] = '';
-            $mood = '';
+			$mood = '';
             $moodoptions = '<option value="" selected="selected">' . $LANG_GF01['NOMOOD'] . "</option>\n";
         }
         if ($dir = @opendir("{$CONF_FORUM['imgset_path']}/moods")) {
@@ -847,9 +847,9 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
             closedir($dir);
         }
-        $submissionform_main->set_var('LANG_MOOD', $LANG_GF02['msg36']);
-        $submissionform_main->set_var('moodoptions', $moodoptions);
-        $submissionform_main->parse('moods', 'submissionform_moods');
+        $submissionform_main->set_var ('LANG_MOOD', $LANG_GF02['msg36']);
+        $submissionform_main->set_var ('moodoptions', $moodoptions);
+        $submissionform_main->parse ('moods', 'submissionform_moods');
     } else {
         $submissionform_main->set_var('moods', '');
     }
@@ -869,7 +869,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 
             // When $method = 'newtopic' then $id will = ''
             $submissionform_main->set_var('topic_selection', $topic_selection_control);
-            $submissionform_main->parse('gl_topics', 'submissionform_gl_topics');
+            $submissionform_main->parse ('gl_topics', 'submissionform_gl_topics');
         } else {
             $submissionform_main->set_var('gl_topics', '');            
         }
@@ -899,45 +899,45 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $mode_switch = 0;
     }
 
-    $submissionform_main->set_var('LANG_code', $LANG_GF01['CODE']);
-    $submissionform_main->set_var('LANG_fontcolor', $LANG_GF01['FONTCOLOR']);
-    $submissionform_main->set_var('LANG_fontsize', $LANG_GF01['FONTSIZE']);
-    $submissionform_main->set_var('LANG_closetags', $LANG_GF01['CLOSETAGS']);
-    $submissionform_main->set_var('LANG_codetip', $LANG_GF01['CODETIP']);
-    $submissionform_main->set_var('LANG_tiny', $LANG_GF01['TINY']);
-    $submissionform_main->set_var('LANG_small', $LANG_GF01['SMALL']);
-    $submissionform_main->set_var('LANG_normal', $LANG_GF01['NORMAL']);
-    $submissionform_main->set_var('LANG_large', $LANG_GF01['LARGE']);
-    $submissionform_main->set_var('LANG_huge', $LANG_GF01['HUGE']);
+    $submissionform_main->set_var ('LANG_code', $LANG_GF01['CODE']);
+    $submissionform_main->set_var ('LANG_fontcolor', $LANG_GF01['FONTCOLOR']);
+    $submissionform_main->set_var ('LANG_fontsize', $LANG_GF01['FONTSIZE']);
+    $submissionform_main->set_var ('LANG_closetags', $LANG_GF01['CLOSETAGS']);
+    $submissionform_main->set_var ('LANG_codetip', $LANG_GF01['CODETIP']);
+    $submissionform_main->set_var ('LANG_tiny', $LANG_GF01['TINY']);
+    $submissionform_main->set_var ('LANG_small', $LANG_GF01['SMALL']);
+    $submissionform_main->set_var ('LANG_normal', $LANG_GF01['NORMAL']);
+    $submissionform_main->set_var ('LANG_large', $LANG_GF01['LARGE']);
+    $submissionform_main->set_var ('LANG_huge', $LANG_GF01['HUGE']);
 
-    $submissionform_main->set_var('LANG_default', $LANG_GF01['DEFAULT']);
-    $submissionform_main->set_var('LANG_dkred', $LANG_GF01['DKRED']);
-    $submissionform_main->set_var('LANG_red', $LANG_GF01['RED']);
-    $submissionform_main->set_var('LANG_orange', $LANG_GF01['ORANGE']);
-    $submissionform_main->set_var('LANG_brown', $LANG_GF01['BROWN']);
-    $submissionform_main->set_var('LANG_yellow', $LANG_GF01['YELLOW']);
-    $submissionform_main->set_var('LANG_green', $LANG_GF01['GREEN']);
-    $submissionform_main->set_var('LANG_olive', $LANG_GF01['OLIVE']);
-    $submissionform_main->set_var('LANG_cyan', $LANG_GF01['CYAN']);
-    $submissionform_main->set_var('LANG_blue', $LANG_GF01['BLUE']);
-    $submissionform_main->set_var('LANG_dkblue', $LANG_GF01['DKBLUE']);
-    $submissionform_main->set_var('LANG_indigo', $LANG_GF01['INDIGO']);
-    $submissionform_main->set_var('LANG_violet', $LANG_GF01['VIOLET']);
-    $submissionform_main->set_var('LANG_white', $LANG_GF01['WHITE']);
-    $submissionform_main->set_var('LANG_black', $LANG_GF01['BLACK']);
+    $submissionform_main->set_var ('LANG_default', $LANG_GF01['DEFAULT']);
+    $submissionform_main->set_var ('LANG_dkred', $LANG_GF01['DKRED']);
+    $submissionform_main->set_var ('LANG_red', $LANG_GF01['RED']);
+    $submissionform_main->set_var ('LANG_orange', $LANG_GF01['ORANGE']);
+    $submissionform_main->set_var ('LANG_brown', $LANG_GF01['BROWN']);
+    $submissionform_main->set_var ('LANG_yellow', $LANG_GF01['YELLOW']);
+    $submissionform_main->set_var ('LANG_green', $LANG_GF01['GREEN']);
+    $submissionform_main->set_var ('LANG_olive', $LANG_GF01['OLIVE']);
+    $submissionform_main->set_var ('LANG_cyan', $LANG_GF01['CYAN']);
+    $submissionform_main->set_var ('LANG_blue', $LANG_GF01['BLUE']);
+    $submissionform_main->set_var ('LANG_dkblue', $LANG_GF01['DKBLUE']);
+    $submissionform_main->set_var ('LANG_indigo', $LANG_GF01['INDIGO']);
+    $submissionform_main->set_var ('LANG_violet', $LANG_GF01['VIOLET']);
+    $submissionform_main->set_var ('LANG_white', $LANG_GF01['WHITE']);
+    $submissionform_main->set_var ('LANG_black', $LANG_GF01['BLACK']);
 
     if ($CONF_FORUM['allow_img_bbcode']) {
-        $submissionform_main->set_var('hide_imgbutton_begin','');
-        $submissionform_main->set_var('hide_imgbutton_end','');
+        $submissionform_main->set_var ('hide_imgbutton_begin','');
+        $submissionform_main->set_var ('hide_imgbutton_end','');
     } else {
-        $submissionform_main->set_var('hide_imgbutton_begin','<!--');
-        $submissionform_main->set_var('hide_imgbutton_end','-->');
+        $submissionform_main->set_var ('hide_imgbutton_begin','<!--');
+        $submissionform_main->set_var ('hide_imgbutton_end','-->');
     }
 
-    $submissionform_main->set_var('site_name', $_CONF['site_name']);
-    $submissionform_main->parse('modal_bbcode_help', 'submissionform_bbcode_help');
+    $submissionform_main->set_var ('site_name', $_CONF['site_name']);
+    $submissionform_main->parse ('modal_bbcode_help', 'submissionform_bbcode_help');
     
-    $submissionform_main->parse('code', 'submissionform_code');
+    $submissionform_main->parse ('code', 'submissionform_code');
 
     if (!$CONF_FORUM['allow_smilies']) {
         $smilies = '';
@@ -946,7 +946,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     }
 
     // if this is the first time showing the new submission form - then check if notify option should be on
-    if ($submit != $LANG_GF01['PREVIEW']) {
+	if ($submit != $LANG_GF01['PREVIEW']) {
         if ($editpid > 0) {
             $notifyTopicid = $editpid;
         } else {
@@ -981,49 +981,49 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $sticky_prompt = '';
     $notify_prompt = '';
     if ($editmoderator) {
-        if ($notify == 1 || ((int) Input::post('notify') === 1)) {
+        if ($notify == 1 || (isset($_POST['notify']) && $_POST['notify'] == 1)) {
             $notify_val = 'checked="checked"';
         } else {
             $notify_val = '';
         }
         // Notify Option
-        $submissionform_main->set_var('LANG_OPTION', $LANG_GF02['msg38']);
-        $submissionform_main->set_var('option_name', 'notify');
-        $submissionform_main->set_var('option_checked', $notify_val);
-        $submissionform_main->set_var('option_extra', '');
-        $submissionform_main->parse('option', 'submissionform_option', true);
+        $submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg38']);
+        $submissionform_main->set_var ('option_name', 'notify');
+        $submissionform_main->set_var ('option_checked', $notify_val);
+        $submissionform_main->set_var ('option_extra', '');
+        $submissionform_main->parse ('option', 'submissionform_option', true);
         $options_exist = true;
 
         // check that this is the parent topic - only able to make it skicky or locked
         if ($editpid == 0) {
             if (!isset($locked_val) AND !isset($sticky_val) AND $method == 'edit') {
-                $locked_val = '';
-                $sticky_val = '';
-                
+				$locked_val = '';
+				$sticky_val = '';
+            	
                 if ((!isset($_POST['locked_switch']) AND $edittopic['locked'] == 1) OR (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 )) {
                     $locked_val = 'checked="checked"';
-                }
+				}
                 if ((!isset($_POST['sticky_switch']) AND $edittopic['sticky'] == 1) OR (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 )) {
                     $sticky_val = 'checked="checked"';
                 }
-            } else { 
-                $locked_val = '';
-                $sticky_val = '';
-            }
+			} else { 
+				$locked_val = '';
+				$sticky_val = '';				
+			}
 
-            // Locked Option
-            $submissionform_main->set_var('LANG_OPTION', $LANG_GF02['msg109']);
-            $submissionform_main->set_var('option_name', 'locked_switch');
-            $submissionform_main->set_var('option_checked', $locked_val);
-            $submissionform_main->set_var('option_extra', '');
-            $submissionform_main->parse('option', 'submissionform_option', true);
-            // Sticky Option
-            $submissionform_main->set_var('LANG_OPTION', $LANG_GF02['msg61']);
-            $submissionform_main->set_var('option_name', 'sticky_switch');
-            $submissionform_main->set_var('option_checked', $sticky_val);
-            $submissionform_main->set_var('option_extra', '');
-            $submissionform_main->parse('option', 'submissionform_option', true);
-            $options_exist = true;
+			// Locked Option
+			$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg109']);
+			$submissionform_main->set_var ('option_name', 'locked_switch');
+			$submissionform_main->set_var ('option_checked', $locked_val);
+			$submissionform_main->set_var ('option_extra', '');
+			$submissionform_main->parse ('option', 'submissionform_option', true);
+			// Sticky Option
+			$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg61']);
+			$submissionform_main->set_var ('option_name', 'sticky_switch');
+			$submissionform_main->set_var ('option_checked', $sticky_val);
+			$submissionform_main->set_var ('option_extra', '');
+			$submissionform_main->parse ('option', 'submissionform_option', true);
+			$options_exist = true;
         }
     } else {
         if ($uid > 1) {
@@ -1034,12 +1034,12 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
             //$notify_prompt = '<label for="notify">' . $LANG_GF02['msg38']. '</label><br' . XHTML . '><input type="checkbox" name="notify" id="notify" value="on" ' . $notify_val. XHTML . '>';
             // Notify Option
-            $submissionform_main->set_var('LANG_OPTION', $LANG_GF02['msg38']);
-            $submissionform_main->set_var('option_name', 'notify');
-            $submissionform_main->set_var('option_checked', $notify_val);
-            $submissionform_main->set_var('option_extra', '');
-            $submissionform_main->parse('option', 'submissionform_option', true);
-            $options_exist = true;
+			$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg38']);
+			$submissionform_main->set_var ('option_name', 'notify');
+			$submissionform_main->set_var ('option_checked', $notify_val);
+			$submissionform_main->set_var ('option_extra', '');
+			$submissionform_main->parse ('option', 'submissionform_option', true);
+			$options_exist = true;
         }
     }
 
@@ -1050,14 +1050,14 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     }
     if ($CONF_FORUM['allow_html'] || SEC_inGroup( 'Root' )) {
         
-        // Mode Option
-        $submissionform_main->set_var('LANG_OPTION', $postmode_msg);
-        $submissionform_main->set_var('option_name', 'postmode_switch');
-        $submissionform_main->set_var('option_checked', '');
-        $postmode_extra = '<input type="hidden" name="postmode" value="' . $postmode . '"' . XHTML . '>';
-        $submissionform_main->set_var('option_extra', $postmode_extra);
-        $submissionform_main->parse('option', 'submissionform_option', true);
-        $options_exist = true;
+		// Mode Option
+		$submissionform_main->set_var ('LANG_OPTION', $postmode_msg);
+		$submissionform_main->set_var ('option_name', 'postmode_switch');
+		$submissionform_main->set_var ('option_checked', '');
+		$postmode_extra = '<input type="hidden" name="postmode" value="' . $postmode . '"' . XHTML . '>';
+		$submissionform_main->set_var ('option_extra', $postmode_extra);
+		$submissionform_main->parse ('option', 'submissionform_option', true);
+		$options_exist = true;
     }
 
     if ($method == 'edit') {
@@ -1071,35 +1071,35 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
              $edit_val = 'checked="checked"';
         }
 
-        // Edit Option
-        $submissionform_main->set_var('LANG_OPTION', $LANG_GF02['msg190']);
-        $submissionform_main->set_var('option_name', 'silentedit');
-        $submissionform_main->set_var('option_checked', $edit_val);
-        $submissionform_main->set_var('option_extra', '');
-        $submissionform_main->parse('option', 'submissionform_option', true); 
-        $options_exist = true;
+		// Edit Option
+		$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg190']);
+		$submissionform_main->set_var ('option_name', 'silentedit');
+		$submissionform_main->set_var ('option_checked', $edit_val);
+		$submissionform_main->set_var ('option_extra', '');
+		$submissionform_main->parse ('option', 'submissionform_option', true); 
+		$options_exist = true;
     }
 
     $subject = str_replace('"', '&quot;',$subject);
 
     $submissionform_main->set_unknowns('keep');
-    $submissionform_main->set_var('LANG_SUBJECT', $LANG_GF01['SUBJECT']);
+    $submissionform_main->set_var ('LANG_SUBJECT', $LANG_GF01['SUBJECT']);
     if ($options_exist) {
-        $submissionform_main->set_var('LANG_OPTIONS', $LANG_GF01['OPTIONS']);
-        $submissionform_main->parse('options', 'submissionform_options');
-    } else {
-        $submissionform_main->set_var('options', '');
-    }
-    $submissionform_main->set_var('LANG_SUBMIT', $LANG_GF01['SUBMIT']);
-    $submissionform_main->set_var('LANG_PREVIEW', $LANG_GF01['PREVIEW']);
-    $submissionform_main->set_var('LANG_CANCEL', $LANG_GF01['CANCEL']);
-    $submissionform_main->set_var('required', $required);
-    $submissionform_main->set_var('subject', $subject);
-    $submissionform_main->set_var('smilies', $smilies);
+    	$submissionform_main->set_var ('LANG_OPTIONS', $LANG_GF01['OPTIONS']);
+    	$submissionform_main->parse ('options', 'submissionform_options');
+	} else {
+		$submissionform_main->set_var ('options', '');
+	}
+    $submissionform_main->set_var ('LANG_SUBMIT', $LANG_GF01['SUBMIT']);
+    $submissionform_main->set_var ('LANG_PREVIEW', $LANG_GF01['PREVIEW']);
+    $submissionform_main->set_var ('LANG_CANCEL', $LANG_GF01['CANCEL']);
+    $submissionform_main->set_var ('required', $required);
+    $submissionform_main->set_var ('subject', $subject);
+    $submissionform_main->set_var ('smilies', $smilies);
     if (!empty($smilies)) {
-        $submissionform_main->parse('smilies', 'submissionform_smilies');
-    }
-    $submissionform_main->set_var('hide_notify', ($uid == 1) ? 'none' : '');
+		$submissionform_main->parse ('smilies', 'submissionform_smilies');
+	}
+    $submissionform_main->set_var ('hide_notify', ($uid == 1) ? 'none' : '');
     /*
     if ( function_exists('plugin_templatesetvars_captcha') ) {
         plugin_templatesetvars_captcha('forum', $submissionform_main);
@@ -1107,7 +1107,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         if ( function_exists('plugin_templatesetvars_recaptcha') ) {
             plugin_templatesetvars_recaptcha('forum', $submissionform_main);
         } else {
-            $submissionform_main->set_var('captcha','');
+            $submissionform_main->set_var ('captcha','');
         }
     }
     */
@@ -1121,37 +1121,37 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
                 $comment = forum_xchsmilies($comment,true);
             }
         }
-        $submissionform_main->set_var('post_message', $comment);
+        $submissionform_main->set_var ('post_message', $comment);
     } else {
-        $submissionform_main->set_var('post_message', htmlspecialchars($comment,ENT_QUOTES, $CONF_FORUM['charset']));
+        $submissionform_main->set_var ('post_message', htmlspecialchars($comment,ENT_QUOTES, $CONF_FORUM['charset']));
     }
     
-    $submissionform_main->set_var('postmode', $postmode);
-    $submissionform_main->parse('output', 'submissionform_main');
+    $submissionform_main->set_var ('postmode', $postmode);
+    $submissionform_main->parse ('output', 'submissionform_main');
     $display .= $submissionform_main->finish($submissionform_main->get_var('output'));
     
     $topicfooter = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $topicfooter->set_file (array ( 'topicfooter'=>'submissionform_footer.thtml'));
+    $topicfooter->set_file (array (	'topicfooter'=>'submissionform_footer.thtml'));
     
     $topicfooter->set_block('topicfooter', 'topic_review');
     
-    $topicfooter->set_var('imgset', $CONF_FORUM['imgset']);
-    $topicfooter->set_var('layout_url', $CONF_FORUM['layout_url']);
-    $topicfooter->set_var('site_url', $_CONF['site_url']);
-    
+    $topicfooter->set_var ('imgset', $CONF_FORUM['imgset']);
+	$topicfooter->set_var ('layout_url', $CONF_FORUM['layout_url']);
+    $topicfooter->set_var ('site_url', $_CONF['site_url']);
+	
     //Topic Review
     if (($method != 'newtopic' && $editpost != 'yes') && ($method == 'postreply' || $submit == $LANG_GF01['PREVIEW'])) {
         if ($CONF_FORUM['show_topicreview']) {
-            $topicfooter->set_var('topic_id', $id);
-            $topicfooter->parse('topic_review', 'topic_review');
+        	$topicfooter->set_var ('topic_id', $id);
+        	$topicfooter->parse ('topic_review', 'topic_review');
         } else {
-            $topicfooter->set_var('topic_review', '');
-        }
-    } else {
-        $topicfooter->set_var('topic_review', '');
+        	$topicfooter->set_var ('topic_review', '');
+		}
+	} else {
+		$topicfooter->set_var ('topic_review', '');
     }
-    
-    $topicfooter->parse('output', 'topicfooter');
+	
+	$topicfooter->parse ('output', 'topicfooter');
     $display .= $topicfooter->finish ($topicfooter->get_var('output'));
 
 }
@@ -1192,7 +1192,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
         if ($N['uid'] > 1 AND $N['uid'] != $userid AND $CONF_FORUM['allow_notification'] == '1' ) {
 
             // if the topic_id is 0 for this record - user has subscribed to complete forum. Check if they have opted out of this forum topic.
-            if (DB_count($_TABLES['forum_watch'], ['uid','forum_id','topic_id'], [$N['uid'], $forumid, -$topicid]) == 0) {
+            if (DB_count($_TABLES['forum_watch'],array('uid','forum_id','topic_id'),array($N['uid'],$forumid,-$topicid)) == 0) {
 
                 // Check if user does not want to receive multiple notifications for same topic and already has been notified
                 $userNotifyOnceOption = DB_getItem($_TABLES['forum_userprefs'],'notify_once',"uid='{$N['uid']}'");
@@ -1266,3 +1266,5 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
         }
     }
 }
+
+?>

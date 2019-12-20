@@ -49,7 +49,7 @@ require_once '../../auth.inc.php';
 
 if (!SEC_hasRights('forum.edit')) {
     $display = COM_showMessageText($MESSAGE[29], $MESSAGE[30]);
-    $display = COM_createHTMLDocument($display, ['pagetitle' => $MESSAGE[30]]);
+    $display = COM_createHTMLDocument($display, array('pagetitle' => $MESSAGE[30]));
     COM_accessLog("User {$_USER['username']} tried to illegally access the forum administration.");
     COM_output($display);
     exit;
@@ -90,7 +90,7 @@ function gf_resyncforum($id) {
         DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=$topicCount, post_count=$postCount WHERE forum_id=$id");
 
         $recCount = 0;
-        while ($trecord = DB_fetchArray($topicsQuery)) {
+        while($trecord = DB_fetchArray($topicsQuery)) {
             $recCount++;
             // Retrieve the oldest post records for this topic and update the lastupdated time in the parent topic record
             $lsql = DB_query("SELECT MAX(id) AS maxid FROM {$_TABLES['forum_topic']} WHERE pid={$trecord['id']}");
@@ -131,3 +131,5 @@ function gf_updateSystem() {
         }
     }
 }
+
+?>

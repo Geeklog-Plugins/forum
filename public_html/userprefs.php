@@ -33,8 +33,6 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-use Geeklog\Input;
-
 require_once '../lib-common.php'; // Path to your lib-common.php
 
 if (!in_array('forum', $_PLUGINS)) {
@@ -49,23 +47,24 @@ forum_chkUsercanAccess(true);
 
 $display = '';
 
-if ((int) Input::fGet('msg', 0) === 1) {
+$msg = isset($_GET['msg']) ? COM_applyFilter($_GET['msg'], true) : '';
+if ($msg==1) {
     $display .= COM_showMessageText($LANG_GF92['setsavemsg']);
 }
 
 // SAVE SETTINGS
 if (isset($_POST['submit']) && SEC_checkToken()) {
-    $xalwaysnotify   = (int) Input::fPost('xalwaysnotify', 0);
-    $xmembersperpage = (int) Input::fPost('xmembersperpage', 0);
-    $xnotifyonce     = (int) Input::fPost('xnotifyonce', 0);
-    $xpopularperpage = (int) Input::fPost('xpopularperpage', 0);
-    $xpopularlimit   = (int) Input::fPost('xpopularlimit', 0);
-    $xpostsperpage   = (int) Input::fPost('xpostsperpage', 0);
-    $xnewperpage     = (int) Input::fPost('xnewperpage', 0);
-    $xsearchperpage  = (int) Input::fPost('xsearchperpage', 0);
-    $xshowiframe     = (int) Input::fPost('xshowiframe', 0);
-    $xtopicsperpage  = (int) Input::fPost('xtopicsperpage', 0);
-    $xviewanonposts  = (int) Input::fPost('xviewanonposts', 0);
+    $xalwaysnotify    = isset($_POST['xalwaysnotify'])    ? COM_applyFilter($_POST['xalwaysnotify'],true)    : '';
+    $xmembersperpage  = isset($_POST['xmembersperpage'])  ? COM_applyFilter($_POST['xmembersperpage'],true)  : '';
+    $xnotifyonce      = isset($_POST['xnotifyonce'])      ? COM_applyFilter($_POST['xnotifyonce'],true)      : '';
+    $xpopularperpage  = isset($_POST['xpopularperpage'])  ? COM_applyFilter($_POST['xpopularperpage'],true)  : '';
+    $xpopularlimit    = isset($_POST['xpopularlimit'])    ? COM_applyFilter($_POST['xpopularlimit'],true)    : '';
+    $xpostsperpage    = isset($_POST['xpostsperpage'])    ? COM_applyFilter($_POST['xpostsperpage'],true)    : '';
+    $xnewperpage  	  = isset($_POST['xnewperpage'])  	  ? COM_applyFilter($_POST['xnewperpage'],true) 	 : '';
+    $xsearchperpage   = isset($_POST['xsearchperpage'])   ? COM_applyFilter($_POST['xsearchperpage'],true)   : '';
+    $xshowiframe      = isset($_POST['xshowiframe'])      ? COM_applyFilter($_POST['xshowiframe'],true)      : '';
+    $xtopicsperpage   = isset($_POST['xtopicsperpage'])   ? COM_applyFilter($_POST['xtopicsperpage'],true)   : '';
+    $xviewanonposts   = isset($_POST['xviewanonposts'])   ? COM_applyFilter($_POST['xviewanonposts'],true)   : '';
 
     DB_query("UPDATE {$_TABLES['forum_userprefs']} SET
         topicsperpage='$xtopicsperpage',
@@ -87,7 +86,7 @@ if (isset($_POST['submit']) && SEC_checkToken()) {
 
 
 // SETTINGS MAIN
-if (Input::post('submit', null) === null) {
+if (!isset($_POST['$submit'])) {
     // Get user specific settings from database
     $result = DB_query("SELECT * FROM {$_TABLES['forum_userprefs']} WHERE uid='{$_USER['uid']}'");
     $nrows = DB_numRows($result);
@@ -140,33 +139,33 @@ if (Input::post('submit', null) === null) {
     }
 
     $usersettings = COM_newTemplate(CTL_plugin_templatePath('forum', 'userprefs'));
-    $usersettings->set_file(array ('usersettings'=>'user_settings.thtml'));
-    $usersettings->set_var('phpself', $_CONF['site_url'] .'/forum/userprefs.php');
-    $usersettings->set_var('lang_user_preferences', $LANG_GF92['userpreferences']);
-    $usersettings->set_var('LANG_feature', $LANG_GF01['FEATURE']);  
-    $usersettings->set_var('LANG_setting', $LANG_GF01['SETTING']);  
-    $usersettings->set_var('LANG_save', $LANG_GF01['SAVE']);
-    $usersettings->set_var('topicsperpage', $A['topicsperpage']);
-    $usersettings->set_var('postsperpage', $A['postsperpage']);
-    $usersettings->set_var('newperpage', $A['newperpage']);
-    $usersettings->set_var('popularperpage', $A['popularperpage']);
-    $usersettings->set_var('popularlimit', $A['popularlimit']);
-    $usersettings->set_var('searchperpage', $A['searchlines']);
-    $usersettings->set_var('membersperpage', $A['membersperpage']);
-    $usersettings->set_var('viewanonposts', $A['viewanonposts']);
-    $usersettings->set_var('viewanonposts_yes', $viewanonposts_yes);
-    $usersettings->set_var('viewanonposts_no', $viewanonposts_no);
-    $usersettings->set_var('enablenotify', $A['enablenotify']);
-    $usersettings->set_var('emailnotify_yes', $emailnotify_yes);
-    $usersettings->set_var('emailnotify_no', $emailnotify_no);
-    $usersettings->set_var('notifyonce_yes', $notifyonce_yes);
-    $usersettings->set_var('notifyonce_no', $notifyonce_no);
-    $usersettings->set_var('alwaysnotify', $A['alwaysnotify']);
-    $usersettings->set_var('alwaysnotify_yes', $alwaysnotify_yes);
-    $usersettings->set_var('alwaysnotify_no', $alwaysnotify_no);
-    $usersettings->set_var('showiframe', $A['showiframe']);
-    $usersettings->set_var('showiframe_yes', $showiframe_yes);
-    $usersettings->set_var('showiframe_no', $showiframe_no);
+    $usersettings->set_file (array ('usersettings'=>'user_settings.thtml'));
+    $usersettings->set_var ('phpself', $_CONF['site_url'] .'/forum/userprefs.php');
+    $usersettings->set_var ('lang_user_preferences', $LANG_GF92['userpreferences']);
+    $usersettings->set_var ('LANG_feature', $LANG_GF01['FEATURE']);  
+    $usersettings->set_var ('LANG_setting', $LANG_GF01['SETTING']);  
+    $usersettings->set_var ('LANG_save', $LANG_GF01['SAVE']);
+    $usersettings->set_var ('topicsperpage', $A['topicsperpage']);
+    $usersettings->set_var ('postsperpage', $A['postsperpage']);
+    $usersettings->set_var ('newperpage', $A['newperpage']);
+    $usersettings->set_var ('popularperpage', $A['popularperpage']);
+    $usersettings->set_var ('popularlimit', $A['popularlimit']);
+    $usersettings->set_var ('searchperpage', $A['searchlines']);
+    $usersettings->set_var ('membersperpage', $A['membersperpage']);
+    $usersettings->set_var ('viewanonposts', $A['viewanonposts']);
+    $usersettings->set_var ('viewanonposts_yes', $viewanonposts_yes);
+    $usersettings->set_var ('viewanonposts_no', $viewanonposts_no);
+    $usersettings->set_var ('enablenotify', $A['enablenotify']);
+    $usersettings->set_var ('emailnotify_yes', $emailnotify_yes);
+    $usersettings->set_var ('emailnotify_no', $emailnotify_no);
+    $usersettings->set_var ('notifyonce_yes', $notifyonce_yes);
+    $usersettings->set_var ('notifyonce_no', $notifyonce_no);
+    $usersettings->set_var ('alwaysnotify', $A['alwaysnotify']);
+    $usersettings->set_var ('alwaysnotify_yes', $alwaysnotify_yes);
+    $usersettings->set_var ('alwaysnotify_no', $alwaysnotify_no);
+    $usersettings->set_var ('showiframe', $A['showiframe']);
+    $usersettings->set_var ('showiframe_yes', $showiframe_yes);
+    $usersettings->set_var ('showiframe_no', $showiframe_no);
     if ($CONF_FORUM['usermenu'] == 'navbar') {
         $usersettings->set_var('navmenu', forumNavbarMenu($LANG_GF01['USERPREFS']));
     } else {
@@ -178,7 +177,7 @@ if (Input::post('submit', null) === null) {
     $usersettings->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
     $usersettings->set_var('block_end', COM_endBlock());      
 
-    $usersettings->parse('output', 'usersettings');
+    $usersettings->parse ('output', 'usersettings');
     $display .= $usersettings->finish($usersettings->get_var('output'));
 }
 

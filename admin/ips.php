@@ -34,16 +34,14 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-use Geeklog\Input;
-
 include_once 'gf_functions.php';
 
 // Filter input variables
-$ip     = Input::fRequest('ip', '');
-$msg    = (int) Input::fGet('msg', 0);
-$op     = Input::fRequest('op', '');
-$sure   = Input::fRequest('sure', '');
-$submit = Input::fRequest('submit', '');
+$ip    = isset($_REQUEST['ip'])   ? COM_applyFilter($_REQUEST['ip'])    : '';
+$msg   = isset($_GET['msg'])      ? COM_applyFilter($_GET['msg'], true) : '';
+$op    = isset($_REQUEST['op'])   ? COM_applyFilter($_REQUEST['op'])    : '';
+$sure  = isset($_REQUEST['sure']) ? COM_applyFilter($_REQUEST['sure'])  : '';
+$submit   = isset($_REQUEST['submit'])   ? COM_applyFilter($_REQUEST['submit'])     : '';
 
 // Initialise output variable
 $display = '';
@@ -140,3 +138,4 @@ $display = COM_createHTMLDocument($display);
 
 // Show output
 COM_output($display);
+?>

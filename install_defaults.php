@@ -44,7 +44,7 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'install_defaults.php') !== false) 
 
 global $_FORUM_DEFAULT;
 
-$_FORUM_DEFAULT = [
+$_FORUM_DEFAULT = array(
     'registration_required' => '0',
     'registered_to_post'    => '0',
     'allow_notification'    => '1',
@@ -92,9 +92,9 @@ $_FORUM_DEFAULT = [
     'sideblock_isleft'         => '0',
     'sideblock_order'          => '100',
     'sideblock_topic_option'   => TOPIC_HOMEONLY_OPTION,
-    'sideblock_topic'          => [],
+    'sideblock_topic'          => array(),
     'sideblock_enable'         => true,
-    'sideblock_permissions'    => [2, 2, 2, 2],
+    'sideblock_permissions'    => array (2, 2, 2, 2),
     // ----------------------------------
     'level1'                => '1',
     'level2'                => '15',
@@ -110,10 +110,10 @@ $_FORUM_DEFAULT = [
     'menublock_isleft'         => '1',
     'menublock_order'          => '0',
     'menublock_topic_option'   => TOPIC_ALL_OPTION,
-    'menublock_topic'          => [],
+    'menublock_topic'          => array(),
     'menublock_enable'         => true,
-    'menublock_permissions'    => [2, 2, 2, 2]
-];
+    'menublock_permissions'    => array (2, 2, 2, 2)
+);
 
 /**
 * Initialize Forum plugin configuration
@@ -436,24 +436,24 @@ function forum_update_ConfValues_2_8_0()
 
 function forum_update_ConfValues_2_9_0()
 {
-    global $_CONF;
-    
+	global $_CONF;
+	
     require_once $_CONF['path_system'] . 'classes/config.class.php';
-    
+	
     // Remove use_themes_template override
-    $c = config::get_instance();
-    $c->del('use_themes_template', 'forum');
-
-    return true;
+	$c = config::get_instance();
+	$c->del('use_themes_template', 'forum');
+    
+	return true;	
 }
 
 function forum_update_ConfValues_2_9_4()
 {
-    global $_CONF, $_FORUM_DEFAULT;
-    
+	global $_CONF, $_FORUM_DEFAULT;
+	
     require_once $_CONF['path_system'] . 'classes/config.class.php';
-    
-    $c = config::get_instance();
+	
+	$c = config::get_instance();
 
     $n = 'forum';
 
@@ -463,8 +463,10 @@ function forum_update_ConfValues_2_9_4()
     $c->add('likes_forum',           $_FORUM_DEFAULT['likes_forum'],           'select',   0, 0, 41,   $o, true, $n, $t);
     // Add reCAPTCHA plugin v1.2.1+ support
     $o = 60;
-    $t = 0;
+    $t = 0;    
     $c->add('recaptcha',             $_FORUM_DEFAULT['recaptcha'],             'select',   0, 0, 16,   $o++, true, $n, $t);
     
-    return true;
+	return true;	
 }
+
+?>

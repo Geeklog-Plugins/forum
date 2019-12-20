@@ -29,74 +29,76 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-if (stripos($_SERVER['PHP_SELF'], 'configuration_validation.php') !== false) {
+if (strpos(strtolower($_SERVER['PHP_SELF']), 'configuration_validation.php') !== false) {
     die('This file can not be used on its own!');
 }
 
 // General Forum Settings
-$_CONF_VALIDATE['forum']['registration_required'] = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['registered_to_post']    = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['allow_notification']    = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['show_topicreview']      = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['allow_user_dateformat'] = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_pm_plugin']         = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['show_topics_perpage']   = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['show_posts_perpage']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['show_messages_perpage'] = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['show_searches_perpage'] = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['showblocks']            = [
-    'rule' => ['inList', ['leftblocks', 'rightblocks', 'allblocks', 'noblocks'], true]
-];
-$_CONF_VALIDATE['forum']['usermenu']              = [
-    'rule' => ['inList', ['blockmenu', 'navbar', 'none'], true]
-];
-$_CONF_VALIDATE['forum']['likes_forum'] = [
-    'rule' => ['inList', [0, 1, 2], false]
-];
+$_CONF_VALIDATE['forum']['registration_required'] = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['registered_to_post']    = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['allow_notification']    = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['show_topicreview']      = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['allow_user_dateformat'] = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_pm_plugin']         = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['show_topics_perpage']   = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['show_posts_perpage']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['show_messages_perpage'] = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['show_searches_perpage'] = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['showblocks']            = array(
+    'rule' => array('inList', array('leftblocks', 'rightblocks', 'allblocks', 'noblocks'), true)
+);
+$_CONF_VALIDATE['forum']['usermenu']              = array(
+    'rule' => array('inList', array('blockmenu', 'navbar', 'none'), true)
+);
+$_CONF_VALIDATE['forum']['likes_forum'] = array(
+    'rule' => array('inList', array(0, 1, 2), false)
+);  
 $_CONF_VALIDATE['forum']['recaptcha'] = ['rule' => ['inList', ['0', '1', '2'], true]];
 
 // Topic Posting Settings
-$_CONF_VALIDATE['forum']['show_subject_length']   = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['min_username_length']   = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['min_subject_length']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['min_comment_length']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['views_tobe_popular']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['post_speedlimit']       = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['allowed_editwindow']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['allow_html']            = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['post_htmlmode']         = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['convert_break']         = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_censor']            = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_glfilter']          = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_geshi']             = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_spamx_filter']      = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['show_moods']            = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['allow_smilies']         = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['use_smilies_plugin']    = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['avatar_width']          = ['rule' => 'numeric'];
+$_CONF_VALIDATE['forum']['show_subject_length']   = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['min_username_length']   = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['min_subject_length']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['min_comment_length']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['views_tobe_popular']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['post_speedlimit']       = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['allowed_editwindow']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['allow_html']            = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['post_htmlmode']         = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['convert_break']         = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_censor']            = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_glfilter']          = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_geshi']             = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_spamx_filter']      = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['show_moods']            = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['allow_smilies']         = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['use_smilies_plugin']    = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['avatar_width']          = array('rule' => 'numeric');
 
 // Centerblock Settings
-$_CONF_VALIDATE['forum']['show_centerblock']      = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['centerblock_homepage']  = ['rule' => 'boolean'];
-$_CONF_VALIDATE['forum']['centerblock_numposts']  = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['cb_subject_size']       = ['rule' => 'numeric'];
-$_CONF_VALIDATE['links']['centerblock_where']     = [
-    'rule' => ['inList', [1, 2, 3], true]
-];
+$_CONF_VALIDATE['forum']['show_centerblock']      = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['centerblock_homepage']  = array('rule' => 'boolean');
+$_CONF_VALIDATE['forum']['centerblock_numposts']  = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['cb_subject_size']       = array('rule' => 'numeric');
+$_CONF_VALIDATE['links']['centerblock_where']     = array(
+    'rule' => array('inList', array(1, 2, 3), true)
+);
 
 // Sideblock Settings
-$_CONF_VALIDATE['forum']['sideblock_numposts']    = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['sb_subject_size']       = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['sb_latestpostonly']     = ['rule' => 'boolean'];
+$_CONF_VALIDATE['forum']['sideblock_numposts']    = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['sb_subject_size']       = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['sb_latestpostonly']     = array('rule' => 'boolean');
 
 // Rank Settings
-$_CONF_VALIDATE['forum']['level1']                = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['level2']                = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['level3']                = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['level4']                = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['level5']                = ['rule' => 'numeric'];
-$_CONF_VALIDATE['forum']['level1name']            = ['rule' => 'string'];
-$_CONF_VALIDATE['forum']['level2name']            = ['rule' => 'string'];
-$_CONF_VALIDATE['forum']['level3name']            = ['rule' => 'string'];
-$_CONF_VALIDATE['forum']['level4name']            = ['rule' => 'string'];
-$_CONF_VALIDATE['forum']['level5name']            = ['rule' => 'string'];
+$_CONF_VALIDATE['forum']['level1']                = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['level2']                = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['level3']                = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['level4']                = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['level5']                = array('rule' => 'numeric');
+$_CONF_VALIDATE['forum']['level1name']            = array('rule' => 'string');
+$_CONF_VALIDATE['forum']['level2name']            = array('rule' => 'string');
+$_CONF_VALIDATE['forum']['level3name']            = array('rule' => 'string');
+$_CONF_VALIDATE['forum']['level4name']            = array('rule' => 'string');
+$_CONF_VALIDATE['forum']['level5name']            = array('rule' => 'string');
+
+?>

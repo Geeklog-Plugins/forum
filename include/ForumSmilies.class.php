@@ -36,8 +36,8 @@
  */
 
 // This file can't be used on its own
-if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== false) {
-    die('This file can not be used on its own.');
+if (strpos(strtolower($_SERVER['PHP_SELF']), basename(__FILE__)) !== false) {
+    die ('This file can not be used on its own.');
 }
 
 /**
@@ -46,8 +46,7 @@ if (stripos($_SERVER['PHP_SELF'], basename(__FILE__)) !== false) {
  * list of smilies when posting a topic, converting symbols
  * from the posts to corresponding images and vice-versa.
  */
-class ForumSmilies
-{
+class ForumSmilies {
     /**
      * This array defines each smilie. The 'symbol' is the text that will
      * be converted to the corresponding image in the forum posts.
@@ -57,33 +56,33 @@ class ForumSmilies
      * The order in which the array is sorted will determine in which order
      * the smilies will appear in the list of smilies when posting a topic.
      */
-    private $data = [
-        'biggrin'  => ['symbol' => ':D',         'offset' => 208],
-        'smile'    => ['symbol' => ':)',         'offset' => 192],
-        'frown'    => ['symbol' => ':(',         'offset' => 112],
-        'eek'      => ['symbol' => '8O',         'offset' => 272],
-        'confused' => ['symbol' => ':?',         'offset' => 224],
-        'cool'     => ['symbol' => 'B)',         'offset' =>  48],
-        'lol'      => ['symbol' => ':lol:',      'offset' => 352],
-        'angry'    => ['symbol' => ':x',         'offset' => 384],
-        'razz'     => ['symbol' => ':P',         'offset' => 320],
-        'oops'     => ['symbol' => ':oops:',     'offset' => 144],
-        'surprise' => ['symbol' => ':o',         'offset' => 176],
-        'cry'      => ['symbol' => ':cry:',      'offset' => 288],
-        'evil'     => ['symbol' => ':evil:',     'offset' => 368],
-        'twisted'  => ['symbol' => ':twisted:',  'offset' => 400],
-        'rolleye'  => ['symbol' => ':roll:',     'offset' => 240],
-        'wink'     => ['symbol' => ';)',         'offset' => 160],
-        'exclaim'  => ['symbol' => ':!:',        'offset' =>  64],
-        'question' => ['symbol' => ':question:', 'offset' =>  96],
-        'idea'     => ['symbol' => ':idea:',     'offset' => 256],
-        'arrow'    => ['symbol' => ':arrow:',    'offset' =>  80],
-        'neutral'  => ['symbol' => ':|',         'offset' => 128],
-        'green'    => ['symbol' => ':mrgreen:',  'offset' =>   0],
-        'sick'     => ['symbol' => ':sick:',     'offset' =>  16],
-        'tired'    => ['symbol' => ':tired:',    'offset' => 304],
-        'monkey'   => ['symbol' => ':monkey:',   'offset' =>  32]
-    ];
+    private $data = array(
+        'biggrin'  => array('symbol' => ':D',         'offset' => 208),
+        'smile'    => array('symbol' => ':)',         'offset' => 192),
+        'frown'    => array('symbol' => ':(',         'offset' => 112),
+        'eek'      => array('symbol' => '8O',         'offset' => 272),
+        'confused' => array('symbol' => ':?',         'offset' => 224),
+        'cool'     => array('symbol' => 'B)',         'offset' => 48),
+        'lol'      => array('symbol' => ':lol:',      'offset' => 352),
+        'angry'    => array('symbol' => ':x',         'offset' => 384),
+        'razz'     => array('symbol' => ':P',         'offset' => 320),
+        'oops'     => array('symbol' => ':oops:',     'offset' => 144),
+        'surprise' => array('symbol' => ':o',         'offset' => 176),
+        'cry'      => array('symbol' => ':cry:',      'offset' => 288),
+        'evil'     => array('symbol' => ':evil:',     'offset' => 368),
+        'twisted'  => array('symbol' => ':twisted:',  'offset' => 400),
+        'rolleye'  => array('symbol' => ':roll:',     'offset' => 240),
+        'wink'     => array('symbol' => ';)',         'offset' => 160),
+        'exclaim'  => array('symbol' => ':!:',        'offset' => 64),
+        'question' => array('symbol' => ':question:', 'offset' => 96),
+        'idea'     => array('symbol' => ':idea:',     'offset' => 256),
+        'arrow'    => array('symbol' => ':arrow:',    'offset' => 80),
+        'neutral'  => array('symbol' => ':|',         'offset' => 128),
+        'green'    => array('symbol' => ':mrgreen:',  'offset' => 0),
+        'sick'     => array('symbol' => ':sick:',     'offset' => 16),
+        'tired'    => array('symbol' => ':tired:',    'offset' => 304),
+        'monkey'   => array('symbol' => ':monkey:',   'offset' => 32)
+    );
 
     /**
      * This function returns the HTML code for displaying
@@ -133,8 +132,8 @@ class ForumSmilies
     {
         global $LANG_GF_SMILIES;
 
-        $search    = []; // list of smilie symbols
-        $replace   = []; // list of IMG tags
+        $search    = array(); // list of smilie symbols
+        $replace   = array(); // list of IMG tags
         // The replacement values will be created by filling
         // in the values in this template variable
         $template  = '<img class="frm_sml frm_sml_%s" src="';
@@ -159,3 +158,5 @@ class ForumSmilies
         return $message;
     }
 }
+
+?>
