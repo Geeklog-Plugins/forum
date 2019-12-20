@@ -33,16 +33,18 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
+use Geeklog\Input;
+
 include_once 'gf_functions.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-$id         = isset($_REQUEST['id'])         ? COM_applyFilter($_REQUEST['id'],true)         : '';
-$op         = isset($_REQUEST['op'])  		 ? COM_applyFilter($_REQUEST['op'])       		 : '';
-$show       = isset($_REQUEST['show'])       ? COM_applyFilter($_REQUEST['show'], true)      : '';
-$page       = isset($_REQUEST['page'])       ? COM_applyFilter($_REQUEST['page'],true)       : '';
-$forum      = isset($_REQUEST['forum'])      ? COM_applyFilter($_REQUEST['forum'],true)      : '';
-$member     = isset($_REQUEST['member'])     ? COM_applyFilter($_REQUEST['member'],true)     : '';
-$parentonly = isset($_REQUEST['parentonly']) ? COM_applyFilter($_REQUEST['parentonly'],true) : '';
+$id         = (int) Input::fRequest('id', 0);
+$op         = Input::fRequest('op', '');
+$show       = (int) Input::fRequest('show', 0);
+$page       = (int) Input::fRequest('page', 0);
+$forum      = (int) Input::fRequest('forum', 0);
+$member     = (int) Input::fRequest('member', 0);
+$parentonly = (int) Input::fRequest('parentonly', 0);
 
 function selectHTML_forum($selected='') {
     global $_CONF,$_TABLES;
@@ -70,8 +72,9 @@ function selectHTML_forum($selected='') {
     return $selectHTML;
 }
 
-function selectHTML_members($selected='') {
-    global $_CONF,$_TABLES,$LANG_GF02;
+function selectHTML_members($selected = '') {
+    global $_CONF, $_TABLES, $LANG_GF02;
+
     $selectHTML = '';
     $sql  = "SELECT  user.uid,user.username FROM {$_TABLES['users']} user, {$_TABLES['forum_topic']} topic ";
     $sql .= "WHERE user.uid=topic.uid GROUP BY uid ORDER BY user.username";
@@ -93,14 +96,10 @@ function selectHTML_members($selected='') {
 }
 
 /* Check to see if user has checked multiple records to delete */
-if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked' AND SEC_checkToken()) {
-    $chk_record_delete = array();
-    if (isset($_POST['chk_record_delete'])) {
-        $chk_record_delete = $_POST['chk_record_delete'];
-    }
+if (strcasecmp(Input::server('REQUEST_METHOD'), 'POST') === 0 AND $op === 'delchecked' AND SEC_checkToken()) {
+    $chk_record_delete = Input::fPost('chk_record_delete', []);
+
     foreach ($chk_record_delete as $id) {
-        $id = COM_applyFilter($id,true);
-        
         // Retrieve post info
         $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$id'");
         $nrows = DB_numRows($result);
@@ -200,8 +199,10 @@ $nrows = DB_numRows($result);
 
 $display = '';
 $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
-$report->set_file(array ('messages'=>'admin/messages.thtml', 
-        				'forum_links'   => 'forum_links.thtml')); 
+$report->set_file([
+    'messages'=>'admin/messages.thtml', 
+    'forum_links'   => 'forum_links.thtml'
+]);
 
 $report->set_block('messages', 'report_record');
 $report->set_block('messages', 'no_records_message');
@@ -239,9 +240,9 @@ if ($parentonly == 1) {
 }
 
 if ($forumname == '') {
-	$report->set_var('startblock', COM_startBlock($LANG_GF95['header1']));
+    $report->set_var('startblock', COM_startBlock($LANG_GF95['header1']));
 } else {
-	$report->set_var('startblock', COM_startBlock(sprintf($LANG_GF95['header2'], $forumname)));
+    $report->set_var('startblock', COM_startBlock(sprintf($LANG_GF95['header2'], $forumname)));
 }
 
 // Needs to be here before individual records created
@@ -284,8 +285,8 @@ if ($nrows > 0) {
         }
     }
 } else {
-	$report->set_var ('records_message', $LANG_GF95['nomess']);
-	$report->parse ('no_records_message', 'no_records_message');
+    $report->set_var('records_message', $LANG_GF95['nomess']);
+    $report->parse('no_records_message', 'no_records_message');
 }  
 
 $report->set_var('endblock', COM_endBlock());
@@ -295,4 +296,3 @@ $display .= $report->finish($report->get_var('output'));
 $display = COM_createHTMLDocument($display);
 
 COM_output($display);
-?>

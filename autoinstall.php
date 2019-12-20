@@ -50,30 +50,30 @@ function plugin_autoinstall_forum($pi_name)
 //  $pi_admin        = $pi_display_name . ' Admin';
     $pi_admin        = $pi_name . ' Admin';
 
-    $info = array(
+    $info = [
         'pi_name'         => $pi_name,
         'pi_display_name' => $pi_display_name,
         'pi_version'      => '2.9.4',
         'pi_gl_version'   => '2.2.1',
         'pi_homepage'     => 'https://github.com/Geeklog-Plugins/forum'
-    );
+    ];
 
-    $groups = array(
+    $groups = [
 //      $pi_admin => 'Has full access to ' . $pi_display_name . ' features'
         $pi_admin => 'Users in this group can administer the forum plugin'
-    );
+    ];
 
-    $features = array(
-        $pi_name . '.edit'      => 'Forum Admin',
-        $pi_name . '.user'      => 'Forum Viewer'
-    );
+    $features = [
+        $pi_name . '.edit' => 'Forum Admin',
+        $pi_name . '.user' => 'Forum Viewer'
+    ;
 
-    $mappings = array(
-        $pi_name . '.edit'      => array($pi_admin),
-        $pi_name . '.user'      => array($pi_admin)
-    );
+    $mappings = [
+        $pi_name . '.edit' => [$pi_admin],
+        $pi_name . '.user' => [$pi_admin]
+    ];
 
-    $tables = array(
+    $tables = [
         'forum_userprefs',
         'forum_topic',
         'forum_categories',
@@ -84,23 +84,23 @@ function plugin_autoinstall_forum($pi_name)
         'forum_banned_ip',
         'forum_log',
         'forum_userinfo',
-    );
+    ];
 
-    $requires = array(
-        array(
-               'db' => 'mysql',
-               'version' => '4.1'
-             )
-    );    
+    $requires = [
+        [
+            'db'      => 'mysql',
+            'version' => '4.1'
+        ]
+    ];
 
-    $inst_parms = array(
+    $inst_parms = [
         'info'      => $info,
         'groups'    => $groups,
         'features'  => $features,
         'mappings'  => $mappings,
         'tables'    => $tables,
         'requires'  => $requires
-    );
+    ];
 
     return $inst_parms;
 }
@@ -205,19 +205,17 @@ function plugin_compatible_with_this_version_forum($pi_name)
     
     if (!function_exists('TOPIC_getList')) {
         return false;
-    }    
+    }
 
-	if (!function_exists('CTL_plugin_templatePath')) {
+    if (!function_exists('CTL_plugin_templatePath')) {
         return false;
-    }   
+    }
 
     // As of Geeklog v2.2.1
     // Likes Control and Structured Data Class now required
-	if (!function_exists('LIKES_control')) {
+    if (!function_exists('LIKES_control')) {
         return false;
-    }     
+    }
 
     return true;
 }
-
-?>

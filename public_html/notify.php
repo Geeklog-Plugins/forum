@@ -33,6 +33,8 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
+use Geeklog\Input;
+
 require_once '../lib-common.php'; // Path to your lib-common.php
 
 if (!in_array('forum', $_PLUGINS)) {
@@ -43,22 +45,20 @@ if (!in_array('forum', $_PLUGINS)) {
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$forum      = isset($_REQUEST['forum'])  ? COM_applyFilter($_REQUEST['forum'],true) : '';
-$id         = isset($_REQUEST['id'])     ? COM_applyFilter($_REQUEST['id'],true)    : '';
-$msg        = isset($_GET['msg'])        ? COM_applyFilter($_GET['msg'], true)      : '';
-$notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'])     : '';
-$op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         : '';
-$page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      : '';
-$show       = isset($_GET['show'])       ? COM_applyFilter($_GET['show'],true)      : '';
-$topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) : '';
+$forum      = (int) Input::fRequest('forum', 0);
+$id         = (int) Input::fRequest('id', 0);
+$msg        = (int) Input::fGet('msg', 0);
+$notifytype = Input::fRequest('filter', '');
+$op         = Input::fRequest('op', '');
+$page       = (int) Input::fGet('page', 0);
+$show       = (int) Input::fGet('show', 0);
+$topic      = (int) Input::fRequest('topic', 0);
 
 //Check is anonymous users can access - and need to be signed in
 forum_chkUsercanAccess(true);
 
-$display = '';
-
 // Debug Code to show variables
-$display .= gf_showVariables();
+$display = gf_showVariables();
 
 // Display warning if no email found (usually happens with user oauth accounts)
 if (($_USER['email'] == '')  OR !COM_isEmail($_USER['email'])) {
@@ -71,7 +71,7 @@ if ($msg==1) {
 
 // NOTIFY CODE -> SAVE
 if (isset($_REQUEST['submit'])) {
-    if (($_REQUEST['submit'] == 'save') && ($id != 0)) {
+    if ((Input::request('submit') === 'save') && ($id != 0)) {
         $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id='$id') AND (uid='{$_USER['uid']}') OR ";
         $sql .= "((forum_id='$forum') AND (topic_id='0') AND (uid='{$_USER['uid']}')))";
         $notifyquery = DB_query("$sql");
@@ -113,10 +113,10 @@ if (isset($_REQUEST['submit'])) {
         COM_output($display);
         exit();
 
-    } elseif (($_REQUEST['submit'] == 'delete') AND ($id != 0))  {
+    } elseif ((Input::request('submit') === 'delete') AND ($id != 0))  {
         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE (id='$id')");
         COM_redirect($_CONF['site_url'] . "/forum/notify.php?msg=1&amp;filter=$notifytype");
-    } elseif (($_REQUEST['submit'] == 'delete2') AND ($id != ''))  {
+    } elseif ((Input::request('submit') == 'delete2') AND ($id != ''))  {
         // Check and see if subscribed to complete forum and if so - unsubscribe to just this topic
         if (DB_getItem($_TABLES['forum_watch'], 'topic_id', "id='$id'") == 0 ) {
             $ntopic = -$topic;  // Negative Value
@@ -142,8 +142,7 @@ if ($page == 0) {
 
 /* Check to see if user has checked multiple records to delete */
 if ($op == 'delchecked' && isset($_POST['chk_record_delete'])) {
-    foreach ($_POST['chk_record_delete'] as $id) {
-        $id = COM_applyFilter($id);
+    foreach (Input::fPost('chk_record_delete', []) as $id) {
         if (DB_getItem($_TABLES['forum_watch'],'uid',"id='$id'") == $_USER['uid']) {
             DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id='$id'");
         }
@@ -151,9 +150,10 @@ if ($op == 'delchecked' && isset($_POST['chk_record_delete'])) {
 }
 
 $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
-$report->set_file (array (
-                  'report'         => 'reports/notifications.thtml',
-                  'forum_links'    => 'forum_links.thtml' ));
+$report->set_file([
+    'report'      => 'reports/notifications.thtml',
+    'forum_links' => 'forum_links.thtml'
+]);
 
 $report->set_block('report', 'notification_record');
 $report->set_block('report', 'no_records_message');
@@ -161,12 +161,12 @@ $report->set_block('report', 'links');
 $report->set_block('forum_links', 'trash_link');
 $report->set_block('forum_links', 'return_link');
 
-$report->set_var ('imgset', $CONF_FORUM['imgset']);
-$report->set_var ('layout_url', $CONF_FORUM['layout_url']);
-$report->set_var ('LANG_TITLE', $LANG_GF02['msg89']);
-$report->set_var ('lang_subscriptions', $LANG_GF01['SUBSCRIPTIONS']);
+$report->set_var('imgset', $CONF_FORUM['imgset']);
+$report->set_var('layout_url', $CONF_FORUM['layout_url']);
+$report->set_var('LANG_TITLE', $LANG_GF02['msg89']);
+$report->set_var('lang_subscriptions', $LANG_GF01['SUBSCRIPTIONS']);
 
-$report->set_var ('select_forum', f_forumjump($_CONF['site_url'].'/forum/notify.php',$forum));
+$report->set_var('select_forum', f_forumjump($_CONF['site_url'].'/forum/notify.php',$forum));
 
 $filteroptions = '';
 for ($i = 1; $i <= 3; $i++) {
@@ -177,21 +177,21 @@ for ($i = 1; $i <= 3; $i++) {
     }
 }
 
-$report->set_var ('filter_options', $filteroptions);
-//$report->set_var ('LANG_Heading1', $LANG_GF01['ID']);
-$report->set_var ('LANG_Heading2', $LANG_GF01['FORUM']);
-$report->set_var ('LANG_Heading3', $LANG_GF01['SUBJECT']);
-$report->set_var ('LANG_Heading4', $LANG_GF01['DATEADDED']);
-$report->set_var ('LANG_Heading5', $LANG_GF01['STARTEDBY']);
-$report->set_var ('LANG_Heading6', $LANG_GF01['VIEWS']);
-$report->set_var ('LANG_Heading7', $LANG_GF01['REPLIES']);
-$report->set_var ('LANG_Heading8', $LANG_GF01['REMOVE']);
+$report->set_var('filter_options', $filteroptions);
+//$report->set_var('LANG_Heading1', $LANG_GF01['ID']);
+$report->set_var('LANG_Heading2', $LANG_GF01['FORUM']);
+$report->set_var('LANG_Heading3', $LANG_GF01['SUBJECT']);
+$report->set_var('LANG_Heading4', $LANG_GF01['DATEADDED']);
+$report->set_var('LANG_Heading5', $LANG_GF01['STARTEDBY']);
+$report->set_var('LANG_Heading6', $LANG_GF01['VIEWS']);
+$report->set_var('LANG_Heading7', $LANG_GF01['REPLIES']);
+$report->set_var('LANG_Heading8', $LANG_GF01['REMOVE']);
 
-$report->set_var ('LANG_deleteall', $LANG_GF01['DELETEALL']);
-$report->set_var ('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM']);
+$report->set_var('LANG_deleteall', $LANG_GF01['DELETEALL']);
+$report->set_var('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM']);
 $report->parse ('trash_link', 'trash_link');
 
-$report->set_var ('notifytype', $notifytype);   
+$report->set_var('notifytype', $notifytype);   
 if ($CONF_FORUM['usermenu'] == 'navbar') {
     $report->set_var('navmenu', forumNavbarMenu($LANG_GF01['SUBSCRIPTIONS']));
 } else {
@@ -249,35 +249,35 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
 
     }
 
-    $report->set_var ('id', $notify_recid);
-    $report->set_var ('csscode', $i%2+1);
-    $report->set_var ('forum', $forum_name);
-    $report->set_var ('linksubject', htmlspecialchars($subject,ENT_QUOTES,$CONF_FORUM['charset']));
-    $report->set_var ('is_forum', $is_forum);
-    $report->set_var ('topic_link', $topic_link);
-    $report->set_var ('topicauthor', $A['name']);
-    $report->set_var ('date_added', $date_added);
-    $report->set_var ('uid', $A['uid']);
-    $report->set_var ('views', $A['views']);
-    $report->set_var ('replies', $A['replies']);
-    $report->set_var ('topic_id', $topic_id);
-    $report->set_var ('notify_id', $notify_recid);
-    $report->set_var ('LANG_REMOVE', $LANG_GF01['REMOVE']);
+    $report->set_var('id', $notify_recid);
+    $report->set_var('csscode', $i%2+1);
+    $report->set_var('forum', $forum_name);
+    $report->set_var('linksubject', htmlspecialchars($subject,ENT_QUOTES,$CONF_FORUM['charset']));
+    $report->set_var('is_forum', $is_forum);
+    $report->set_var('topic_link', $topic_link);
+    $report->set_var('topicauthor', $A['name']);
+    $report->set_var('date_added', $date_added);
+    $report->set_var('uid', $A['uid']);
+    $report->set_var('views', $A['views']);
+    $report->set_var('replies', $A['replies']);
+    $report->set_var('topic_id', $topic_id);
+    $report->set_var('notify_id', $notify_recid);
+    $report->set_var('LANG_REMOVE', $LANG_GF01['REMOVE']);
     $report->parse ('notification_record', 'notification_record',true);
     $i++;
 }
 
 if ($nrows == 0) {
-    $report->set_var ('message',$LANG_GF02['msg44']);
+    $report->set_var('message',$LANG_GF02['msg44']);
     $report->parse ('no_records_message', 'no_records_message');
 } else {
-    $report->set_var ('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
+    $report->set_var('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
     if ($forum > 0) {
-        $report->set_var ('LANG_return', $LANG_GF02['msg144']);
-        $report->set_var ('returnlink', "{$_CONF['site_url']}/forum/index.php?forum=$forum");
+        $report->set_var('LANG_return', $LANG_GF02['msg144']);
+        $report->set_var('returnlink', "{$_CONF['site_url']}/forum/index.php?forum=$forum");
     } else {
-        $report->set_var ('LANG_return', $LANG_GF02['msg175']);
-        $report->set_var ('returnlink', "{$_CONF['site_url']}/forum/index.php");
+        $report->set_var('LANG_return', $LANG_GF02['msg175']);
+        $report->set_var('returnlink', "{$_CONF['site_url']}/forum/index.php");
     }
     $report->parse ('return_link', 'return_link');
     $report->parse ('links', 'links');

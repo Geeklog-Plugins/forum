@@ -122,4 +122,3 @@ $display .= COM_endBlock();
 $display = COM_createHTMLDocument($display);
 
 COM_output($display);
-?>

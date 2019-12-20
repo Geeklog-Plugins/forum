@@ -29,17 +29,19 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-if (strpos(strtolower($_SERVER['PHP_SELF']), 'upgrade.inc') !== false) {
+if (stripos($_SERVER['PHP_SELF'], 'upgrade.inc') !== false) {
     die('This file can not be used on its own.');
 }
 
 function upgrade_232() {
     global $_TABLES;
 
-    $_SQL = array();
+    $_SQL = [];
 
     /* Drop these extra fields in case they still exist */
-    $dropfields = array('img_width','img_height','topicnumchars','newtopic','newreply','mouseover','mouseout');
+    $dropfields = [
+        'img_width', 'img_height', 'topicnumchars', 'newtopic', 'newreply', 'mouseover', 'mouseout'
+    ];
     $fields = DB_query("SHOW COLUMNS FROM {$_TABLES['forum_settings']}");
     while ($A = DB_fetchArray($fields)) {
         if (in_array($A['Field'],$dropfields)) {
@@ -50,7 +52,7 @@ function upgrade_232() {
     // Version 2.3 to 2.3.2 added one field - Add if this field does not exist
     $fields = DB_query("SHOW COLUMNS FROM {$_TABLES['forum_userprefs']}");
     while ($A = DB_fetchArray($fields)) {
-        if (in_array($A['Field'],array('enablenotify'))) {         
+        if (in_array($A['Field'], ['enablenotify'])) {
             $fieldfound = true;
         }
     }
@@ -130,7 +132,7 @@ function upgrade_232() {
 function upgrade_25() {
     global $_TABLES;
 
-    $_SQL = array();
+    $_SQL = [];
 
     /* Add new fields */
     $_SQL[] = "ALTER TABLE {$_TABLES['forum_forums']} ADD topic_count mediumint(8) DEFAULT '0' NOT NULL AFTER no_newposts";
@@ -214,7 +216,6 @@ function upgrade_290() {
     DB_query("ALTER TABLE {$_TABLES['forum_userprefs']} DROP `messagesperpage`");
     DB_query("ALTER TABLE {$_TABLES['forum_userprefs']} CHANGE `topicsperpage` `topicsperpage` INT( 3 ) NOT NULL DEFAULT '10', CHANGE `postsperpage` `postsperpage` INT( 3 ) NOT NULL DEFAULT '10'");  
     
-
     COM_errorLog("Success - Completed Forum plugin version 2.9.1 update",1);
     return 0;
 }
@@ -230,13 +231,11 @@ function upgrade_293() {
 }
 
 function upgrade_294() {
-	global $_CONF, $_TABLES;
-	
-	require_once $_CONF['path'] . 'plugins/forum/install_defaults.php';
+    global $_CONF, $_TABLES;
+    
+    require_once $_CONF['path'] . 'plugins/forum/install_defaults.php';
     forum_update_ConfValues_2_9_4();
 
     COM_errorLog("Success - Completed Forum plugin version 2.9.4 update",1);
     return 0;
 }
-
-?>

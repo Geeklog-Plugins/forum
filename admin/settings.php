@@ -48,6 +48,6 @@ $display .= "<input type='hidden' name='conf_group' value='forum'" . XHTML . ">"
 $display .= "</div></form></div>";
 $display .= COM_endBlock();
 $display .= "<script type='text/javascript'>document.redirect.submit();</script>";
-$display = COM_createHTMLDocument($display, array('what' => 'none'));
+$display = COM_createHTMLDocument($display, ['what' => 'none']);
 
 COM_output($display);

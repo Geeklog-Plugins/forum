@@ -116,18 +116,18 @@ $CONF_FORUM['gl_topic_default'] = TOPIC_ALL_OPTION;
 // Place images in the directory /forum/forum/image_set/badges
 // Note Root needs a unique mapping since if you are in the Root group, then you are in all groups
 // $CONF_FORUM['grouptags'] and $CONF_FORUM['groupnames'] needs to have the same element ids
-$CONF_FORUM['grouptags'] = array(
+$CONF_FORUM['grouptags'] = [
     'Root'            => 'siteadmin_badge.png',
     'Logged-in Users' => 'forum_user.png',
     'Group A'         => 'badge1.png',
     'Group B'         => 'badge2.png'
-);
-$CONF_FORUM['groupnames'] = array(
+];
+$CONF_FORUM['groupnames'] = [
     'Root'            => 'Site Admin',
     'Logged-in Users' => 'Forum User',
     'Group A'         => 'Group A',
     'Group B'         => 'Group B'
-);
+];
 
 // Should glMenu be used for this menublock
 $CONF_FORUM['use_glmenu'] = false;
@@ -152,5 +152,3 @@ $CONF_FORUM['profile']['yim'] = false;
 $CONF_FORUM['profile']['msnm'] = false;
 $CONF_FORUM['profile']['icq'] = false;
 $CONF_FORUM['profile']['yim'] = false;
-
-?>

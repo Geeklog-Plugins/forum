@@ -54,23 +54,23 @@ function showrank($rank, $rankname)
     global $LANG_GF01, $CONF_FORUM;
     
     $userrank = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $userrank->set_file (array('forum_icons' => 'forum_icons.thtml')); 
+    $userrank->set_file (['forum_icons' => 'forum_icons.thtml']); 
     
-    $blocks = array('rankon_icon', 'rankoff_icon', 'rankmod_icon', 'rankadmin_icon');
+    $blocks = ['rankon_icon', 'rankoff_icon', 'rankmod_icon', 'rankadmin_icon'];
     foreach ($blocks as $block) {
         $userrank->set_block('forum_icons', $block);
     }    
     
     $i = '';
     $retval = '';
-    $userrank->set_var ('imgset', $CONF_FORUM['imgset']);
-    $userrank->set_var ('ranktitle', $rankname);
+    $userrank->set_var('imgset', $CONF_FORUM['imgset']);
+    $userrank->set_var('ranktitle', $rankname);
     if ($rank <= 5) {
-    	$userrank->set_var ('rankonicon', gf_getImage('rank_on','ranks'));
-    	$userrank->set_var ('rankofficon', gf_getImage('rank_off','ranks'));
-    	
-    	$on = $userrank->parse ('output', 'rankon_icon');
-    	$off = $userrank->parse ('output', 'rankoff_icon');
+        $userrank->set_var('rankonicon', gf_getImage('rank_on','ranks'));
+        $userrank->set_var('rankofficon', gf_getImage('rank_off','ranks'));
+        
+        $on = $userrank->parse('output', 'rankon_icon');
+        $off = $userrank->parse('output', 'rankoff_icon');
         for ($i=1; $i<=$rank; $i++) {
             $retval .= $on;
         }
@@ -79,11 +79,11 @@ function showrank($rank, $rankname)
         }
     } else {
         if ($rank == 6) {
-        	$userrank->set_var ('rankmodicon', gf_getImage('rank_mod','ranks'));
-        	$i = $userrank->parse ('output', 'rankmod_icon');
+            $userrank->set_var('rankmodicon', gf_getImage('rank_mod','ranks'));
+            $i = $userrank->parse('output', 'rankmod_icon');
         } else if ($rank == 7) {
-        	$userrank->set_var ('rankadminicon', gf_getImage('rank_admin','ranks'));
-        	$i = $userrank->parse ('output', 'rankadmin_icon');
+            $userrank->set_var('rankadminicon', gf_getImage('rank_admin','ranks'));
+            $i = $userrank->parse('output', 'rankadmin_icon');
         }
         $retval = $i . $i . $i . $i. $i;
     }
@@ -114,7 +114,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
             'topictemplate' =>  'topic.thtml',
             'forum_icons'   => 'forum_icons.thtml', 
             'forum_links'   => 'forum_links.thtml')); 
-    		
+            
     $topictemplate->set_block('topictemplate', 'block_user_information');
     $topictemplate->set_block('topictemplate', 'block_anon_user_information');
     $topictemplate->set_block('topictemplate', 'location');
@@ -123,7 +123,11 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     $topictemplate->set_block('topictemplate', 'user_signature');
     $topictemplate->set_block('topictemplate', 'mod_functions');
     
-    $blocks = array('block_user_name', 'block_anon_user_name', 'block_user_information', 'block_anon_user_information', 'user_signature', 'mod_functions');
+    $blocks = [
+        'block_user_name', 'block_anon_user_name', 'block_user_information',
+        'block_anon_user_information', 'user_signature', 'mod_functions'
+    ];
+    
     foreach ($blocks as $block) {
         $topictemplate->set_block('topictemplate', $block);
     }    
@@ -131,7 +135,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     $topictemplate->set_block('forum_icons', 'topiclocked_icon');
     $topictemplate->set_block('forum_icons', 'mood_icon');
     
-    $blocks = array('profile_link', 'pm_link', 'email_link', 'website_link', 'quotetopic_link', 'edittopic_link');
+    $blocks = ['profile_link', 'pm_link', 'email_link', 'website_link', 'quotetopic_link', 'edittopic_link'];
     foreach ($blocks as $block) {
         $topictemplate->set_block('forum_links', $block);
     }    
@@ -147,8 +151,8 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     $date = strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
     
     $sql = "SELECT u.*, ui.location FROM {$_TABLES['users']} u, {$_TABLES['userinfo']} ui 
-    		WHERE u.uid = ui.uid 
-    		AND u.uid = '{$showtopic['uid']}'";
+            WHERE u.uid = ui.uid 
+            AND u.uid = '{$showtopic['uid']}'";
     
     $userQuery = DB_query($sql);
     $isUserBanned = false;
@@ -208,33 +212,33 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
             $sig = $userarray['sig'];
             $min_height = $min_height + 30;
         } else {
-			$sig = '';
-		}
+            $sig = '';
+        }
     } else {
         $uservalid = false;
         $userlink = urldecode($showtopic['name']);
     }
 
     // As of Geeklog 2.2.1 it now returns a photo for anonymous user if configured
-	if ($showtopic['uid'] == 1) {
-		$avatar = USER_getPhoto($showtopic['uid'], '', '', $CONF_FORUM['avatar_width'], '', $showtopic['name']);
-	} else {
-		$avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
-	}
+    if ($showtopic['uid'] == 1) {
+        $avatar = USER_getPhoto($showtopic['uid'], '', '', $CONF_FORUM['avatar_width'], '', $showtopic['name']);
+    } else {
+        $avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
+    }
     if (!empty($avatar)) {
         $min_height = $min_height + 50;
     }
 
     if ($CONF_FORUM['show_moods'] &&  $showtopic['mood'] != "") {
-		$topictemplate->set_var ('moodicon', gf_getImage($showtopic['mood'],'moods'));
-		$topictemplate->set_var ('moodicontitle', $showtopic['mood']);
-        $topictemplate->set_var ('moodtitle', $showtopic['mood']);
-		$topictemplate->parse ('mood_icon', 'mood_icon');
+        $topictemplate->set_var('moodicon', gf_getImage($showtopic['mood'],'moods'));
+        $topictemplate->set_var('moodicontitle', $showtopic['mood']);
+        $topictemplate->set_var('moodtitle', $showtopic['mood']);
+        $topictemplate->parse('mood_icon', 'mood_icon');
         
-		$min_height = $min_height + 30;
+        $min_height = $min_height + 30;
     } else {
-		$topictemplate->set_var ('mood_icon', '');
-	}
+        $topictemplate->set_var('mood_icon', '');
+    }
 
 
     //$intervalTime = $mytimer->stopTimer();
@@ -254,7 +258,11 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         }
         $showtopic['comment'] = str_ireplace("[code]<code>",'[code]',$showtopic['comment']);
         $showtopic['comment'] = str_ireplace("</code>[/code]",'[/code]',$showtopic['comment']);
-        $showtopic['comment'] = str_replace(array("<br />\r\n","<br />\n\r","<br />\r","<br />\n","<br>\r\n","<br>\n\r","<br>\r","<br>\n"), '<br' . XHTML . '>', $showtopic['comment'] );
+        $showtopic['comment'] = str_replace(
+            ["<br />\r\n", "<br />\n\r", "<br />\r", "<br />\n", "<br>\r\n", "<br>\n\r", "<br>\r", "<br>\n"],
+            '<br' . XHTML . '>',
+            $showtopic['comment']
+        );
         $showtopic['comment'] = preg_replace("/\[QUOTE\sBY=\s(.+?)\]/i","[QUOTE] Quote by $1:",$showtopic['comment']);
         /* Reformat code blocks - version 2.3.3 and prior */
         $showtopic['comment'] = str_replace( '<pre class="forumCode">', '[code]', $showtopic['comment'] );
@@ -292,10 +300,10 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         if ($editAllowed) {
             $editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;forum={$showtopic['forum']}&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
             $editlinktext = $LANG_GF09['edit'];
-            $topictemplate->set_var ('editlink', $editlink);
-            $topictemplate->set_var ('editlinktext', $editlinktext);
-            $topictemplate->set_var ('LANG_edit', $LANG_GF01['EDITICON']);
-            $topictemplate->parse ('edittopic_link', 'edittopic_link');
+            $topictemplate->set_var('editlink', $editlink);
+            $topictemplate->set_var('editlinktext', $editlinktext);
+            $topictemplate->set_var('LANG_edit', $LANG_GF01['EDITICON']);
+            $topictemplate->parse('edittopic_link', 'edittopic_link');
         }
     }
 
@@ -303,31 +311,31 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $showtopic['subject'] = str_replace("$highlight","<span class=\"highlight\">$highlight</span>", $showtopic['subject']);
         $showtopic['comment'] = str_replace("$highlight","<span class=\"highlight\">$highlight</span>", $showtopic['comment']);
     }
-	
-	if (!isset($showtopic['pid'])) {
-		$showtopic['pid'] = 0;
-	}
-	
+    
+    if (!isset($showtopic['pid'])) {
+        $showtopic['pid'] = 0;
+    }
+    
     if ($showtopic['pid'] == 0) {
         $replytopicid = $showtopic['id'];
         $is_lockedtopic = $showtopic['locked'];
         $views = $showtopic['views'];
-        $topictemplate->set_var ('read_msg', sprintf($LANG_GF02['msg49'],$views) );
+        $topictemplate->set_var('read_msg', sprintf($LANG_GF02['msg49'],$views) );
         if ($is_lockedtopic) {
             $topictemplate->parse('topiclocked_icon', 'topiclocked_icon'); 
         }
     } else {
         $replytopicid = $showtopic['pid'];
         $is_lockedtopic = DB_getItem($_TABLES['forum_topic'],'locked', "id={$showtopic['pid']}");
-        $topictemplate->set_var ('read_msg','');
+        $topictemplate->set_var('read_msg','');
     }
 
     if ($CONF_FORUM['allow_user_dateformat']) {
         $date = COM_getUserDateTimeFormat($showtopic['date']);
-        $topictemplate->set_var ('posted_date', $date[0]);
+        $topictemplate->set_var('posted_date', $date[0]);
     } else {
         $date = strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
-        $topictemplate->set_var ('posted_date', $date);
+        $topictemplate->set_var('posted_date', $date);
     }
 
     if ($mode != 'preview') {
@@ -336,42 +344,42 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
             if ($is_readonly == 0 OR forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_edit')) {
                 $quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum={$showtopic['forum']}&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";
                 $quotelinktext = $LANG_GF09['quote'];
-                $topictemplate->set_var ('quotelink', $quotelink);
-                $topictemplate->set_var ('quotelinktext', $quotelinktext);
-                $topictemplate->set_var ('LANG_quote', $LANG_GF01['QUOTEICON']);
-                $topictemplate->parse ('quotetopic_link', 'quotetopic_link');
+                $topictemplate->set_var('quotelink', $quotelink);
+                $topictemplate->set_var('quotelinktext', $quotelinktext);
+                $topictemplate->set_var('LANG_quote', $LANG_GF01['QUOTEICON']);
+                $topictemplate->parse('quotetopic_link', 'quotetopic_link');
             }
         }
 
-        $topictemplate->set_var ('topic_post_id', $showtopic['id']);
+        $topictemplate->set_var('topic_post_id', $showtopic['id']);
 
         if ($showtopic['uid'] > 1 && $uservalid && !$isUserBanned) {
             $profile_link = "{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$showtopic['uid']}";
             $profile_linktext = $LANG_GF09['profile'];
-            $topictemplate->set_var ('profilelink', $profile_link);
-            $topictemplate->set_var ('profilelinktext', $profile_linktext);
-            $topictemplate->set_var ('LANG_profile',$LANG_GF01['ProfileLink']);
-            $topictemplate->parse ('profile_link', 'profile_link');
+            $topictemplate->set_var('profilelink', $profile_link);
+            $topictemplate->set_var('profilelinktext', $profile_linktext);
+            $topictemplate->set_var('LANG_profile',$LANG_GF01['ProfileLink']);
+            $topictemplate->parse('profile_link', 'profile_link');
             if ($CONF_FORUM['use_pm_plugin']) {
                 $pmusernmame = COM_getDisplayName($showtopic['uid']);
                 $pmplugin_link = forumPLG_getPMlink($pmusernmame);
                 if ($pmplugin_link != '') {
                     $pm_link = $pmplugin_link;
                     $pm_linktext = $LANG_GF09['pm'];
-                    $topictemplate->set_var ('pmlink', $pm_link);
-                    $topictemplate->set_var ('pmlinktext', $pm_linktext);
-                    $topictemplate->set_var ('LANG_pm', $LANG_GF01['PMLink']);
-                    $topictemplate->parse ('pm_link', 'pm_link');
+                    $topictemplate->set_var('pmlink', $pm_link);
+                    $topictemplate->set_var('pmlinktext', $pm_linktext);
+                    $topictemplate->set_var('LANG_pm', $LANG_GF01['PMLink']);
+                    $topictemplate->parse('pm_link', 'pm_link');
                 }
             }
 
             if (isset($userarray['email']) && $userarray['email'] != '' && $showtopic["uid"] > 1) {
                 $email_link = "{$_CONF['site_url']}/profiles.php?uid={$showtopic['uid']}";
                 $email_linktext = $LANG_GF09['email'];
-                $topictemplate->set_var ('emaillink', $email_link);
-                $topictemplate->set_var ('emaillinktext', $email_linktext);
-                $topictemplate->set_var ('LANG_email', $LANG_GF01['EmailLink']);
-                $topictemplate->parse ('email_link', 'email_link');
+                $topictemplate->set_var('emaillink', $email_link);
+                $topictemplate->set_var('emaillinktext', $email_linktext);
+                $topictemplate->set_var('LANG_email', $LANG_GF01['EmailLink']);
+                $topictemplate->parse('email_link', 'email_link');
             }
             if (isset($userarray['homepage']) && $userarray['homepage'] != '') {
                 $homepage = trim($userarray['homepage']);
@@ -379,28 +387,28 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
                     $homepage = 'http://' .$homepage;
                 }
                 $homepagetext = $LANG_GF09['website'];
-                $topictemplate->set_var ('websitelink', $homepage);
-                $topictemplate->set_var ('websitelinktext', $homepagetext);
-                $topictemplate->set_var ('LANG_website', $LANG_GF01['WebsiteLink']);
-                $topictemplate->parse ('website_link', 'website_link');
+                $topictemplate->set_var('websitelink', $homepage);
+                $topictemplate->set_var('websitelinktext', $homepagetext);
+                $topictemplate->set_var('LANG_website', $LANG_GF01['WebsiteLink']);
+                $topictemplate->parse('website_link', 'website_link');
             }
             if (isset($userarray['location']) && $userarray['location'] != '' && $showtopic["uid"] > 1) {
-                $topictemplate->set_var ('user_location', $userarray['location']);
-                $topictemplate->parse ('location', 'location');
+                $topictemplate->set_var('user_location', $userarray['location']);
+                $topictemplate->parse('location', 'location');
             }
         }
 
     } else {
         if (isset($_GET['onlytopic']) AND $_GET['onlytopic'] != 1) {
-            $topictemplate->set_var ('posted_date', '');
-            $topictemplate->set_var ('preview_topic_subject', $showtopic['subject']);
+            $topictemplate->set_var('posted_date', '');
+            $topictemplate->set_var('preview_topic_subject', $showtopic['subject']);
         } else {
-            $topictemplate->set_var ('preview_topic_subject', '');
+            $topictemplate->set_var('preview_topic_subject', '');
         }
-        $topictemplate->set_var ('read_msg', '');
-        $topictemplate->set_var ('topiclocked_icon', '');
+        $topictemplate->set_var('read_msg', '');
+        $topictemplate->set_var('topiclocked_icon', '');
 
-        $topictemplate->set_var ('preview_mode', 'none');
+        $topictemplate->set_var('preview_mode', 'none');
     }
 
     //$intervalTime = $mytimer->stopTimer();
@@ -410,76 +418,76 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
     $showtopic['comment'] = str_replace('}','&#125;',$showtopic['comment']);
 
     // Temporary correspondence. You should cope in more roots.
-    $showtopic['comment'] = str_replace(array("<br />","<br>"), '<br' . XHTML . '>', $showtopic['comment'] );
-	
-    $topictemplate->set_var ('layout_url', $CONF_FORUM['layout_url']);
-    $topictemplate->set_var ('csscode', $onetwo);
-    $topictemplate->set_var ('postmode', $showtopic['postmode']);
-    $topictemplate->set_var ('userlink', $userlink);
-    $topictemplate->set_var ('lang_forum', $LANG_GF01['FORUM']);
+    $showtopic['comment'] = str_replace(["<br />", "<br>"], '<br' . XHTML . '>', $showtopic['comment'] );
+    
+    $topictemplate->set_var('layout_url', $CONF_FORUM['layout_url']);
+    $topictemplate->set_var('csscode', $onetwo);
+    $topictemplate->set_var('postmode', $showtopic['postmode']);
+    $topictemplate->set_var('userlink', $userlink);
+    $topictemplate->set_var('lang_forum', $LANG_GF01['FORUM']);
     if (isset($user_levelname)) {
-        $topictemplate->set_var ('user_levelname', $user_levelname);
+        $topictemplate->set_var('user_levelname', $user_levelname);
     }
     if (isset($user_level)) {
-        $topictemplate->set_var ('user_level', $user_level);
+        $topictemplate->set_var('user_level', $user_level);
     }
     if (isset($avatar)) {
-        $topictemplate->set_var ('avatar', $avatar);
+        $topictemplate->set_var('avatar', $avatar);
     }
     if (isset($user_status)) {
-        $topictemplate->set_var ('user_status', $user_status);
+        $topictemplate->set_var('user_status', $user_status);
     }
     if (isset($regdate)) {
-        $topictemplate->set_var ('regdate', $regdate);
+        $topictemplate->set_var('regdate', $regdate);
     }
     if (isset($numposts)) {
-        $topictemplate->set_var ('numposts', $numposts);
+        $topictemplate->set_var('numposts', $numposts);
     }
     if (forum_modPermission($showtopic['forum'],'','mod_ban')) {
-		$topictemplate->set_var ('ip', $showtopic['ip']);
-		if ($showtopic['uid'] == 1) {
-			$topictemplate->parse ('ip_address', 'anon_ip_address');
-		} else {
-			$topictemplate->parse ('ip_address', 'ip_address');
-		}
-	} else {
-		$topictemplate->set_var ('ip_address', '');
-	}
-    $topictemplate->set_var ('imgset', $CONF_FORUM['imgset']);
-    $topictemplate->set_var ('topic_subject', $showtopic['subject']);
-    $topictemplate->set_var ('LANG_ON2', $LANG_GF01['ON2']);
+        $topictemplate->set_var('ip', $showtopic['ip']);
+        if ($showtopic['uid'] == 1) {
+            $topictemplate->parse('ip_address', 'anon_ip_address');
+        } else {
+            $topictemplate->parse('ip_address', 'ip_address');
+        }
+    } else {
+        $topictemplate->set_var('ip_address', '');
+    }
+    $topictemplate->set_var('imgset', $CONF_FORUM['imgset']);
+    $topictemplate->set_var('topic_subject', $showtopic['subject']);
+    $topictemplate->set_var('LANG_ON2', $LANG_GF01['ON2']);
     
     if ($mode != 'preview') {
-    	$mod_functions = forum_getmodFunctions($showtopic);
-		if (!empty($mod_functions)) {
-			$topictemplate->set_var ('mod_functions', $mod_functions);
-			$topictemplate->parse ('mod_functions', 'mod_functions');
-		} else {
-			$topictemplate->set_var ('mod_functions', '');
-		}
-	}
-	
-    $topictemplate->set_var ('topic_comment', $showtopic['comment']);
-    $topictemplate->set_var ('comment_minheight', "min-height:{$min_height}px");
-    if (isset($sig) && trim($sig) != '') {
-        $topictemplate->set_var ('sig', PLG_replaceTags(($sig)));
-        $topictemplate->set_var ('show_sig', '');
-        $topictemplate->parse ('user_signature', 'user_signature');
-    } else {
-        $topictemplate->set_var ('sig', '');
-        $topictemplate->set_var ('show_sig', 'none');
-        $topictemplate->set_var ('user_signature', '');
+        $mod_functions = forum_getmodFunctions($showtopic);
+        if (!empty($mod_functions)) {
+            $topictemplate->set_var('mod_functions', $mod_functions);
+            $topictemplate->parse('mod_functions', 'mod_functions');
+        } else {
+            $topictemplate->set_var('mod_functions', '');
+        }
     }
-    $topictemplate->set_var ('forumid', $showtopic['forum']);
-    $topictemplate->set_var ('topic_id', $showtopic['id']);
-    $topictemplate->set_var ('member_badge',forumPLG_getMemberBadge($showtopic['uid']));
+    
+    $topictemplate->set_var('topic_comment', $showtopic['comment']);
+    $topictemplate->set_var('comment_minheight', "min-height:{$min_height}px");
+    if (isset($sig) && trim($sig) != '') {
+        $topictemplate->set_var('sig', PLG_replaceTags(($sig)));
+        $topictemplate->set_var('show_sig', '');
+        $topictemplate->parse('user_signature', 'user_signature');
+    } else {
+        $topictemplate->set_var('sig', '');
+        $topictemplate->set_var('show_sig', 'none');
+        $topictemplate->set_var('user_signature', '');
+    }
+    $topictemplate->set_var('forumid', $showtopic['forum']);
+    $topictemplate->set_var('topic_id', $showtopic['id']);
+    $topictemplate->set_var('member_badge',forumPLG_getMemberBadge($showtopic['uid']));
     if ($uservalid) {
-    	$topictemplate->parse ('user_name', 'block_user_name');
-    	$topictemplate->parse ('user_information', 'block_user_information');
-	} else {
-		$topictemplate->parse ('user_name', 'block_anon_user_name');
-		$topictemplate->parse ('user_information', 'block_anon_user_information');
-	}
+        $topictemplate->parse('user_name', 'block_user_name');
+        $topictemplate->parse('user_information', 'block_user_information');
+    } else {
+        $topictemplate->parse('user_name', 'block_anon_user_name');
+        $topictemplate->parse('user_information', 'block_anon_user_information');
+    }
 
     if ($mode != 'preview') { // Still allow for locked topics and read only forums
         if ($_CONF['likes_enabled'] != 0 && $CONF_FORUM['likes_forum'] != 0) {
@@ -493,7 +501,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         PLG_templateSetVars('forum_showtopic', $topictemplate);
     }
     
-    $topictemplate->parse ('output', 'topictemplate');
+    $topictemplate->parse('output', 'topictemplate');
     $retval = $topictemplate->finish ($topictemplate->get_var('output'));
 
     //$intervalTime = $mytimer->stopTimer();
@@ -507,11 +515,11 @@ function forum_getmodFunctions($showtopic) {
 
     $retval = '';
     $options = '';
-	
-	if (COM_isAnonUser()) {
-		return $retval;
-	}
-	
+    
+    if (COM_isAnonUser()) {
+        return $retval;
+    }
+    
     if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_edit')) {
         $options .= '<option value="editpost">' .$LANG_GF03['edit']. '</option>';
         if ($showtopic['locked'] == 1) {
@@ -525,18 +533,18 @@ function forum_getmodFunctions($showtopic) {
         $options .= '<option value="banippost">' .$LANG_GF03['banippost']. '</option>';
     }
     if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_ban')) {
-    	if (function_exists('BAN_for_plugins_check_access') AND BAN_for_plugins_check_access()) {
-			$iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='{$showtopic['id']}'");
-			$forumpostipnum = DB_fetchArray($iptobansql);
-			$ip_address = $forumpostipnum['ip'];
-			if ($ip_address != '') {
-				if (BAN_for_plugins_ban_found($ip_address)) {
-					$options .= '<option value="banip">' .$LANG_GF03['banipremove']. '</option>';
-				} else {
-					$options .= '<option value="banip">' .$LANG_GF03['banip']. '</option>';
-				}
-			}
-		}
+        if (function_exists('BAN_for_plugins_check_access') AND BAN_for_plugins_check_access()) {
+            $iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='{$showtopic['id']}'");
+            $forumpostipnum = DB_fetchArray($iptobansql);
+            $ip_address = $forumpostipnum['ip'];
+            if ($ip_address != '') {
+                if (BAN_for_plugins_ban_found($ip_address)) {
+                    $options .= '<option value="banip">' .$LANG_GF03['banipremove']. '</option>';
+                } else {
+                    $options .= '<option value="banip">' .$LANG_GF03['banip']. '</option>';
+                }
+            }
+        }
     }    
     if ($showtopic['pid'] == 0) {
         if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_move')) {
@@ -573,7 +581,7 @@ function gf_chkpostmode($postmode,$postmode_switch) {
     global $_TABLES,$CONF_FORUM;
 
     if ($postmode == "") {
-    	if ($CONF_FORUM['allow_html'] AND $CONF_FORUM['post_htmlmode']) { // Check if html allowed and if it is the default selection
+        if ($CONF_FORUM['allow_html'] AND $CONF_FORUM['post_htmlmode']) { // Check if html allowed and if it is the default selection
             $postmode = 'html';
         } else {
             $postmode = 'text';
@@ -587,18 +595,16 @@ function gf_chkpostmode($postmode,$postmode_switch) {
             }
             $postmode_switch = 0;
         } else {
-        	// before returning lets just make sure postmode is set properly to 1 of 2 options
-        	if ($postmode != 'html' AND $postmode != 'text') {
-				if ($CONF_FORUM['allow_html'] AND $CONF_FORUM['post_htmlmode']) { // Check if html allowed and if it is_a the default selection
-					$postmode = 'html';
-				} else {
-					$postmode = 'text';
-				}
-			}
-		}
+            // before returning lets just make sure postmode is set properly to 1 of 2 options
+            if ($postmode != 'html' AND $postmode != 'text') {
+                if ($CONF_FORUM['allow_html'] AND $CONF_FORUM['post_htmlmode']) { // Check if html allowed and if it is_a the default selection
+                    $postmode = 'html';
+                } else {
+                    $postmode = 'text';
+                }
+            }
+        }
     }
     
     return $postmode;
 }
-
-?>

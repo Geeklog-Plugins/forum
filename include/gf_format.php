@@ -33,11 +33,11 @@
 // +---------------------------------------------------------------------------+
 
 // this file can't be used on its own
-if (strpos(strtolower($_SERVER['PHP_SELF']), 'gf_format.php') !== false) {
-    die ('This file can not be used on its own.');
+if (stripos($_SERVER['PHP_SELF'], 'gf_format.php') !== false) {
+    die('This file can not be used on its own.');
 }
 
-if (!class_exists('StringParser') ) {
+if (!class_exists('StringParser')) {
     require_once $CONF_FORUM['path_include'] . 'bbcode/stringparser_bbcode.class.php';
 }
 
@@ -48,7 +48,7 @@ function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
     if (!isset($CONF_FORUM['showblocks'])) $CONF_FORUM['showblocks'] = 'leftblocks';
     if (!isset($CONF_FORUM['usermenu'])) $CONF_FORUM['usermenu'] = 'blockmenu';
 
-    $information = array();
+    $information = [];
     if ($subject != '') {
         $information['pagetitle'] = $subject;
     } else {
@@ -80,18 +80,18 @@ function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
     return COM_createHTMLDocument($content, $information);
 }
 
-function convertlinebreaks ($text) {
-    return preg_replace ("/\015\012|\015|\012/", "\n", $text);
+function convertlinebreaks($text) {
+    return preg_replace("/\015\012|\015|\012/", "\n", $text);
 }
 
-function bbcode_stripcontents ($text) {
-    return preg_replace ("/[^\n]/", '', $text);
+function bbcode_stripcontents($text) {
+    return preg_replace("/[^\n]/", '', $text);
 }
 
 function bbcode_htmlspecialchars($text) {
     global $CONF_FORUM;
 
-    return (htmlspecialchars ($text,ENT_QUOTES, $CONF_FORUM['charset']));
+    return htmlspecialchars($text, ENT_QUOTES, $CONF_FORUM['charset']);
 }
 
 function gf_fixtemplate($text) {
@@ -101,51 +101,51 @@ function gf_fixtemplate($text) {
     return $text;
 }
 
-function do_bbcode_url ($action, $attributes, $content, $params, $node_object) {
+function do_bbcode_url($action, $attributes, $content, $params, $node_object) {
     global $CONF_FORUM;
 
     if ($action == 'validate') {
         return true;
     }
-    if (!isset ($attributes['default'])) {
-        if ( stristr($content,'http') ) {
-            return '<a href="'.$content.'" target="_blank" rel="nofollow">'.htmlspecialchars ($content,ENT_QUOTES, $CONF_FORUM['charset']).'</a>';
+    if (!isset($attributes['default'])) {
+        if (stristr($content, 'http')) {
+            return '<a href="' . $content . '" target="_blank" rel="nofollow">' . htmlspecialchars($content,ENT_QUOTES, $CONF_FORUM['charset']) . '</a>';
         } else {
-            return '<a href="http://'.$content.'" target="_blank" rel="nofollow">'.htmlspecialchars ($content,ENT_QUOTES, $CONF_FORUM['charset']).'</a>';
+            return '<a href="http://' . $content . '" target="_blank" rel="nofollow">' . htmlspecialchars($content,ENT_QUOTES, $CONF_FORUM['charset']) . '</a>';
         }
     }
-    if ( stristr($attributes['default'],'http') ) {
-        return '<a href="'.strip_tags($attributes['default']).'" target="_blank" rel="nofollow">'.$content.'</a>';
+    if (stristr($attributes['default'], 'http')) {
+        return '<a href="' . strip_tags($attributes['default']) . '" target="_blank" rel="nofollow">' . $content . '</a>';
     } else {
-        return '<a href="http://'.strip_tags($attributes['default']).'" target="_blank" rel="nofollow">'.$content.'</a>';
+        return '<a href="http://' . strip_tags($attributes['default']) . '" target="_blank" rel="nofollow">' . $content . '</a>';
     }
 }
 
-function do_bbcode_list ($action, $attributes, $content, $params, $node_object) {
+function do_bbcode_list($action, $attributes, $content, $params, $node_object) {
     if ($action == 'validate') {
         return true;
     }
-    if (!isset ($attributes['default'])) {
-        return '<ul>'.$content.'</ul>';
+    if (!isset($attributes['default'])) {
+        return '<ul>' . $content . '</ul>';
     } else {
-        if ( is_numeric($attributes['default']) ) {
-            return '<ol>'.$content.'</ol>';
+        if (is_numeric($attributes['default'])) {
+            return '<ol>' . $content . '</ol>';
         } else {
-            return '<ul>'.$content.'</ul>';
+            return '<ul>' . $content . '</ul>';
         }
     }
-    return '<ul>'.$content.'</ul>';
+    return '<ul>' . $content . '</ul>';
 }
 
 
-function do_bbcode_img ($action, $attributes, $content, $params, $node_object) {
+function do_bbcode_img($action, $attributes, $content, $params, $node_object) {
     global $CONF_FORUM;
 
     if ($action == 'validate') {
         if (isset($attributes['caption'])) {
             $node_object->setFlag('paragraph_type', BBCODE_PARAGRAPH_BLOCK_ELEMENT);
             if ($node_object->_parent->type() == STRINGPARSER_NODE_ROOT OR
-                in_array($node_object->_parent->_codeInfo['content_type'], array('block', 'list', 'listitem'))) {
+                    in_array($node_object->_parent->_codeInfo['content_type'], ['block', 'list', 'listitem'])) {
                 return true;
             }
             else return false;
@@ -154,12 +154,12 @@ function do_bbcode_img ($action, $attributes, $content, $params, $node_object) {
     }
 
     if ($CONF_FORUM['allow_img_bbcode']) {
-        if ( isset($attributes['h']) AND isset ($attributes['w']) ) {
+        if (isset($attributes['h']) AND isset($attributes['w'])) {
             $dim = 'width="' . COM_applyFilter($attributes['w'], true) . '" height="' . COM_applyFilter($attributes['h'], true) . '" ';
         } else {
             $dim = '';
         }
-        if ( isset($attributes['align'] ) ) {
+        if (isset($attributes['align'])) {
             $align = ' align="' . COM_applyFilter($attributes['align']) . '" ';
         } else {
             $align = '';
@@ -171,28 +171,28 @@ function do_bbcode_img ($action, $attributes, $content, $params, $node_object) {
     }
 }
 
-function do_bbcode_size  ($action, $attributes, $content, $params, $node_object) {
-    if ( $action == 'validate') {
+function do_bbcode_size($action, $attributes, $content, $params, $node_object) {
+    if ($action == 'validate') {
         return true;
     }
-    return '<span style="font-size: '.COM_applyFilter($attributes['default'], true).'px;">'.$content.'</span>';
+    return '<span style="font-size: ' . COM_applyFilter($attributes['default'], true) . 'px;">' . $content . '</span>';
 }
 
-function do_bbcode_color  ($action, $attributes, $content, $params, $node_object) {
-    if ( $action == 'validate') {
+function do_bbcode_color($action, $attributes, $content, $params, $node_object) {
+    if ($action == 'validate') {
         return true;
     }
-    return '<span style="color: '.COM_applyFilter($attributes['default']).';">'.$content.'</span>';
+    return '<span style="color: ' . COM_applyFilter($attributes['default']) . ';">' . $content . '</span>';
 }
 
 function do_bbcode_code($action, $attributes, $content, $params, $node_object) {
     global $CONF_FORUM, $oldPost;
 
-    if ( $action == 'validate') {
+    if ($action == 'validate') {
         return true;
     }
 
-    if ( $oldPost ) {
+    if ($oldPost) {
         $content = str_replace("&#36;","$", $content);
         $content = html_entity_decode($content);
     }
@@ -206,7 +206,7 @@ function do_bbcode_code($action, $attributes, $content, $params, $node_object) {
     }
     if ($CONF_FORUM['use_geshi']) {
         /* Support for formatting various code types : [code=java] for example */
-        if (!isset ($attributes['default'])) {
+        if (!isset($attributes['default'])) {
             $codeblock = geshi_formatted($content);
         } else {
             $codeblock = geshi_formatted($content,strtoupper(COM_applyFilter($attributes['default'])));
@@ -221,7 +221,7 @@ function do_bbcode_code($action, $attributes, $content, $params, $node_object) {
 }
 
 
-function forumNavbarMenu($current='') {
+function forumNavbarMenu($current = '') {
     global $_CONF, $CONF_FORUM, $_USER, $LANG_GF01, $LANG_GF02;
 
     require_once $_CONF['path_system'] . 'classes/navbar.class.php';
@@ -244,9 +244,9 @@ function forumNavbarMenu($current='') {
         $navmenu->set_onclick($LANG_GF01['SUBSCRIPTIONS'], 'location.href="' . "{$_CONF['site_url']}/forum/notify.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     }
     if (($CONF_FORUM['show_memberslist_anonymous'] && COM_isAnonUser()) OR !COM_isAnonUser()) {
-    	$navmenu->add_menuitem($LANG_GF02['msg200'],"{$_CONF['site_url']}/forum/memberlist.php");
+        $navmenu->add_menuitem($LANG_GF02['msg200'],"{$_CONF['site_url']}/forum/memberlist.php");
         $navmenu->set_onclick($LANG_GF02['msg200'], 'location.href="' . "{$_CONF['site_url']}/forum/memberlist.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
-	}
+    }
     $navmenu->add_menuitem($LANG_GF02['msg201'],"{$_CONF['site_url']}/forum/index.php?op=popular");
     $navmenu->set_onclick($LANG_GF02['msg201'], 'location.href="' . "{$_CONF['site_url']}/forum/index.php?op=popular" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     if ($current != '') {
@@ -259,9 +259,9 @@ function ForumHeader($forum, $showtopic, &$display) {
     global $_TABLES, $_CONF, $CONF_FORUM, $LANG_GF01, $LANG_GF02;
     
     $navbar = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $navbar->set_file (array ('topicheader'=>'navbar.thtml'));
-    $navbar->set_var ('search_forum', f_forumsearch());
-    $navbar->set_var ('select_forum', f_forumjump());
+    $navbar->set_file(['topicheader' => 'navbar.thtml']);
+    $navbar->set_var('search_forum', f_forumsearch());
+    $navbar->set_var('select_forum', f_forumjump());
     if ($CONF_FORUM['usermenu'] == 'navbar') {
         if ($forum == 0) {
             $navbar->set_var('navmenu', forumNavbarMenu($LANG_GF01['INDEXPAGE']));
@@ -274,7 +274,7 @@ function ForumHeader($forum, $showtopic, &$display) {
     
     $navbar->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
     
-    $navbar->parse ('output', 'topicheader');
+    $navbar->parse('output', 'topicheader');
     $display .= $navbar->finish($navbar->get_var('output'));
 
     if (($forum != '') || ($showtopic != '')) {
@@ -291,7 +291,7 @@ function ForumHeader($forum, $showtopic, &$display) {
         }        
         $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
         if (!SEC_inGroup($groupname)) {
-        	$display .= alertMessage($LANG_GF02['msg77'], $LANG_GF01['ACCESSERROR']);
+            $display .= alertMessage($LANG_GF02['msg77'], $LANG_GF01['ACCESSERROR']);
             $display = gf_createHTMLDocument($display);
             COM_output($display);            
             exit;
@@ -302,17 +302,27 @@ function ForumHeader($forum, $showtopic, &$display) {
 function gf_checkHTMLforSQL($str,$postmode='html') {
     global $CONF_FORUM;
 
-    $bbcode = new StringParser_BBCode ();
-    $bbcode->setGlobalCaseSensitive (false);
+    $bbcode = new StringParser_BBCode();
+    $bbcode->setGlobalCaseSensitive(false);
     // It is impossible to include block level elements in a <p> element. Therefore I fix this.
-    $bbcode->setParagraphHandlingParameters ("\n\n", "", "");
+    $bbcode->setParagraphHandlingParameters("\n\n", "", "");
 
-    if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML')) {
-        $bbcode->addParser(array('block','inline'), 'gf_cleanHTML');
+    if ($CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML')) {
+        $bbcode->addParser(['block', 'inline'], 'gf_cleanHTML');
     }
-    $bbcode->addCode ('code', 'simple_replace', null, array ('start_tag' => '[code]', 'end_tag' => '[/code]'),
-                      'code', array ('listitem', 'block', 'inline', 'link'), array ());
-    $str = $bbcode->parse ($str);
+    $bbcode->addCode(
+        'code',
+        'simple_replace',
+        null, [
+            'start_tag' => '[code]',
+            'end_tag' => '[/code]'
+        ],
+        'code', [
+            'listitem', 'block', 'inline', 'link'
+        ],
+        []
+    );
+    $str = $bbcode->parse($str);
     return $str;
 }
 
@@ -327,10 +337,8 @@ function gf_checkHTMLforSQL($str,$postmode='html') {
 function gf_cleanHTML($message) {
     global $_CONF, $CONF_FORUM;
 
-    if ( isset( $_CONF['skip_html_filter_for_root'] ) &&
-             ( $_CONF['skip_html_filter_for_root'] == 1 ) &&
-            SEC_inGroup( 'Root' ))
-    {
+    if (isset($_CONF['skip_html_filter_for_root']) && ($_CONF['skip_html_filter_for_root'] == 1) &&
+            SEC_inGroup('Root')) {
         return $message;
     }
     
@@ -340,21 +348,20 @@ function gf_cleanHTML($message) {
 }
 
 
-function gf_preparefordb($message,$postmode) {
+function gf_preparefordb($message, $postmode) {
     global $CONF_FORUM, $_CONF;
 
-    // if magic quotes is on, remove the slashes from the $_POST
-    if (get_magic_quotes_gpc() ) {
-       $message = stripslashes($message);
+    if (($message === null) || ($message === '')) {
+        return '';
     }
-    
+
     // Remove any autotags the user doesn't have permission to use
-    $message = PLG_replaceTags($message, '', true);    
+    $message = PLG_replaceTags($message, '', true);
     
     // Remove Icons if database cannot store them (ie table collation needs to be utf8mb4)
     $message = GLText::remove4byteUtf8Chars($message);
 
-    if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML') ) {
+    if ($CONF_FORUM['use_glfilter'] == 1 && (strtolower($postmode) === 'html')) {
         $message = gf_checkHTMLforSQL($message,$postmode);
     }
 
@@ -362,6 +369,7 @@ function gf_preparefordb($message,$postmode) {
         $message = COM_checkWords($message);
     }
     $message = addslashes($message);
+
     return $message;
 }
 
@@ -395,7 +403,7 @@ function gf_htmLawed($str, $permissions = '') {
 
     // Sets config options for htmLawed.  See http://www.bioinformatics.org/
     // phplabware/internal_utilities/htmLawed/htmLawed_README.htm
-    $config = array(
+    $config = [
         'balance'        => 1, // Balance tags for well-formedness and proper nesting
         'comment'        => 3, // Allow HTML comment
         'css_expression' => 1, // Allow dynamic CSS expression in "style" attributes
@@ -404,14 +412,14 @@ function gf_htmLawed($str, $permissions = '') {
         'tidy'           => 0, // Don't beautify or compact HTML code
         'unique_ids'     => 1, // Remove duplicate and/or invalid ids
         'valid_xhtml'    => 1, // Magic parameter to make input the most valid XHTML
-    );
+    ];
 
     if (isset($_CONF['allowed_protocols']) &&
             is_array($_CONF['allowed_protocols']) &&
             (count($_CONF['allowed_protocols']) > 0)) {
         $schemes = $_CONF['allowed_protocols'];
     } else {
-        $schemes = array('http:', 'https:', 'ftp:');
+        $schemes = ['http:', 'https:', 'ftp:'];
     }
 
     $schemes = str_replace(':', '', implode(', ', $schemes));
@@ -444,14 +452,12 @@ function gf_checkHTML($str) {
     global $CONF_FORUM, $_CONF;
 
     // just return if admin doesn't want to filter html
-    if ( $CONF_FORUM['use_glfilter'] != 1 ) {
+    if ($CONF_FORUM['use_glfilter'] != 1) {
         return $str;
     }
     // if Geeklog is configured to allow root to use all html, no need to call
-    if ( isset( $_CONF['skip_html_filter_for_root'] ) &&
-             ( $_CONF['skip_html_filter_for_root'] == 1 ) &&
-            SEC_inGroup( 'Root' ))
-    {
+    if (isset($_CONF['skip_html_filter_for_root']) && ($_CONF['skip_html_filter_for_root'] == 1) &&
+            SEC_inGroup('Root')) {
         return $str;
     }
     
@@ -463,74 +469,127 @@ function gf_checkHTML($str) {
 function gf_formatTextBlock($str,$postmode='html',$mode='') {
     global $CONF_FORUM;
 
-    $bbcode = new StringParser_BBCode ();
-    $bbcode->setGlobalCaseSensitive (false);
+    $bbcode = new StringParser_BBCode();
+    $bbcode->setGlobalCaseSensitive(false);
     // It is impossible to include block level elements in a <p> element. Therefore I fix this.
-    $bbcode->setParagraphHandlingParameters ("\n\n", "", "");
+    $bbcode->setParagraphHandlingParameters("\n\n", "", "");
 
-    if ( $postmode == 'text') {
-        $bbcode->addParser (array ('block', 'inline', 'link', 'listitem'), 'bbcode_htmlspecialchars');
+    if ($postmode == 'text') {
+        $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'bbcode_htmlspecialchars');
     }
 
     // This filtering should only happen on save and preview and not when viewed in a topic.
     // If an Admin adds HTML that he can only use to a post, we then want ALL users to see it.
-    if ( $CONF_FORUM['use_glfilter'] == 1 && $postmode == 'html' && $mode == 'preview') {
-        $bbcode->addParser(array('block','inline','link','listitem'), 'gf_checkHTML');      // calls GL's checkHTML on all text blocks
+    if ($CONF_FORUM['use_glfilter'] == 1 && $postmode == 'html' && $mode == 'preview') {
+        $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'gf_checkHTML');      // calls GL's checkHTML on all text blocks
     }
     
-    if ( $postmode == 'text' OR $mode == 'subject') {
-    	$bbcode->addParser(array('block','inline','link','listitem'), 'nl2br');
-	}
-    if ( $mode != 'subject' ) {
-        $bbcode->addParser(array('block','inline','link','listitem'), 'gf_replacesmilie');      // calls replacesmilie on all text blocks
+    if ($postmode == 'text' OR $mode == 'subject') {
+        $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'nl2br');
     }
-    $bbcode->addParser(array('block','inline','link','listitem'), 'gf_fixtemplate');
-    if ( $mode != 'subject' ) {
+    if ($mode != 'subject') {
+        $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'gf_replacesmilie');      // calls replacesmilie on all text blocks
+    }
+    $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'gf_fixtemplate');
+    if ($mode != 'subject') {
 //        $bbcode->addParser(array('block','inline','link','listitem'), 'PLG_replacetags');
     }
 
-	// Docs http://christian-seiler.de/projekte/php/bbcode/doc/en/chapter1.php
+    // Docs http://christian-seiler.de/projekte/php/bbcode/doc/en/chapter1.php
 
-    $bbcode->addParser ('list', 'bbcode_stripcontents');
-    $bbcode->addCode ('b', 'simple_replace', null, array ('start_tag' => '<b>', 'end_tag' => '</b>'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('i', 'simple_replace', null, array ('start_tag' => '<i>', 'end_tag' => '</i>'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('u', 'simple_replace', null, array ('start_tag' => '<span style="text-decoration: underline;">', 'end_tag' => '</span>'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('p', 'simple_replace', null, array ('start_tag' => '<p>', 'end_tag' => '</p>'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    $bbcode->addCode ('s', 'simple_replace', null, array ('start_tag' => '<del>', 'end_tag' => '</del>'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-	// Below was 'usecontent?' but switched to 'callback_replace' since size always requires to be equal something ie [size=15] and we want the bbcode within the size tag to be parsed
-    $bbcode->addCode ('size', 'callback_replace', 'do_bbcode_size', array ('usercontent_param' => 'default'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-	// Below was 'usecontent?' but switched to 'callback_replace' since color always requires to be equal something ie [color=red] and we want the bbcode within the size tag to be parsed
-    $bbcode->addCode ('color', 'callback_replace', 'do_bbcode_color', array ('usercontent_param' => 'default'),
-                      'inline', array ('listitem', 'block', 'inline', 'link'), array ());
-    if ( $mode != 'subject' ) {                      
-        $bbcode->addCode ('list', 'callback_replace', 'do_bbcode_list', array ('usecontent_param' => 'default'),
-                          'list', array ('inline','block', 'listitem'), array ());
-        $bbcode->addCode ('*', 'simple_replace', null, array ('start_tag' => '<li>', 'end_tag' => '</li>'),
-                          'listitem', array ('list'), array ());
-        $bbcode->addCode ('quote','simple_replace',null,array('start_tag' => '<div class="quotemain">', 'end_tag' => '</div>'),
-                          'inline', array('listitem','block','inline','link'), array());                          
-        $bbcode->addCode ('url', 'usecontent?', 'do_bbcode_url', array ('usecontent_param' => 'default'),
-                          'link', array ('listitem', 'block', 'inline'), array ('link'));
-        $bbcode->addCode ('link', 'callback_replace_single', 'do_bbcode_url', array (),
-                          'link', array ('listitem', 'block', 'inline'), array ('link'));
-        $bbcode->addCode ('img', 'usecontent', 'do_bbcode_img', array (),
-                          'image', array ('listitem', 'block', 'inline', 'link'), array ());
-        $bbcode->addCode ('code', 'usecontent', 'do_bbcode_code', array ('usecontent_param' => 'default'),
-                          'code', array ('listitem', 'block', 'inline', 'link'), array ());
-    }              
-    $bbcode->setCodeFlag ('quote', 'paragraph_type', BBCODE_PARAGRAPH_ALLOW_INSIDE);
-    $bbcode->setCodeFlag ('*', 'closetag', BBCODE_CLOSETAG_OPTIONAL);
-    $bbcode->setCodeFlag ('*', 'paragraphs', true);
-    $bbcode->setCodeFlag ('list', 'opentag.before.newline', BBCODE_NEWLINE_DROP);
-    $bbcode->setCodeFlag ('list', 'closetag.before.newline', BBCODE_NEWLINE_DROP);
+    $bbcode->addParser('list', 'bbcode_stripcontents');
+    $bbcode->addCode(
+        'b',
+        'simple_replace',
+        null, [
+            'start_tag' => '<b>',
+            'end_tag'   => '</b>'
+        ],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+    $bbcode->addCode(
+        'i', 'simple_replace', null, [
+            'start_tag' => '<i>',
+            'end_tag'   => '</i>'
+        ],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+    $bbcode->addCode(
+        'u', 'simple_replace', null, [
+            'start_tag' => '<span style="text-decoration: underline;">',
+            'end_tag'   => '</span>'
+        ],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+    $bbcode->addCode(
+        'p', 'simple_replace', null, [
+            'start_tag' => '<p>',
+            'end_tag'   => '</p>'
+        ],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+    $bbcode->addCode(
+        's', 'simple_replace', null, [
+            'start_tag' => '<del>',
+            'end_tag'   => '</del>'
+        ],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
 
-    $bbcode->setRootParagraphHandling (true);
+    // Below was 'usecontent?' but switched to 'callback_replace' since size always requires to be equal something ie [size=15] and we want the bbcode within the size tag to be parsed
+    $bbcode->addCode(
+        'size', 'callback_replace', 'do_bbcode_size', ['usercontent_param' => 'default'],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+
+    // Below was 'usecontent?' but switched to 'callback_replace' since color always requires to be equal something ie [color=red] and we want the bbcode within the size tag to be parsed
+    $bbcode->addCode(
+        'color', 'callback_replace', 'do_bbcode_color', ['usercontent_param' => 'default'],
+        'inline', ['listitem', 'block', 'inline', 'link'], []
+    );
+
+    if ($mode != 'subject') {                      
+        $bbcode->addCode(
+            'list', 'callback_replace', 'do_bbcode_list', ['usecontent_param' => 'default'],
+            'list', ['inline', 'block', 'listitem'], []
+        );
+        $bbcode->addCode(
+            '*', 'simple_replace', null, [
+                'start_tag' => '<li>',
+                'end_tag'   => '</li>'
+            ], 'listitem', ['list'], []
+        );
+        $bbcode->addCode(
+            'quote', 'simple_replace', null, [
+                'start_tag' => '<div class="quotemain">',
+                'end_tag'   => '</div>'
+            ], 'inline', ['listitem', 'block', 'inline', 'link'], []
+        );                          
+        $bbcode->addCode(
+            'url', 'usecontent?', 'do_bbcode_url', ['usecontent_param' => 'default'],
+            'link', ['listitem', 'block', 'inline'), ['link']
+        );
+        $bbcode->addCode(
+            'link', 'callback_replace_single', 'do_bbcode_url', [],
+            'link', ['listitem', 'block', 'inline'], ['link']
+        );
+        $bbcode->addCode(
+            'img', 'usecontent', 'do_bbcode_img', [],
+            'image', ['listitem', 'block', 'inline', 'link'], []
+        );
+        $bbcode->addCode(
+            'code', 'usecontent', 'do_bbcode_code', ['usecontent_param' => 'default'],
+            'code', ['listitem', 'block', 'inline', 'link'], []
+        );
+    }
+
+    $bbcode->setCodeFlag('quote', 'paragraph_type', BBCODE_PARAGRAPH_ALLOW_INSIDE);
+    $bbcode->setCodeFlag('*', 'closetag', BBCODE_CLOSETAG_OPTIONAL);
+    $bbcode->setCodeFlag('*', 'paragraphs', true);
+    $bbcode->setCodeFlag('list', 'opentag.before.newline', BBCODE_NEWLINE_DROP);
+    $bbcode->setCodeFlag('list', 'closetag.before.newline', BBCODE_NEWLINE_DROP);
+
+    $bbcode->setRootParagraphHandling(true);
 
     if ($mode == 'preview') {
         // Remove any autotags the user doesn't have permission to use from preview
@@ -543,7 +602,7 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
     // Replace autotags with random strings to prevent them from being parsed
     $markers = [];
     $simpleTags = [
-		'[p]', '[/p]',
+        '[p]', '[/p]',
         '[b]', '[/b]',
         '[i]', '[/i]',
         '[u]', '[/u]',
@@ -598,21 +657,21 @@ function gf_formatTextBlock($str,$postmode='html',$mode='') {
 function bbcode_oldpost($text) {
     global $CONF_FORUM;
 
-    if ($CONF_FORUM['pre2.5_mode'] == true ) {
+    if ($CONF_FORUM['pre2.5_mode'] == true) {
         $comment = str_replace("&#36;","$", $text);
         $comment = str_replace("<br />","\r",$comment);
         $comment = str_replace("<br>","\r",$comment);
-        $comment = str_replace ( '&amp;', '&', $comment );
-        $comment = str_replace ( '&#039;', '\'', $comment );
-        $comment = str_replace ( '&quot;', '"', $comment );
-        $comment = str_replace ( '&lt;', '<', $comment );
-        $comment = str_replace ( '&gt;', '>', $comment );
-        $comment = str_replace ( '<b>', '[b]', $comment );
-        $comment = str_replace ( '</b>', '[/b]', $comment );
-        $comment = str_replace ( '<i>', '[i]', $comment );
-        $comment = str_replace ( '</i>', '[/i]', $comment );
-        $comment = str_replace ( '<p>', '[p]', $comment );
-        $comment = str_replace ( '</p>', '[/p]', $comment );
+        $comment = str_replace('&amp;', '&', $comment);
+        $comment = str_replace('&#039;', '\'', $comment);
+        $comment = str_replace('&quot;', '"', $comment);
+        $comment = str_replace('&lt;', '<', $comment);
+        $comment = str_replace('&gt;', '>', $comment);
+        $comment = str_replace('<b>', '[b]', $comment);
+        $comment = str_replace('</b>', '[/b]', $comment);
+        $comment = str_replace('<i>', '[i]', $comment);
+        $comment = str_replace('</i>', '[/i]', $comment);
+        $comment = str_replace('<p>', '[p]', $comment);
+        $comment = str_replace('</p>', '[/p]', $comment);
     } else {
         return $text;
     }
@@ -624,66 +683,74 @@ function gf_formatOldPost($str,$postmode='html',$mode='') {
 
     $oldPost = 0;
 
-    if ( $CONF_FORUM['pre2.5_mode'] != true ) {
+    if ($CONF_FORUM['pre2.5_mode'] != true) {
         return $str;
     }
 
     if (strstr($str,'<pre class="forumCode">') !== false)  $oldPost = 1;
     if (strstr($str,"[code]<code>") !== false) $oldPost = 1;
-    if (strstr($str,"<pre>") !== false ) $oldPost = 1;
+    if (strstr($str,"<pre>") !== false) $oldPost = 1;
 
-    if ( stristr($str,'[code') == false || stristr($str,'[code]<code>') == true) {
+    if (stristr($str,'[code') == false || stristr($str,'[code]<code>') == true) {
         if (strstr($str,"<pre>") !== false)  $oldPost = 1;
         $str = str_replace('<pre>','[code]',$str);
         $str = str_replace('</pre>','[/code]',$str);
     }
     $str = str_ireplace("[code]<code>",'[code]',$str);
     $str = str_ireplace("</code>[/code]",'[/code]',$str);
-    $str = str_replace(array("<br />\r\n","<br />\n\r","<br />\r","<br />\n","<br>\r\n","<br>\n\r","<br>\r","<br>\n",), '<br' . XHTML . '>', $str );
+    $str = str_replace(
+        ["<br />\r\n", "<br />\n\r", "<br />\r", "<br />\n", "<br>\r\n", "<br>\n\r", "<br>\r", "<br>\n",],
+         '<br' . XHTML . '>',
+         $str
+    );
     $str = preg_replace("/\[QUOTE\sBY=\s(.+?)\]/i","[QUOTE] Quote by $1:",$str);
     /* Reformat code blocks - version 2.3.3 and prior */
-    $str = str_replace( '<pre class="forumCode">', '[code]', $str );
+    $str = str_replace('<pre class="forumCode">', '[code]', $str);
     $str = preg_replace("/\[QUOTE\sBY=(.+?)\]/i","[QUOTE] Quote by $1:",$str);
 
-    $bbcode = new StringParser_BBCode ();
-    $bbcode->setGlobalCaseSensitive (false);
+    $bbcode = new StringParser_BBCode();
+    $bbcode->setGlobalCaseSensitive(false);
     // It is impossible to include block level elements in a <p> element. Therefore I fix this.
-    $bbcode->setParagraphHandlingParameters ("\n\n", "", "");
+    $bbcode->setParagraphHandlingParameters("\n\n", "", "");
 
-    if ( $postmode == 'text') {
-        $bbcode->addParser (array ('block', 'inline', 'link', 'listitem'), 'bbcode_htmlspecialchars');
+    if ($postmode == 'text') {
+        $bbcode->addParser(['block', 'inline', 'link', 'listitem'], 'bbcode_htmlspecialchars');
     }
-    if ( $CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML') ) {
-        $bbcode->addParser(array('block','inline','link','listitem'), 'gf_checkHTML');      // calls checkHTML on all text blocks
+    if ($CONF_FORUM['use_glfilter'] == 1 && ($postmode == 'html' || $postmode == 'HTML')) {
+        $bbcode->addParser(['block','inline','link','listitem'], 'gf_checkHTML');      // calls checkHTML on all text blocks
     }
-    $bbcode->addParser(array('block','inline','link','list','listitem'), 'bbcode_oldpost');
+    $bbcode->addParser(['block', 'inline', 'link', 'list', 'listitem'], 'bbcode_oldpost');
 
-    $bbcode->addCode ('code', 'simple_replace', null, array ('start_tag' => '[code]', 'end_tag' => '[/code]'),
-                      'code', array ('listitem', 'block', 'inline', 'link'), array ());
+    $bbcode->addCode(
+        'code', 'simple_replace', null, [
+            'start_tag' => '[code]',
+            'end_tag'   => '[/code]'
+        ], 'code', ['listitem', 'block', 'inline', 'link'], []
+    );
 
-    if ( $CONF_FORUM['use_censor'] ) {
+    if ($CONF_FORUM['use_censor']) {
         $str = COM_checkWords($str);
     }
-    $str = $bbcode->parse ($str);
+    $str = $bbcode->parse($str);
 
     // If we have identified an old post based on the checks above
     // it is possible that code blocks will have htmlencoded items
     // we need to reverse that ...
-    if ( $oldPost ) {
-        if ( strstr($str,"\\'") !== false ) {
+    if ($oldPost) {
+        if (strstr($str,"\\'") !== false) {
             $str = stripslashes($str);
         }
         $str = str_replace("&#36;","$", $str);
         $str = str_replace("<br />","\r",$str);
         $str = str_replace("<br>","\r",$str);
-        $str = str_replace ( '&amp;', '&', $str );
-        $str = str_replace ( '&#039;', '\'', $str );
-        $str = str_replace ( '&quot;', '"', $str );
-        $str = str_replace ( '&lt;', '<', $str );
-        $str = str_replace ( '&gt;', '>', $str );
+        $str = str_replace('&amp;', '&', $str);
+        $str = str_replace('&#039;', '\'', $str);
+        $str = str_replace('&quot;', '"', $str);
+        $str = str_replace('&lt;', '<', $str);
+        $str = str_replace('&gt;', '>', $str);
     }
 
-    $str = str_replace ( '&#92;', '\\',$str);
+    $str = str_replace('&#92;', '\\',$str);
 
     return $str;
 }
@@ -742,58 +809,58 @@ function alertMessage($message, $title = '', $prompt = '') {
     $retval = '';
     
     if (empty($title)) {
-    	$title = $LANG_GF01['MESSAGE'];
-	}
-    
-    $alertmsg = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $alertmsg->set_file (array('alertmsg'=>'alertmsg.thtml'));
-
-    $alertmsg->set_var ('imgset', $CONF_FORUM['imgset']);
-    $alertmsg->set_var ('layout_url', $CONF_FORUM['layout_url']);
-    $alertmsg->set_var ('alert_title', $title);
-    $alertmsg->set_var ('alert_message', $message);
-    if ($prompt == "0") {
-        $alertmsg->set_var ('prompt', ''); // No Prompt
-	} elseif (empty($prompt)) {
-		$alertmsg->set_var ('prompt', $LANG_GF02['msg148']);
-    } else {
-        $alertmsg->set_var ('prompt', $prompt);
+        $title = $LANG_GF01['MESSAGE'];
     }
     
-    $alertmsg->parse ('output', 'alertmsg');
-    $retval .= $alertmsg->finish ($alertmsg->get_var('output'));
+    $alertmsg = COM_newTemplate(CTL_plugin_templatePath('forum'));
+    $alertmsg->set_file(['alertmsg' => 'alertmsg.thtml']);
+
+    $alertmsg->set_var('imgset', $CONF_FORUM['imgset']);
+    $alertmsg->set_var('layout_url', $CONF_FORUM['layout_url']);
+    $alertmsg->set_var('alert_title', $title);
+    $alertmsg->set_var('alert_message', $message);
+    if ($prompt == "0") {
+        $alertmsg->set_var('prompt', ''); // No Prompt
+    } elseif (empty($prompt)) {
+        $alertmsg->set_var('prompt', $LANG_GF02['msg148']);
+    } else {
+        $alertmsg->set_var('prompt', $prompt);
+    }
+    
+    $alertmsg->parse('output', 'alertmsg');
+    $retval .= $alertmsg->finish($alertmsg->get_var('output'));
     
     return $retval;
 }
 
 
 function BaseFooter($showbottom=true) {
-    global $_USER,$_CONF,$LANG_GF02,$forum,$CONF_FORUM;
+    global $_USER, $_CONF, $LANG_GF02, $forum, $CONF_FORUM;
 
     $retval = '';
     if (!$CONF_FORUM['registration_required'] OR !COM_isAnonUser()) {
         $footer = COM_newTemplate(CTL_plugin_templatePath('forum'));
-        $footer->set_file (array ('footerblock'=>'footer/footer.thtml'));
+        $footer->set_file(['footerblock' => 'footer/footer.thtml']);
         
-        $footer->set_var ('imgset', $CONF_FORUM['imgset']);
+        $footer->set_var('imgset', $CONF_FORUM['imgset']);
         if ($forum == '') {
-            $footer->set_var ('forum_time', f_forumtime() );
+            $footer->set_var('forum_time', f_forumtime());
             if ($showbottom == "true") {
-                $footer->set_var ('forum_legend', f_legend() );
-                $footer->set_var ('forum_whosonline', f_whosonline() );
+                $footer->set_var('forum_legend', f_legend());
+                $footer->set_var('forum_whosonline', f_whosonline());
             }
           } else {
-            $footer->set_var ('forum_time', f_forumtime() );
+            $footer->set_var('forum_time', f_forumtime());
             if ($showbottom == "true") {
-                $footer->set_var ('forum_legend', f_legend() );
-                $footer->set_var ('forum_rules', f_forumrules() );
+                $footer->set_var('forum_legend', f_legend());
+                $footer->set_var('forum_rules', f_forumrules());
             }
         }
-        $footer->set_var ('search_forum', f_forumsearch() );
-        $footer->set_var ('select_forum', f_forumjump() );
-        $footer->parse ('output', 'footerblock');
+        $footer->set_var('search_forum', f_forumsearch());
+        $footer->set_var('select_forum', f_forumjump());
+        $footer->parse('output', 'footerblock');
         
-        $footer->set_var('block_end', COM_endBlock());     
+        $footer->set_var('block_end', COM_endBlock());
         
         $retval .= $footer->finish($footer->get_var('output'));
     }
@@ -804,16 +871,16 @@ function f_forumsearch() {
     global $_CONF,$_TABLES,$LANG_GF01,$LANG_GF02,$forum,$CONF_FORUM;
 
     $forum_search = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $forum_search->set_file (array ('forum_search'=>'forum_search.thtml'));
-    $forum_search->set_var ('forum', $forum);
+    $forum_search->set_file(['forum_search' => 'forum_search.thtml']);
+    $forum_search->set_var('forum', $forum);
     if ($forum == "") {
-        $forum_search->set_var ('search', $LANG_GF02['msg117']);
+        $forum_search->set_var('search', $LANG_GF02['msg117']);
     } else {
-        $forum_search->set_var ('search', $LANG_GF02['msg118']);
+        $forum_search->set_var('search', $LANG_GF02['msg118']);
     }
-    $forum_search->set_var ('jumpheading', $LANG_GF02['msg103']);
-    $forum_search->set_var ('LANG_GO', $LANG_GF01['GO']);
-    $forum_search->parse ('output', 'forum_search');
+    $forum_search->set_var('jumpheading', $LANG_GF02['msg103']);
+    $forum_search->set_var('LANG_GO', $LANG_GF01['GO']);
+    $forum_search->parse('output', 'forum_search');
     return $forum_search->finish($forum_search->get_var('output'));
 }
 
@@ -823,7 +890,7 @@ function f_forumjump($action='',$selected=0) {
     $selecthtml = '';
     $asql = DB_query("SELECT * FROM {$_TABLES['forum_categories']} ORDER BY cat_order ASC");
     while($A = DB_fetchArray($asql)) {
-    	
+        
         $catthtml = '<optgroup label="' .$A['cat_name']. '">' . LB;
         $formhtml = '';
         $bsql = DB_query("SELECT * FROM {$_TABLES['forum_forums']} WHERE forum_cat='{$A['id']}' ORDER BY forum_order ASC");
@@ -838,23 +905,23 @@ function f_forumjump($action='',$selected=0) {
             }
         }
         if (!empty($formhtml)) {
-        	$selecthtml .= $catthtml . $formhtml . '</optgroup>' . LB;
-		}
+            $selecthtml .= $catthtml . $formhtml . '</optgroup>' . LB;
+        }
     }
     $forum_jump = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $forum_jump->set_file (array ('forum_jump'=>'forum_jump.thtml'));
-    $forum_jump->set_var ('LANG_msg103', $LANG_GF02['msg103']);
-    $forum_jump->set_var ('LANG_msg106', $LANG_GF02['msg106']);
-    $forum_jump->set_var ('jumpheading', $LANG_GF02['msg103']);
-    $forum_jump->set_var ('imgset', $CONF_FORUM['imgset']);
+    $forum_jump->set_file(['forum_jump' => 'forum_jump.thtml']);
+    $forum_jump->set_var('LANG_msg103', $LANG_GF02['msg103']);
+    $forum_jump->set_var('LANG_msg106', $LANG_GF02['msg106']);
+    $forum_jump->set_var('jumpheading', $LANG_GF02['msg103']);
+    $forum_jump->set_var('imgset', $CONF_FORUM['imgset']);
     if ($action == '') {
-        $forum_jump->set_var ('action', $_CONF['site_url'] . '/forum/index.php');
+        $forum_jump->set_var('action', $_CONF['site_url'] . '/forum/index.php');
     } else {
-        $forum_jump->set_var ('action', $action);
+        $forum_jump->set_var('action', $action);
     }
-    $forum_jump->set_var ('selecthtml', $selecthtml);
-    $forum_jump->set_var ('LANG_GO', $LANG_GF01['GO']);
-    $forum_jump->parse ('output', 'forum_jump');
+    $forum_jump->set_var('selecthtml', $selecthtml);
+    $forum_jump->set_var('LANG_GO', $LANG_GF01['GO']);
+    $forum_jump->parse('output', 'forum_jump');
     return $forum_jump->finish($forum_jump->get_var('output'));
 }
 
@@ -862,17 +929,17 @@ function f_forumtime() {
     global $CONF_FORUM, $_CONF,$_TABLES,$LANG_GF01,$LANG_GF02,$forum;
 
     $forum_time = COM_newTemplate(CTL_plugin_templatePath('forum', 'footer'));
-    $forum_time->set_file (array ('forum_time'=>'forum_time.thtml'));
+    $forum_time->set_file(['forum_time' => 'forum_time.thtml']);
     $timezone = strftime('%Z');
-	if (($_CONF['language'] === 'japanese_utf-8') &&
-		(strpos(PHP_OS, 'WIN') === 0) &&
-		is_callable('mb_convert_encoding')) {
-		$timezone = mb_convert_encoding($timezone, COM_getCharset(), 'cp932');
-	}
+    if (($_CONF['language'] === 'japanese_utf-8') &&
+        (strpos(PHP_OS, 'WIN') === 0) &&
+        is_callable('mb_convert_encoding')) {
+        $timezone = mb_convert_encoding($timezone, COM_getCharset(), 'cp932');
+    }
     $time = strftime('%I:%M %p');
-    $forum_time->set_var ('imgset', $CONF_FORUM['imgset']);
-    $forum_time->set_var ('message', sprintf($LANG_GF02['msg121'],$timezone,$time));
-    $forum_time->parse ('output', 'forum_time');
+    $forum_time->set_var('imgset', $CONF_FORUM['imgset']);
+    $forum_time->set_var('message', sprintf($LANG_GF02['msg121'],$timezone,$time));
+    $forum_time->parse('output', 'forum_time');
     return $forum_time->finish($forum_time->get_var('output'));
 }
 
@@ -880,48 +947,53 @@ function f_legend() {
     global $CONF_FORUM,$forum,$_CONF,$LANG_GF01,$LANG_GF02;
     
     $forum_legend = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $forum_legend->set_file (array ('forum_legend'	=> 'footer/forum_legend.thtml',         
-    								'forum_icons'   => 'forum_icons.thtml'
-    ));
-    $blocks = array('new_icon', 'quiet_icon', 'active_icon', 'normal_icon', 'normalnew_icon', 'sticky_icon', 'stickynew_icon', 'locked_icon', 'lockednew_icon');
+    $forum_legend->set_file([
+        'forum_legend' => 'footer/forum_legend.thtml',
+        'forum_icons'  => 'forum_icons.thtml'
+    ]);
+    $blocks = [
+        'new_icon', 'quiet_icon', 'active_icon', 'normal_icon', 'normalnew_icon', 'sticky_icon',
+        'stickynew_icon', 'locked_icon', 'lockednew_icon'
+    ];
+    
     foreach ($blocks as $block) {
         $forum_legend->set_block('forum_icons', $block);
     }
     
-    $forum_legend->set_var ('imgset', $CONF_FORUM['imgset']);
+    $forum_legend->set_var('imgset', $CONF_FORUM['imgset']);
 
     if ($forum == '') {
-        $forum_legend->set_var ('normal_msg', $LANG_GF02['msg194']);
-        $forum_legend->set_var ('normalnew_msg', $LANG_GF02['msg108']);
+        $forum_legend->set_var('normal_msg', $LANG_GF02['msg194']);
+        $forum_legend->set_var('normalnew_msg', $LANG_GF02['msg108']);
         
 
-        $forum_legend->parse ('normal_icon', 'quiet_icon');
-        $forum_legend->parse ('normalnew_icon', 'active_icon');
+        $forum_legend->parse('normal_icon', 'quiet_icon');
+        $forum_legend->parse('normalnew_icon', 'active_icon');
         
         
         
-        $forum_legend->parse ('viewnew_icon', 'new_icon');
-        $forum_legend->set_var ('viewnew_msg', $LANG_GF02['msg112']);
+        $forum_legend->parse('viewnew_icon', 'new_icon');
+        $forum_legend->set_var('viewnew_msg', $LANG_GF02['msg112']);
         
-        $forum_legend->set_var ('markread_icon','<img src="'.gf_getImage('allread').'" alt="' . $LANG_GF02['msg84'] .'" title="' .$LANG_GF02['msg84']. '"'. XHTML .'>');
-        $forum_legend->set_var ('markread_msg', $LANG_GF02['msg84']);
+        $forum_legend->set_var('markread_icon','<img src="'.gf_getImage('allread').'" alt="' . $LANG_GF02['msg84'] .'" title="' .$LANG_GF02['msg84']. '"'. XHTML .'>');
+        $forum_legend->set_var('markread_msg', $LANG_GF02['msg84']);
     } else {
-        $forum_legend->parse ('normal_icon', 'normal_icon');
-        $forum_legend->parse ('normalnew_icon', 'normalnew_icon');
-        $forum_legend->parse ('sticky_icon', 'sticky_icon');
-        $forum_legend->parse ('stickynew_icon', 'stickynew_icon');
-        $forum_legend->parse ('locked_icon', 'locked_icon');
-        $forum_legend->parse ('lockednew_icon', 'lockednew_icon');
+        $forum_legend->parse('normal_icon', 'normal_icon');
+        $forum_legend->parse('normalnew_icon', 'normalnew_icon');
+        $forum_legend->parse('sticky_icon', 'sticky_icon');
+        $forum_legend->parse('stickynew_icon', 'stickynew_icon');
+        $forum_legend->parse('locked_icon', 'locked_icon');
+        $forum_legend->parse('lockednew_icon', 'lockednew_icon');
         
-        $forum_legend->set_var ('normal_msg', $LANG_GF02['msg59']);
-        $forum_legend->set_var ('normalnew_msg', $LANG_GF02['msg60']);
-        $forum_legend->set_var ('sticky_msg',$LANG_GF02['msg61']);
-        $forum_legend->set_var ('locked_msg', $LANG_GF02['msg114']);
-        $forum_legend->set_var ('stickynew_msg', $LANG_GF02['msg115']);
-        $forum_legend->set_var ('lockednew_msg', $LANG_GF02['msg116']);
+        $forum_legend->set_var('normal_msg', $LANG_GF02['msg59']);
+        $forum_legend->set_var('normalnew_msg', $LANG_GF02['msg60']);
+        $forum_legend->set_var('sticky_msg',$LANG_GF02['msg61']);
+        $forum_legend->set_var('locked_msg', $LANG_GF02['msg114']);
+        $forum_legend->set_var('stickynew_msg', $LANG_GF02['msg115']);
+        $forum_legend->set_var('lockednew_msg', $LANG_GF02['msg116']);
     }
 
-    $forum_legend->parse ('output', 'forum_legend');
+    $forum_legend->parse('output', 'forum_legend');
     return $forum_legend->finish($forum_legend->get_var('output'));
 }
 
@@ -930,11 +1002,11 @@ function f_whosonline(){
 
     $onlineusers = phpblock_whosonline();
     $forum_users = COM_newTemplate(CTL_plugin_templatePath('forum', 'footer'));
-    $forum_users->set_file (array ('forum_users'=>'forum_users.thtml'));
-    $forum_users->set_var ('LANG_msg07', $LANG_GF02['msg07']);
-    $forum_users->set_var ('imgset', $CONF_FORUM['imgset']);
-    $forum_users->set_var ('onlineusers', $onlineusers);
-    $forum_users->parse ('output', 'forum_users');
+    $forum_users->set_file(['forum_users' => 'forum_users.thtml']);
+    $forum_users->set_var('LANG_msg07', $LANG_GF02['msg07']);
+    $forum_users->set_var('imgset', $CONF_FORUM['imgset']);
+    $forum_users->set_var('onlineusers', $onlineusers);
+    $forum_users->parse('output', 'forum_users');
     return $forum_users->finish($forum_users->get_var('output'));
 }
 
@@ -942,16 +1014,17 @@ function f_forumrules() {
     global $_CONF,$_USER,$LANG_GF01,$LANG_GF02,$CONF_FORUM;
     
     $forum_rules = COM_newTemplate(CTL_plugin_templatePath('forum'));
-    $forum_rules->set_file (array ( 'forum_rules'	=> 'footer/forum_rules.thtml',         
-    								'forum_icons'   => 'forum_icons.thtml'
-    ));
+    $forum_rules->set_file([
+        'forum_rules' => 'footer/forum_rules.thtml',
+        'forum_icons' => 'forum_icons.thtml'
+    ]);
     
-    $blocks = array('status_yes', 'status_no');
+    $blocks = ['status_yes', 'status_no'];
     foreach ($blocks as $block) {
         $forum_rules->set_block('forum_icons', $block);
     }     
 
-    if ( $CONF_FORUM['registered_to_post'] AND ($_USER['uid'] < 2 OR empty($_USER['uid'])) ) {
+    if ($CONF_FORUM['registered_to_post'] AND ($_USER['uid'] < 2 OR empty($_USER['uid']))) {
         $postperm_msg = $LANG_GF01['POST_PERM_MSG2'];
         $post_perm_image = "status_no";
     } else {
@@ -981,21 +1054,21 @@ function f_forumrules() {
         $anon_perm_image = "status_no";
     }
     
-    $forum_rules->set_var ('imgset', $CONF_FORUM['imgset']);
-    $forum_rules->set_var ('LANG_title', $LANG_GF02['msg101']);
+    $forum_rules->set_var('imgset', $CONF_FORUM['imgset']);
+    $forum_rules->set_var('LANG_title', $LANG_GF02['msg101']);
 
-    $forum_rules->set_var ('anonymous_msg', $LANG_GF01['ANON_PERM_MSG']);
-    $forum_rules->parse ('anon_perm_image', $anon_perm_image);
+    $forum_rules->set_var('anonymous_msg', $LANG_GF01['ANON_PERM_MSG']);
+    $forum_rules->parse('anon_perm_image', $anon_perm_image);
 
-    $forum_rules->set_var ('postingperm_msg',$postperm_msg);
-    $forum_rules->parse ('post_perm_image', $post_perm_image);
+    $forum_rules->set_var('postingperm_msg',$postperm_msg);
+    $forum_rules->parse('post_perm_image', $post_perm_image);
 
-    $forum_rules->set_var ('html_msg', $htmlmsg);
-    $forum_rules->parse ('html_perm_image', $html_perm_image);
-    $forum_rules->set_var ('censor_msg', $LANG_GF01['CENSOR_PERM_MSG']);
-    $forum_rules->parse ('censor_perm_image', $censor_perm_image);
+    $forum_rules->set_var('html_msg', $htmlmsg);
+    $forum_rules->parse('html_perm_image', $html_perm_image);
+    $forum_rules->set_var('censor_msg', $LANG_GF01['CENSOR_PERM_MSG']);
+    $forum_rules->parse('censor_perm_image', $censor_perm_image);
 
-    $forum_rules->parse ('output', 'forum_rules');
+    $forum_rules->parse('output', 'forum_rules');
     return $forum_rules->finish($forum_rules->get_var('output'));
 
 }
@@ -1035,20 +1108,20 @@ function forum_chkUsercanAccess($secure = false) {
     global $_CONF, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER;
 
     if ($CONF_FORUM['registration_required'] && COM_isAnonUser()) {
-    	$message = sprintf($LANG_GF01['loginreqview'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-    	$display .= alertMessage($message);
+        $message = sprintf($LANG_GF01['loginreqview'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
+        $display .= alertMessage($message);
         $display = gf_createHTMLDocument($display);
         COM_output($display);
 
         exit;
     //} elseif ($secure AND empty($_USER['uid'])) {
     } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
-		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
-		$display = gf_createHTMLDocument($display);
-		COM_output($display);
-	
-		exit;    	
+        $message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
+        $display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
+        $display = gf_createHTMLDocument($display);
+        COM_output($display);
+    
+        exit;
     }
 }
 
@@ -1061,5 +1134,3 @@ function forum_xchsmilies($message, $reverse = false) {
     // Let the ForumSmilies class handle this
     return $_SMILIES->replace($message, $reverse);
 }
-
-?>

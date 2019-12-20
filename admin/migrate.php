@@ -33,6 +33,7 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
+use Geeklog\Input;
 
 require_once 'gf_functions.php';
 if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
@@ -41,18 +42,19 @@ if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
     require_once $_CONF['path_system'] . 'lib-story.php'; 
 }
 
-$page     = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
-$show     = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
-$migrate  = isset($_POST['migrate'])        ? COM_applyFilter($_POST['migrate'])             : '';
-$selforum = isset($_POST['selforum'])       ? COM_applyFilter($_POST['selforum'])            : '';
-$curtopic = isset($_POST['seltopic'])       ? COM_applyFilter($_POST['seltopic'])            : '';
-$dpm      = isset($_POST['delPostMigrate']) ? COM_applyFilter($_POST['delPostMigrate'],true) : '';
+$page     = (int) Input::fGet('page', 0);
+$show     = (int) Input::fGet('show', 0);
+$migrate  = Input::fPost('migrate', '');
+$selforum = Input::fPost('selforum', '');
+$curtopic = Input::fPost('seltopic', '');
+$dpm      = (int) Input::fPost('delPostMigrate', 0);
 
 if ($migrate == $LANG_GF01['MIGRATE_NOW'] && $selforum != "select"
         && !empty($_POST['chk_record_delete']) && SEC_checkToken()) {
     $num_stories = 0;
     $num_posts = 0;
-    foreach ($_POST['chk_record_delete'] as $sid) {
+
+    foreach (Input::fPost('chk_record_delete', []) as $sid) {
         if ($curtopic == 'submissions') {
             $sql = "SELECT sid,date,uid,title,introtext "
                  . "FROM {$_TABLES['storysubmission']} WHERE sid='$sid'";
@@ -125,12 +127,12 @@ function migratetopic($forum, $sid, $storydate, $uid, $subject, $introtext, $bod
     PLG_itemSaved($parent, 'forum');
 //    $i++;
     $num_posts = 0;
-	$comments  = 0;
-	
+    $comments  = 0;
+    
     if (isset($_POST['seltopic']) && $_POST['seltopic'] != 'submissions') {
         $comments = migrateComments($forum, $sid, $parent);
     }
-	
+    
     $num_posts = $num_posts + $comments;
     return $num_posts;
 }
@@ -220,7 +222,7 @@ function migrate_topicsList($selected='')
         $retval .= ' selected="selected"';
     }
     $retval .= '>' . $LANG_GF01['SUBMISSIONS'] . '</option>';
-    $retval .= TOPIC_getTopicListSelect(array($selected), 0);
+    $retval .= TOPIC_getTopicListSelect([$selected], 0);
     $retval .= '</select>';
 
     return $retval;
@@ -234,9 +236,9 @@ $display .= gf_showVariables();
 
 // Check if the number of records was specified to show - part of page navigation.
 if ($show == 0 AND $CONF_FORUM['show_messages_perpage'] > 0) {
-	$show = $CONF_FORUM['show_messages_perpage'];
+    $show = $CONF_FORUM['show_messages_perpage'];
 } elseif ($show == 0) {
-	$show = 20;
+    $show = 20;
 }
 
 // Check if this is the first page.
@@ -250,15 +252,19 @@ $navbar->set_selected($LANG_GF06['5']);
 $display .= $navbar->generate();
 
 $p = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
-$p->set_file(array('page'=>'migrate.thtml'));
+$p->set_file(['page' => 'migrate.thtml']);
 
 $p->set_block('page', 'report_record');
 $p->set_block('page', 'message');
 $p->set_block('page', 'no_records_message');
 
 if (!empty($_GET['num_stories']) && !empty($_GET['num_posts'])) {
-    $p->set_var('status_message',
-        sprintf($LANG_GF02['msg192'], $_GET['num_stories'], $_GET['num_posts']));
+    $p->set_var(
+        'status_message',
+        sprintf(
+            $LANG_GF02['msg192'], (int) Input::fGet('num_stories', 0), (int) Input::fGet('num_posts', 0)
+        )
+    );
     $p->parse('message','message');
 } else {
     $p->set_var('show_message', 'none');
@@ -281,8 +287,8 @@ if (!empty($curtopic) && $curtopic != 'all') {
 }
 $sql_part1 = "FROM $table_name AS s, {$_TABLES['topic_assignments']} AS ta "
            . "WHERE ta.id=s.sid AND ta.type='article' ";
-           
-$sql_part3 = "GROUP BY s.sid ";           
+
+$sql_part3 = "GROUP BY s.sid ";
 
 $result = DB_query("SELECT s.sid " . $sql_part1 . $sql_part2 . $sql_part3);
 $nrows = DB_numRows($result);
@@ -334,9 +340,9 @@ if ($nrows > 0) {
     }
     $p->set_var('pagenavigation', COM_printPageNavigation($base_url, $page, $numpages));
 } else {
-	$p->set_var ('message', $LANG_GF01['no_articles_found']);
-	$p->parse ('no_records_message', 'no_records_message');
-}    
+    $p->set_var ('message', $LANG_GF01['no_articles_found']);
+    $p->parse ('no_records_message', 'no_records_message');
+}
 
 $p->set_var('gltoken_name', CSRF_TOKEN);
 $p->set_var('gltoken', SEC_createToken());
@@ -347,4 +353,3 @@ $display .= COM_endBlock();
 $display = COM_createHTMLDocument($display);
 
 COM_output($display);
-?>
