@@ -2322,6 +2322,8 @@ function plugin_likesenabled_forum($sub_type)
 
 /**
  * Can user perform a like action on item
+ * Note: $Id is filtered as a string. If needed do additional filtering, 
+ *		example if your IDs should be numeric
  *
  * @return   bool
  */
@@ -2330,6 +2332,9 @@ function plugin_canuserlike_forum($sub_type, $id, $uid, $ip)
     global $_TABLES;
 
     $retval = false;
+
+	// Make sure $id is numeric
+	$id = (int) $id;
 
     $sql = "SELECT uid, ip FROM {$_TABLES['forum_topic']} WHERE id = ".$id;
     $result = DB_query($sql);
