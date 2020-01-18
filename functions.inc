@@ -2322,8 +2322,9 @@ function plugin_likesenabled_forum($sub_type)
 
 /**
  * Can user perform a like action on item
- * Note: $Id is filtered as a string. If needed do additional filtering, 
- *		example if your IDs should be numeric
+ * Note: $Id is filtered as a string by likes.php.
+ *       If needed do additional checks here (like if you need a numeric value)
+ *       but you cannot change the value of id since it will not change in the original calling function
  *
  * @return   bool
  */
@@ -2333,20 +2334,21 @@ function plugin_canuserlike_forum($sub_type, $id, $uid, $ip)
 
     $retval = false;
 
-	// Make sure $id is numeric
-	$id = (int) $id;
+	// Make sure $id is just a number as comment id is numeric
+    // Cannot change id in this function, since the id from the calling function is used else where
+	if (strval((int) $id) == $id) {
+		$sql = "SELECT uid, ip FROM {$_TABLES['forum_topic']} WHERE id = ".$id;
+		$result = DB_query($sql);
+		if (DB_numRows($result) > 0) {
+			list ($owner_id, $owner_ip) = DB_fetchArray($result);
+			if ($owner_id != $uid) {
+				$retval = true;
+			} elseif ($uid == 1 AND $owner_id == 1 AND $ip != $owner_ip) {
+				$retval = true;
+			}
 
-    $sql = "SELECT uid, ip FROM {$_TABLES['forum_topic']} WHERE id = ".$id;
-    $result = DB_query($sql);
-    if (DB_numRows($result) > 0) {
-        list ($owner_id, $owner_ip) = DB_fetchArray($result);
-        if ($owner_id != $uid) {
-            $retval = true;
-        } elseif ($uid == 1 AND $owner_id == 1 AND $ip != $owner_ip) {
-            $retval = true;
-        }
-
-    }
+		}
+	}
 
     return $retval;
 }
