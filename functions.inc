@@ -2391,23 +2391,6 @@ function plugin_getItemLikeURL_forum($sub_type, $id)
         $retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
     }	
 
-    if ($CONF_FORUM['likes_forum'] > 0) {
-		// Figure out read permission for topic (based on Forum User Group assignment)
-		$sql = "SELECT forum, uid, ip FROM {$_TABLES['forum_topic']} WHERE id = $id";
-		$result = DB_query($sql);
-		if (DB_numRows($result) > 0) {
-			list ($forum, $owner_id, $owner_ip) = DB_fetchArray($result);
-
-			$query = DB_query("SELECT grp_name FROM {$_TABLES['groups']} groups, {$_TABLES['forum_forums']} forum WHERE forum.forum_id='$forum' AND forum.grp_id=groups.grp_id");
-			list ($groupname) = DB_fetchArray($query);
-			// User belongs to security group so now check if owner of the item is the same as the visitor
-			if (SEC_inGroup($groupname)) {
-				$options['sub_type'] = $sub_type;
-				$retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);				
-			}
-        }
-    }
-
     return $retval;
 }
 
