@@ -83,15 +83,17 @@ if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
     exit;
 }
 
-//Check is anonymous users can access
 if ($id == 0 OR DB_count($_TABLES['forum_topic'],"id","$id") == 0) {
-    COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=2&amp;forum=$forum");
+    // Topic doesn't exist so exit gracefully
+    COM_handle404('/forum/index.php');
+    exit;
 }
 
-$forum = DB_getItem($_TABLES['forum_topic'],"forum","id='{$id}'");
+//Check is anonymous users can access
+$forum = DB_getItem($_TABLES['forum_topic'],"forum","id=$id");
 $query = DB_query("SELECT grp_name FROM {$_TABLES['groups']} groups, {$_TABLES['forum_forums']} forum WHERE forum.forum_id='$forum' AND forum.grp_id=groups.grp_id");
 list ($groupname) = DB_fetchArray($query);
-if (!SEC_inGroup($groupname) AND $grp_id != 2) {
+if (!SEC_inGroup($groupname)) {
     $display .= alertMessage($LANG_GF02['msg02'],$LANG_GF02['msg171']);
     $display = COM_createHTMLDocument($display);
     COM_output($display);
