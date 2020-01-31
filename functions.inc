@@ -1004,7 +1004,7 @@ function plugin_autouninstall_forum()
 }
 
 /**
-* Return information for a topic
+* Return information for a forum topic
 *
 * @param    string  $id         link ID or '*'
 * @param    string  $what       comma-separated list of properties
@@ -1015,7 +1015,7 @@ function plugin_autouninstall_forum()
 */
 function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 {
-    global $_CONF, $_TABLES;
+    global $_CONF, $_TABLES, $_GROUPS;
 
     // parse $what to see what we need to pull from the database
     $properties = explode(',', $what);
@@ -1023,22 +1023,22 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     foreach ($properties as $p) {
         switch ($p) {
         case 'date-modified':
-            $fields[] = 'date';
+            $fields[] = 'ft.date';
             break;
         case 'description':
         case 'excerpt':
-            $fields[] = 'comment';
+            $fields[] = 'ft.comment';
             break;
         case 'id':
-            $fields[] = 'id';
+            $fields[] = 'ft.id';
             break;
         case 'title':
-            $fields[] = 'subject';
+            $fields[] = 'ft.subject';
             break;
         case 'url':
             // needed for $id == '*', but also in case we're only requesting
-            // the URL (so that $fields isn't emtpy)
-            $fields[] = 'id';
+            // the URL (so that $fields isn't empty)
+            $fields[] = 'ft.id';
             break;
         default:
             // nothing to do
@@ -1057,18 +1057,27 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     // prepare SQL request
     if ($id == '*') {
         $where = '';
-        $permOp = 'WHERE';
     } else {
-        $where = " WHERE id = '" . addslashes($id) . "'";
-        $permOp = 'AND';
+        $where = " AND ft.id = $id";
     }
-
+	
+	// Figure out permissions
+	if ($uid > 0) {
+		$userGroups = SEC_getUserGroups($uid);
+		
+	} else {
+		$userGroups = $_GROUPS;
+	}
+	$where .= " AND (ff.grp_id IN (" . implode(",", $userGroups) . "))";
+	
     $sql = "SELECT " . implode(',', $fields)
-            . " FROM {$_TABLES['forum_topic']}" . $where;
+            . " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff" 
+			. " WHERE ft.forum = ff.forum_id $where";
+			
     if ($id != '*') {
         $sql .= ' LIMIT 1';
     }
-
+ 
     $result = DB_query($sql);
     $numRows = DB_numRows($result);
 
@@ -2309,11 +2318,11 @@ function plugin_usercontributed_forum($uid)
  */
 function plugin_likesenabled_forum($sub_type)
 {
-    global $_CONF, $CONF_FORUM;
+    global $CONF_FORUM;
 
     $retval = false;
 
-    if ($_CONF['likes_enabled'] AND $CONF_FORUM['likes_forum'] > 0) {
+    if ($CONF_FORUM['likes_forum'] > 0) {
         $retval = $CONF_FORUM['likes_forum'];
     }
 
@@ -2330,25 +2339,74 @@ function plugin_likesenabled_forum($sub_type)
  */
 function plugin_canuserlike_forum($sub_type, $id, $uid, $ip)
 {
-    global $_TABLES;
+    global $CONF_FORUM, $_TABLES;
 
     $retval = false;
 
-	// Make sure $id is just a number as comment id is numeric
-    // Cannot change id in this function, since the id from the calling function is used else where
-	if (strval((int) $id) == $id) {
-		$sql = "SELECT uid, ip FROM {$_TABLES['forum_topic']} WHERE id = ".$id;
-		$result = DB_query($sql);
-		if (DB_numRows($result) > 0) {
-			list ($owner_id, $owner_ip) = DB_fetchArray($result);
-			if ($owner_id != $uid) {
-				$retval = true;
-			} elseif ($uid == 1 AND $owner_id == 1 AND $ip != $owner_ip) {
-				$retval = true;
-			}
+    if ($CONF_FORUM['likes_forum'] > 0) {
+    	// Make sure $id is just a number as forum id is numeric
+        // Cannot change id in this function, since the id from the calling function is used else where
+		if (strval((int) $id) == $id) {
+			// Figure out read permission for topic (based on Forum User Group assignment)
+			$sql = "SELECT forum, uid, ip FROM {$_TABLES['forum_topic']} WHERE id = $id";
+			$result = DB_query($sql);
+			if (DB_numRows($result) > 0) {
+				list ($forum, $owner_id, $owner_ip) = DB_fetchArray($result);
 
+				$query = DB_query("SELECT grp_name FROM {$_TABLES['groups']} groups, {$_TABLES['forum_forums']} forum WHERE forum.forum_id='$forum' AND forum.grp_id=groups.grp_id");
+				list ($groupname) = DB_fetchArray($query);
+				// User belongs to security group so now check if owner of the item is the same as the visitor
+				if (SEC_inGroup($groupname)) {
+					if ($owner_id != $uid) {
+						$retval = true;
+					} elseif ($uid == 1 AND $owner_id == 1 AND $ip != $owner_ip) {
+						$retval = true;
+					}
+				}
+			}
 		}
 	}
+
+    return $retval;
+}
+
+/**
+ * Get URL for item like is for
+ * Note: $Id is filtered as a string by likes.php.
+ *       If needed do additional checks here (like if you need a numeric value)
+ *       but you cannot change the value of id since it will not change in the original calling function
+ *
+ * @return   string    URL of item like is for
+ */
+function plugin_getItemLikeURL_forum($sub_type, $id)
+{
+    global $CONF_FORUM, $_TABLES;
+
+    $retval = '';
+	
+    if ($CONF_FORUM['likes_forum'] > 0) {
+        // No sense rebuilding stuff here so use PLG_getItemInfo
+        // PLG_getItemInfo will only return url if user has permissions
+        $options['sub_type'] = $sub_type;
+        $retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
+    }	
+
+    if ($CONF_FORUM['likes_forum'] > 0) {
+		// Figure out read permission for topic (based on Forum User Group assignment)
+		$sql = "SELECT forum, uid, ip FROM {$_TABLES['forum_topic']} WHERE id = $id";
+		$result = DB_query($sql);
+		if (DB_numRows($result) > 0) {
+			list ($forum, $owner_id, $owner_ip) = DB_fetchArray($result);
+
+			$query = DB_query("SELECT grp_name FROM {$_TABLES['groups']} groups, {$_TABLES['forum_forums']} forum WHERE forum.forum_id='$forum' AND forum.grp_id=groups.grp_id");
+			list ($groupname) = DB_fetchArray($query);
+			// User belongs to security group so now check if owner of the item is the same as the visitor
+			if (SEC_inGroup($groupname)) {
+				$options['sub_type'] = $sub_type;
+				$retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);				
+			}
+        }
+    }
 
     return $retval;
 }
