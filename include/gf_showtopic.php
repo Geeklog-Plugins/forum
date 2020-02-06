@@ -164,7 +164,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $postcountQuery = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE uid='{$showtopic['uid']}'");
         $posts = DB_numRows($postcountQuery);
         // STARS CODE
-        if (SEC_inGroup(1,$showtopic['uid'])) {
+        if (SEC_inGroup('Root', $showtopic['uid'])) {
             $user_level = showrank(7, $LANG_GF01['admin']);
             $user_levelname=$LANG_GF01['admin'];
         } else if (forum_modPermission($showtopic['forum'],$showtopic['uid'])) {

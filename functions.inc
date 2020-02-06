@@ -1743,7 +1743,7 @@ function forum_modPermission($forum,$uid='',$permission='') {
         return FALSE;  // Invalid ID or anonymous user
     }
 
-    if (SEC_hasRights('forum.edit')) {
+    if (SEC_hasRights('forum.edit', '', $uid)) {
         // If user is part of forum Admin user group then he should automatically be assumed a moderator
         return TRUE;
     } else {
