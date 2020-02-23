@@ -278,8 +278,8 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
 			$report->set_var('post_end_ahref', '</a>');
             $postdate = COM_getUserDateTimeFormat($P['lastupdated']);
 			$report->set_var('post_date',$postdate[0]);
-			$report->set_var('post_replies', $P['replies']);
-			$report->set_var('post_views', $P['views']);
+			$report->set_var('post_replies', COM_numberFormat($P['replies']));
+			$report->set_var('post_views', COM_numberFormat($P['views']));
 			$report->parse ('report_record', 'report_record',true);
 			if ($csscode == 2) {
 				$csscode = 1;
@@ -509,8 +509,8 @@ if ($op == 'search') {
 			$report->set_var('post_end_ahref', '</a>');
 			$postdate = COM_getUserDateTimeFormat($P['date']);
 			$report->set_var('post_date',$postdate[0]);
-			$report->set_var('post_replies', $P['replies']);
-			$report->set_var('post_views', $P['views']);
+			$report->set_var('post_replies', COM_numberFormat($P['replies']));
+			$report->set_var('post_views', COM_numberFormat($P['views']));
 			$report->set_var ('csscode', $csscode);
 			if ($csscode == 2) {
 				$csscode = 1;
@@ -696,8 +696,8 @@ if ($op == 'popular') {
 			$report->set_var('post_end_ahref', '</a>');
 			$postdate = COM_getUserDateTimeFormat($P['date']);
 			$report->set_var('post_date',$postdate[0]);
-			$report->set_var('post_replies', $P['replies']);
-			$report->set_var('post_views', $P['views']);
+			$report->set_var('post_replies', COM_numberFormat($P['replies']));
+			$report->set_var('post_views', COM_numberFormat($P['views']));
 			$report->set_var('csscode', $i%2+1);
 			$report->parse ('report_record', 'report_record',true);
 		}
@@ -952,8 +952,8 @@ if ($forum == 0) {
             $forumlisting->set_var ('forum_id', $B['forum_id']);
             $forumlisting->set_var ('forum_name', $B['forum_name']);
             $forumlisting->set_var ('forum_desc', $B['forum_dscp']);
-            $forumlisting->set_var ('topics', $topicCount);
-            $forumlisting->set_var ('posts', $postCount);
+            $forumlisting->set_var ('topics', COM_numberFormat($topicCount));
+            $forumlisting->set_var ('posts', COM_numberFormat($postCount));
             $forumlisting->set_var ('topic_id', $topicparent);
             $forumlisting->set_var ('lastpostid', $B['id']);
             $forumlisting->set_var ('LANGGF01_LASTPOST', $LANG_GF01['LASTPOST']);
@@ -1350,8 +1350,8 @@ if ($forum > 0) {
         $topiclisting->set_var ('lastposter', $lastposter);
         $topiclisting->set_var ('LANG_lastpost', $LANG_GF02['msg188']);
         $topiclisting->set_var ('moved', $moved);
-        $topiclisting->set_var ('views', $record['views']);
-        $topiclisting->set_var ('replies', $record['replies']);
+        $topiclisting->set_var ('views', COM_numberFormat($record['views']));
+        $topiclisting->set_var ('replies', COM_numberFormat($record['replies']));
         $topiclisting->set_var ('lastdate', $lastdate);
         $topiclisting->set_var ('lastpostid', $lastreply['id']);
         $topiclisting->set_var ('LANG_BY', $LANG_GF01['BY']);

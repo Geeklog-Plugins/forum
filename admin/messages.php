@@ -273,8 +273,8 @@ if ($nrows > 0) {
         $report->set_var('subject', $A['subject']);
         $report->set_var('siteurl', $_CONF['site_url']);
         $report->set_var('forum', $A['forum']);
-        $report->set_var('views', $A['views']);
-        $report->set_var('replies', $A['replies']);
+        $report->set_var('views', COM_numberFormat($A['views']));
+        $report->set_var('replies', COM_numberFormat($A['replies']));
         $report->set_var('uid', $A['uid']);
         $report->parse('report_record', 'report_record',true);
         if ($csscode == 2) {

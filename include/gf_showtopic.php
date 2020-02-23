@@ -312,7 +312,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $replytopicid = $showtopic['id'];
         $is_lockedtopic = $showtopic['locked'];
         $views = $showtopic['views'];
-        $topictemplate->set_var ('read_msg', sprintf($LANG_GF02['msg49'],$views) );
+        $topictemplate->set_var ('read_msg', sprintf($LANG_GF02['msg49'], COM_numberFormat($views)) );
         if ($is_lockedtopic) {
             $topictemplate->parse('topiclocked_icon', 'topiclocked_icon'); 
         }

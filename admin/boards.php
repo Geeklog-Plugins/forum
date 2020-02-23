@@ -629,7 +629,7 @@ while ($A = DB_FetchArray($asql)) {
         $B = DB_FetchArray($bsql);
         $boards->set_var ('forumname', $B['forum_name']);
         $boards->set_var ('forumid', $B['forum_id']);
-        $boards->set_var ('messagecount', $B['post_count']);
+        $boards->set_var ('messagecount', COM_numberFormat($B['post_count']));
         
         $geeklog_topic = '';
         if (forum_modPermission($B['forum_id'],$_USER['uid'],'mod_edit')) {

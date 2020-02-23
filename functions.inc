@@ -494,7 +494,7 @@ function plugin_showstats_forum($showsitestats)
             if (SEC_inGroup($groupname) OR $grp_id == 2) {
                 $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
                 $S['topicsubject'] = '<a href="' . $url . '">' . $subject . '</a>';
-                $S['views']  = $views;
+                $S['views']  = COM_numberFormat($views);
                 $data_arr[$displaycount] = $S;
                 $displaycount++;
                 if ($displaycount > 10) {
@@ -528,7 +528,7 @@ function plugin_showstats_forum($showsitestats)
                 $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
                 $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
                 $S['topicsubject'] = '<a href="' . $url . '">' . $subject . '</a>';
-                $S['replies']  = $replies;
+                $S['replies']  = COM_numberFormat($replies);
                 $data_arr[$displaycount] = $S;
                 $displaycount++;
                 if ($displaycount > 10) {
@@ -1271,8 +1271,8 @@ function phpblock_forum_newposts() {
                 $block->set_var ('LANG_ON', $LANG_GF01['ON']);
                 $block->set_var ('LANG_VIEWS', $LANG_GF01['VIEWS']);
                 $block->set_var ('LANG_REPLIES', $LANG_GF01['REPLIES']);
-                $block->set_var ('views', $A['views']);
-                $block->set_var ('replies', $A['replies']);
+                $block->set_var ('views', COM_numberFormat($A['views']));
+                $block->set_var ('replies', COM_numberFormat($A['replies']));
                 if ($CONF_FORUM['allow_user_dateformat']) {
                     $date = COM_getUserDateTimeFormat ($postdate);
                     $block->set_var ('date', $date[0]);
@@ -1417,7 +1417,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
     $f_tooltip = function_exists('COM_getTooltip');
     $cssid = 0;
     while ($A = DB_fetchArray ($result)) {
-        $fullsubject = "{$A['subject']}\n{$LANG_GF01['POSTEDBY']}:{$A['name']}{$LANG_GF01['VIEWS']}:{$A['views']}, {$LANG_GF01['REPLIES']}:{$A['replies']}";
+        $fullsubject = "{$A['subject']}\n{$LANG_GF01['POSTEDBY']}:{$A['name']}{$LANG_GF01['VIEWS']}:" . COM_numberFormat($A['views']) . ", {$LANG_GF01['REPLIES']}:" . COM_numberFormat($A['replies']);
         if (($CONF_FORUM['cb_subject_size'] > 0) AND (strlen ($A['subject']) > $CONF_FORUM['cb_subject_size'])) {
             $A['subject'] = COM_truncate($A['subject'], $CONF_FORUM['cb_subject_size'], '...');
         }
@@ -1439,9 +1439,9 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
             $topicinfo_short = "{$LANG_GF01['STARTEDBY']} {$A['name']}";
         }
 
-        $topicinfo .= "{$firstdate}<br" . XHTML . ">{$LANG_GF01['VIEWS']}:{$A['views']}, {$LANG_GF01['REPLIES']}:{$A['replies']}<br" . XHTML . ">";
+        $topicinfo .= "{$firstdate}<br" . XHTML . ">{$LANG_GF01['VIEWS']}:" . COM_numberFormat($A['views']) . ", {$LANG_GF01['REPLIES']}:{$A['replies']}<br" . XHTML . ">";
         $topicinfo_short .= " &raquo; {$firstdate}";
-        $repliesinfo = " {$LANG_GF01['REPLIES']}:{$A['replies']}";
+        $repliesinfo = " {$LANG_GF01['REPLIES']}:" . COM_numberFormat($A['replies']);
 
         if (empty ($A['last_reply_rec']) OR $A['last_reply_rec'] < 1) {
             $lastid = $A['id'];
@@ -1490,8 +1490,8 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         $block->set_var ('forum_name', $A['forum_name']);
         $block->set_var ('topic_id', $A['id']);
         $block->set_var ('fullsubject', $fullsubject);
-        $block->set_var ('views', $A['views']);
-        $block->set_var ('replies', $A['replies']);
+        $block->set_var ('views', COM_numberFormat($A['views']));
+        $block->set_var ('replies', COM_numberFormat($A['replies']));
         $block->set_var ('lastpostby',$A['name']);
         $block->parse ('block_record', 'block_record',true);
     }
