@@ -1817,6 +1817,7 @@ function plugin_getBlocks_forum($side, $topic='')
                                   'content'        => $display,
                                   'allow_autotags' => false,
                                   'convert_newlines' => false,
+								  'css_id' 		   => 'gl-blockForumNewPosts', // Used to jump to block position when user changes order of forum posts in block 
                                   'help'           => '');
 
             }

@@ -2,7 +2,7 @@
 
 <table style="border: 0px; padding:1; border-spacing:1;">
     <tr>
-        <td class="pluginTinyText">{LANG_ORDERBY}<a href="{phpself}?mode=forumblock&amp;order=new">{LANG_NEW}</a> <a href="{phpself}?mode=forumblock&amp;order=views">{LANG_VIEWS}</a> <a href="{phpself}?mode=forumblock&amp;order=posts">{LANG_POSTS}</a><div style="text-align:center;">{view_modemsg}</div></td>
+        <td class="pluginTinyText">{LANG_ORDERBY}<a href="{phpself}?mode=forumblock&amp;order=new#gl-blockForumNewPosts">{LANG_NEW}</a> <a href="{phpself}?mode=forumblock&amp;order=views#gl-blockForumNewPosts">{LANG_VIEWS}</a> <a href="{phpself}?mode=forumblock&amp;order=posts#gl-blockForumNewPosts">{LANG_POSTS}</a><div style="text-align:center;">{view_modemsg}</div></td>
     </tr>
     <tr>
         <td>

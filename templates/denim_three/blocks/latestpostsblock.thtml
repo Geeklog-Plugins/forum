@@ -2,9 +2,9 @@
 
 <div>
 	{LANG_ORDERBY}&nbsp;
-	<a href="{phpself}?mode=forumblock&amp;order=new">{LANG_NEW}</a>&nbsp;&nbsp;&nbsp;
-	<a href="{phpself}?mode=forumblock&amp;order=views">{LANG_VIEWS}</a> &nbsp;&nbsp;&nbsp;
-	<a href="{phpself}?mode=forumblock&amp;order=posts">{LANG_POSTS}</a>
+	<a href="{phpself}?mode=forumblock&amp;order=new#gl-blockForumNewPosts">{LANG_NEW}</a>&nbsp;&nbsp;&nbsp;
+	<a href="{phpself}?mode=forumblock&amp;order=views#gl-blockForumNewPosts">{LANG_VIEWS}</a> &nbsp;&nbsp;&nbsp;
+	<a href="{phpself}?mode=forumblock&amp;order=posts#gl-blockForumNewPosts">{LANG_POSTS}</a>
 </div>
 
 <table class="uk-table uk-table-hover uk-table-striped uk-table-small uk-margin-small-top">
