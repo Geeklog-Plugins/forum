@@ -240,7 +240,7 @@ $LANG_GF02 = array(
     'msg23c' => "You may view it at:\n%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nHave a great day! \n",
     'msg26' => "\nYou are receiving this email because you have chosen to be notified when a reply has been made to this topic. ",
-    'msg27' => "To stop receiving notifications on this topic go to <%s> to remove it.\n",
+    'msg27' => "To stop receiving notifications on this topic go to:\n%s\n";
     'msg33' => 'מחבר: ',
     'msg36' => 'מצב רוח:',
     'msg38' => 'הודיעו לי על תגובות ',

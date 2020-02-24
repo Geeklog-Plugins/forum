@@ -240,7 +240,7 @@ $LANG_GF02 = array(
     'msg23c' => "\nDu kan läsa det på: %s/forum/index.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nHa en bra dag! \n",
     'msg26' => "\nDu har fått detta mail för att du har valt att få en notis när ett svar har gjorts till ämnet. \n",
-    'msg27' => 'För att sluta bevaka detta ämne tryck <a href="%s">här</a> för att avbryta det.',
+    'msg27' => 'För att sluta bevaka detta ämne tryck %s för att avbryta det.',
     'msg33' => 'Namn: [Krävs]',
     'msg36' => 'Humör: [Valfritt]',
     'msg38' => 'Meddela mig vid svar ',

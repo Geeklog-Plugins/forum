@@ -240,7 +240,7 @@ $LANG_GF02 = array(
     'msg23c' => "Du kannst den Beitrag hier lesen:\n%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nViel Spaß,\n",
     'msg26' => "\nDu bekommst diese E-Mail, da Du die Benachrichtigung für dieses Thema aktiviert hast. ",
-    'msg27' => "Deine Benachrichtigungen kannst Du unter <%s> löschen.\n",
+    'msg27' => "Deine Benachrichtigungen kannst Du unter %s löschen.\n",
     'msg33' => 'Autor: ',
     'msg36' => 'Stimmung:',
     'msg38' => 'Bei Antworten benachrichtigen ',

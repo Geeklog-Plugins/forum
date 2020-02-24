@@ -240,7 +240,7 @@ $LANG_GF02 = array(
     'msg23c' => "Du kan vise det her:\n%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nHa en strålende dag! \n",
     'msg26' => "\nDu mottar denne mailen fordi du har valgt å bli varslet når et svar har blitt skrevet i denne tråden. ",
-    'msg27' => "For å stoppe mottak av varsler gå til <%s> for å fjerne varsling.\n",
+    'msg27' => "For å stoppe mottak av varsler gå til %s for å fjerne varsling.\n",
     'msg33' => 'Av: ',
     'msg36' => 'Mood:',
     'msg38' => 'Varsle svar ',

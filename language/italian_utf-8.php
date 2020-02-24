@@ -243,7 +243,7 @@ $LANG_GF02 = array(
     'msg23c' => "\nPuoi leggerlo su: %s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nBuona giornata! \n",
     'msg26' => "\nHai ricevuto questa e-mail perchè hai scelto di ricevere una notifica\nper ogni risposta aggiunta.",
-    'msg27' => 'Per non ricevere più notifiche su questo argomento vai <a href="%s">qui</a> per rimuoverti.',
+    'msg27' => 'Per non ricevere più notifiche su questo argomento vai %s qui per rimuoverti.',
     'msg33' => 'Autore: ',
     'msg36' => 'Umore:',
     'msg38' => 'Inviami una Notifica per ogni risposta ',

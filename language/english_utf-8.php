@@ -242,7 +242,7 @@ $LANG_GF02['msg23b']   = "A new topic '%s' has been posted by %s in the %s forum
 $LANG_GF02['msg23c']   = "You may view it at:\n%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n";
 $LANG_GF02['msg25']    = "\nHave a great day! \n";
 $LANG_GF02['msg26']    = "\nYou are receiving this email because you have chosen to be notified when a reply has been made to this topic. ";
-$LANG_GF02['msg27']    = "To stop receiving notifications on this topic go to <%s> to remove it.\n";
+$LANG_GF02['msg27']    = "To stop receiving notifications on this topic go to:\n%s\n";
 $LANG_GF02['msg33']    = 'Author: ';
 $LANG_GF02['msg36']    = 'Mood:';
 $LANG_GF02['msg38']    = 'Notify me of replies ';

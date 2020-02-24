@@ -244,7 +244,7 @@ $LANG_GF02 = array(
     'msg23c' => "\nVous pouvez utiliser le lien suivant pour voir la réponse : %s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nMerci et bonne journée ! \n",
     'msg26' => "\nVous avez reçu ce mail parce que vous avez choisi d'être averti quand une réponse est faite à ce sujet. \n",
-    'msg27' => 'Si vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant : <a href="%s">here</a>',
+    'msg27' => 'Si vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant:\n%s\n',
     'msg33' => 'Auteur : ',
     'msg36' => 'Humeur',
     'msg38' => ' M\'avertir des réponses ',

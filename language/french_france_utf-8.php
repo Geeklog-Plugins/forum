@@ -240,7 +240,7 @@ $LANG_GF02['msg23b']   = "Un nouveau sujet '%s' a ete poste par %s dans le forum
 $LANG_GF02['msg23c']   = "\nVous pouvez utiliser le lien suivant pour voir la reponse : %s/forum/viewtopic.php?showtopic=%s&lastpost=true\n";
 $LANG_GF02['msg25']    = "\nMerci et bonne journee ! \n";
 $LANG_GF02['msg26']    = "\nVous avez recu ce mail parce que vous avez choisi d'etre averti quand une reponse est faite a ce sujet. \n";
-$LANG_GF02['msg27']    = 'Si vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant : <a href="%s">here</a>';
+$LANG_GF02['msg27']    = 'Si vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant:\n%s\n';
 $LANG_GF02['msg33']    = 'Auteur : ';
 $LANG_GF02['msg36']    = 'Humeur';
 $LANG_GF02['msg38']    = ' M\'avertir des reponses ';

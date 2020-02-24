@@ -240,7 +240,7 @@ $LANG_GF02 = array(
     'msg23c' => "\nDu kan se det her: %s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
     'msg25' => "\nFortsat god dag! \n",
     'msg26' => "\nDu modtager denne email fordi du har valgt at blive adviseret når der kommer et svar på dette emne. \n",
-    'msg27' => 'Du kan stoppe adviseringen: <a href="%s">her</a>.',
+    'msg27' => 'Du kan stoppe adviseringen:\n%s\n',
     'msg33' => 'Forfatter: ',
     'msg36' => 'Humør:',
     'msg38' => "Advisér mig\n ved svar ",
