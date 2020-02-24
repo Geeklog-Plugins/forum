@@ -626,6 +626,14 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     return $search;
 }
 
+// Format content to be displayed in the search results
+function plugin_searchformat_forum($id, $contentType, $content) 
+{
+	// Remove any BBCode from forum post
+	if ($contentType == 'description') {
+		return stripBBCode($content);
+	}
+}
 
 /* RSS FEED Related API functions */
 
@@ -724,7 +732,7 @@ function plugin_getfeedcontent_forum ($feed, &$link, &$update)
     $sql .= forum_buildFeedsSql ($F['topic'], $F['limits']);
     $result = DB_query ($sql);
 
-    while ( $A=DB_fetchArray($result) ) {
+    while ($A = DB_fetchArray($result)) {
         $preface = '';
         if ($F['content_length'] == 0) {
             $comment = '';
