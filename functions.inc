@@ -1041,7 +1041,7 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 		}
 		$where = " AND (ff.grp_id IN (" . implode(",", $userGroups) . "))";
 		$sql = "SELECT ft.id, ft.date,"
-				. " (SELECT ft2.date FROM gl_forum_topic ft2 WHERE ft.id = ft2.pid ORDER BY ft2.date DESC LIMIT 1) replydate" // find date of topic and latest date of any replies. Use newest one as modify date
+				. " (SELECT ft2.date FROM {$_TABLES['forum_topic']} ft2 WHERE ft.id = ft2.pid ORDER BY ft2.date DESC LIMIT 1) replydate" // find date of topic and latest date of any replies. Use newest one as modify date
 				. " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff" 
 				. " WHERE pid = 0 AND ft.forum = ff.forum_id $where";
 				
