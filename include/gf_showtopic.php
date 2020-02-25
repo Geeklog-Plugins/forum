@@ -436,7 +436,11 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         $topictemplate->set_var ('numposts', $numposts);
     }
     if (forum_modPermission($showtopic['forum'],'','mod_ban')) {
-		$topictemplate->set_var ('ip', $showtopic['ip']);
+		if (isset($showtopic['ip'])) {
+			$topictemplate->set_var ('ip', $showtopic['ip']);
+		} else {
+			$topictemplate->set_var ('ip', '');
+		}
 		if ($showtopic['uid'] == 1) {
 			$topictemplate->parse ('ip_address', 'anon_ip_address');
 		} else {

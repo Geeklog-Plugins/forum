@@ -48,6 +48,9 @@ $mytimer->startTimer();
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess();
+
 $mytimer = new timerobject();
 $mytimer->startTimer();
 
@@ -113,8 +116,6 @@ if ($onlytopic == 1) {
         
     $display .= '<body class="glforum-preview-body">';
 } else {
-    //Check is anonymous users can access
-    forum_chkUsercanAccess();
     // Debug Code to show variables
     $display .= gf_showVariables();
 
@@ -485,7 +486,7 @@ if ($onlytopic != 1) {
     $display .= BaseFooter();
     $display = gf_createHTMLDocument($display, $subject);
 } else {
-	// need to call this incase plugin doesnt use script class OR footercode function is used to set required javascript file
+	// need to call this in case plugin doesn't use script class OR footercode function is used to set required javascript file
 	$display .= PLG_getFooterCode();
 	$display .= $_SCRIPTS->getFooter();
     $display .= '</body>' . LB;

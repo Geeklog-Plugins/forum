@@ -42,6 +42,15 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess();
+
+// Check if user is anonymous and can view member list as forum_chkUsercanAccess does not do this
+if (!$CONF_FORUM['show_memberslist_anonymous'] && COM_isAnonUser()) {
+	// Display access error message for a feature
+	forum_chkUsercanAccess(true);
+}
+
 // Use filter to remove all possible hostile SQL injections - only expecting numeric data
 $chkactivity = isset($_REQUEST['chkactivity']) ? COM_applyFilter($_REQUEST['chkactivity'],true) : '';
 $direction   = isset($_GET['direction'])       ? COM_applyFilter($_GET['direction'])            : '';
@@ -52,14 +61,6 @@ $prevorder   = isset($_GET['prevorder'])       ? COM_applyFilter($_GET['prevorde
 $show        = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
 $showuser    = isset($_GET['showuser'])        ? COM_applyFilter($_GET['showuser'],true)        : '';
 $sort        = isset($_GET['sort'])            ? COM_applyFilter($_GET['sort'],true)            : '';
-
-//Check is anonymous users can access forum
-forum_chkUsercanAccess();
-
-// Check if anonymouse users can access
-if (!$CONF_FORUM['show_memberslist_anonymous'] && COM_isAnonUser()) {
-	forum_chkUsercanAccess(true);
-}
 
 $display = '';
 

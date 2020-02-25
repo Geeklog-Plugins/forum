@@ -771,7 +771,9 @@ function BaseFooter($showbottom=true) {
     global $_USER,$_CONF,$LANG_GF02,$forum,$CONF_FORUM;
 
     $retval = '';
-    if (!$CONF_FORUM['registration_required'] OR !COM_isAnonUser()) {
+	
+    // if (!$CONF_FORUM['registration_required'] OR !COM_isAnonUser()) {
+	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user'))) {
         $footer = COM_newTemplate(CTL_plugin_templatePath('forum'));
         $footer->set_file (array ('footerblock'=>'footer/footer.thtml'));
         
@@ -796,6 +798,7 @@ function BaseFooter($showbottom=true) {
 		
         $retval .= $footer->finish($footer->get_var('output'));
     }
+	
     return $retval;
 }
 
@@ -950,6 +953,7 @@ function f_forumrules() {
         $forum_rules->set_block('forum_icons', $block);
     }     
 
+	// By this point permission of user is checked for viewing already
     if ( $CONF_FORUM['registered_to_post'] AND ($_USER['uid'] < 2 OR empty($_USER['uid'])) ) {
         $postperm_msg = $LANG_GF01['POST_PERM_MSG2'];
         $post_perm_image = "status_no";
@@ -999,7 +1003,6 @@ function f_forumrules() {
 
 }
 
-
 function gf_updateLastPost($forumid,$topicparent=0) {
     global $_TABLES;
 
@@ -1030,20 +1033,34 @@ function gf_updateLastPost($forumid,$topicparent=0) {
     }
 }
 
+/**
+ * Check is anonymous users can access and if not, regular user can access.
+ * If $secure then will be a feature check and if user logged in (elseif before takes care of user security check for features as well)
+ */
 function forum_chkUsercanAccess($secure = false) {
     global $_CONF, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER;
 
-    if ($CONF_FORUM['registration_required'] && COM_isAnonUser()) {
+    
+	// Can anonymous users view posts
+	if ($CONF_FORUM['registration_required'] && COM_isAnonUser()) {
     	$message = sprintf($LANG_GF01['loginreqview'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-    	$display .= alertMessage($message);
+    	$display = alertMessage($message);
         $display = gf_createHTMLDocument($display);
         COM_output($display);
 
         exit;
+	// Can regular users view posts
+	} elseif ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {
+    	$display = alertMessage($LANG_GF02['msg02'], $LANG_GF01['ACCESSERROR']);
+        $display = gf_createHTMLDocument($display);
+        COM_output($display);
+
+        exit;
+	// Login required to use this feature of the forum
     //} elseif ($secure AND empty($_USER['uid'])) {
     } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
 		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
+		$display = alertMessage($message, $LANG_GF01['ACCESSERROR']);
 		$display = gf_createHTMLDocument($display);
 		COM_output($display);
 	

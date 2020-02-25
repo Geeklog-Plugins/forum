@@ -45,13 +45,17 @@ if (!in_array('forum', $_PLUGINS)) {
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-$display = '';
 
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess();	
 
-// Check if anonymouse users can access
+// Check if user is anonymous and can post as forum_chkUsercanAccess does not do this
 if ($CONF_FORUM['registered_to_post'] && COM_isAnonUser()) {
-	forum_chkUsercanAccess(true);
+	// Display access error message for a feature
+	forum_chkUsercanAccess(true);	
 }
+
+$display = '';
 
 // Check if IP of user has been banned
 $ip = getenv("REMOTE_ADDR");

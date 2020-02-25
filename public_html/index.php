@@ -42,6 +42,9 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess();
+
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $op        = isset($_REQUEST['op'])        ? COM_applyFilter($_REQUEST['op'])          : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])             : '';
@@ -56,9 +59,6 @@ $category  = isset($_REQUEST['category'])  ? COM_applyFilter($_REQUEST['category
 $populartype = isset($_REQUEST['populartype']) ? COM_applyFilter($_REQUEST['populartype']) : '';
 
 $display = '';
-
-//Check is anonymous users can access - and need to be signed in
-forum_chkUsercanAccess();
 
 $todaysdate = date($_CONF['shortdate']);
 

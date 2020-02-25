@@ -42,7 +42,7 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-//Check is anonymous users can access - and need to be signed in
+// Check is anonymous users can access and if not, regular user can access
 forum_chkUsercanAccess(true);
 
 $display = '';

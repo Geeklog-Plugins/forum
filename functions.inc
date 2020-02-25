@@ -150,7 +150,9 @@ $_SMILIES = new ForumSmilies();
 function plugin_getmenuitems_forum()
 {
     global $CONF_FORUM,$_CONF,$LANG_GF00;
-    if ($CONF_FORUM['registration_required'] == 0 || SEC_hasRights('forum.user')) {
+	
+    //if ($CONF_FORUM['registration_required'] == 0 || SEC_hasRights('forum.user')) {
+	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user'))) {
         $menuitems["{$LANG_GF00['pluginlabel']}"] = "{$_CONF['site_url']}/forum/index.php";
         return $menuitems;
     }
@@ -212,7 +214,8 @@ function plugin_getuseroption_forum()
 {
     global $CONF_FORUM, $_CONF, $LANG_GF00;
 
-    if ($CONF_FORUM['registration_required'] == 0 || SEC_hasRights('forum.user')) {
+    // if ($CONF_FORUM['registration_required'] == 0 || SEC_hasRights('forum.user')) {
+	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user'))) {
         return array($LANG_GF00['useradminmenu'], $_CONF['site_url'] . '/forum/userprefs.php', 0);
     }
 }
@@ -661,11 +664,10 @@ function forum_buildFeedsSql ($forumID, $limits)
 {
     global $CONF_FORUM;
 
-    $where = '';
     if ($CONF_FORUM['installed_version'] < 2.6) {
         return '';
     }
-
+	
     $groups = array ();
     $usergroups = SEC_getUserGroups(1);
     foreach ($usergroups as $group) {
@@ -1011,6 +1013,72 @@ function plugin_autouninstall_forum()
     return $out;
 }
 
+
+function plugin_collectSitemapItems_forum($uid, $limit)
+{
+	global $_CONF, $_TABLES, $_GROUPS, $CONF_FORUM;
+	
+	// Let's only add 
+	// - Forum Index Link (as that lists all Category and Forum URLs)
+	// - Forum Topics
+	
+	$retval = [];
+
+	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user', 'AND', $uid))) {
+		// Add Forum Index
+		$retval[] = ['url' => $_CONF['site_url'] . '/forum/index.php'];
+		
+		$what = 'url,date-modified';
+		$properties = explode(',', $what);
+		
+		// Figure out permissions and only list topic post (pid = 0)
+		// 0 = current user
+		if ($uid > 0) {
+			$userGroups = SEC_getUserGroups($uid);
+			
+		} else {
+			$userGroups = $_GROUPS;
+		}
+		$where = " AND (ff.grp_id IN (" . implode(",", $userGroups) . "))";
+		$sql = "SELECT ft.id, ft.date,"
+				. " (SELECT ft2.date FROM gl_forum_topic ft2 WHERE ft.id = ft2.pid ORDER BY ft2.date DESC LIMIT 1) replydate" // find date of topic and latest date of any replies. Use newest one as modify date
+				. " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff" 
+				. " WHERE pid = 0 AND ft.forum = ff.forum_id $where";
+				
+		if ($limit > 0) {
+			$sql .= " LIMIT $limit";
+		}
+		$result = DB_query($sql);
+		$numRows = DB_numRows($result);
+		
+		for ($i = 0; $i < $numRows; $i++) {
+			$A = DB_fetchArray($result);
+
+			$props = [];
+			foreach ($properties as $p) {
+				switch ($p) {
+				case 'date-modified':
+					// Use newest date (the only way the topic date could be newer is if it was edited last) 
+					if ($A['date'] > $A['replydate']) {
+						$props['date-modified'] = $A['date'];
+					} else {
+						$props['date-modified'] = $A['replydate'];
+					}
+					break;
+				case 'url':
+					$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+					break;
+				}
+			}
+			
+			$retval[] = $props;
+		}
+	}
+
+    return $retval;	
+	
+}
+
 /**
 * Return information for a forum topic
 *
@@ -1024,6 +1092,9 @@ function plugin_autouninstall_forum()
 function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 {
     global $_CONF, $_TABLES, $_GROUPS;
+	
+	
+	$retval = [];
 
     // parse $what to see what we need to pull from the database
     $properties = explode(',', $what);
@@ -1056,11 +1127,15 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 
     $fields = array_unique($fields);
 
+	// Check if any fields found we can return
     if (count($fields) == 0) {
-        $retval = array();
-
         return $retval;
     }
+	
+	// Check is anonymous users can access and if not, regular user can access
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user', 'AND', $uid)) {		
+        return $retval;
+    }		
 
     // prepare SQL request
     if ($id == '*') {
@@ -1089,7 +1164,6 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     $result = DB_query($sql);
     $numRows = DB_numRows($result);
 
-    $retval = array();
     for ($i = 0; $i < $numRows; $i++) {
         $A = DB_fetchArray($result);
 
@@ -1157,6 +1231,11 @@ function phpblock_forum_newposts() {
         return;
     }
 
+	// Check is anonymous users can access and if not, regular user can access
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
+        return;
+    }
+
     $mode  = isset($_GET['mode'])  ? COM_applyFilter($_GET['mode'])  : '';
     $order = isset($_GET['order']) ? COM_applyFilter($_GET['order']) : '';
 
@@ -1208,7 +1287,7 @@ function phpblock_forum_newposts() {
         $block->set_var ('view_modemsg', $view_modemsg);
 
         // Select SQL to either show the latest posts even if they are for the same topic
-        // Or show only the lastest post for each of the last updated topics
+        // Or show only the latest post for each of the last updated topics
         if ($CONF_FORUM['sb_latestpostonly']) {
             $sql = "SELECT a.id,a.forum,a.name,a.date,a.subject,a.replies,a.views,a.uid,a.pid FROM {$_TABLES['forum_topic']} a ";
             $sql .= "LEFT JOIN {$_TABLES['forum_forums']} b ON a.forum=b.forum_id ";
@@ -1323,7 +1402,7 @@ function phpblock_forum_newposts() {
 * @param   where   int      where the block will be displayed (0..2)
 * @param   page    int      page number
 * @param   topic   string   topic ID
-* @return          string   HTML for the center blcok (can be empty)
+* @return          string   HTML for the center block (can be empty)
 */
 function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 {
@@ -1338,7 +1417,9 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         return;
     }
 
-    if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
+	// Check is anonymous users can access and if not, regular user can access
+    // if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
         return;
     }
 

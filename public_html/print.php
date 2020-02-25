@@ -73,8 +73,9 @@ $id = isset($_REQUEST['id']) ? COM_applyFilter($_REQUEST['id'],true) : '';
 
 $display = '';
 
-//Check is anonymous users can access
-if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
+// Check is anonymous users can access and if not, regular user can access
+//if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
+if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
     $display .= COM_startBlock();
     $display .= alertMessage($LANG_GF02['msg01'],$LANG_GF02['msg171']);
     $display .= COM_endBlock();

@@ -43,7 +43,7 @@ if (!in_array('forum', $_PLUGINS)) {
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 
-// Check for access privilege and pass true to check that user is signed in.
+// Check is anonymous users can access and if not, regular user can access
 forum_chkUsercanAccess(true);
 
 $display = '';
