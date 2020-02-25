@@ -1091,7 +1091,7 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 */
 function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 {
-    global $_CONF, $_TABLES, $_GROUPS;
+    global $_CONF, $_TABLES, $_GROUPS, $CONF_FORUM;
 	
 	
 	$retval = [];
