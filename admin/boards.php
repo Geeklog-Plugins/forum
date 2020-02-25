@@ -93,7 +93,6 @@ if ($type === 'category') {
 
     // Make sure a name is at least specified
     if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
-        $name_missing = false;
         if (($submit == $LANG_GF01['SAVE'])) {
             $name = isset($_POST['name']) ? gf_preparefordb($_POST['name'],'text') : '';
             if (empty(trim($name))) {
@@ -260,9 +259,10 @@ if ($type === 'category') {
 
 // FORUM Maintenance Section
 if ($type == "forum") {
+	$name_missing = false;
+	
     // Make sure a name is at least specified
     if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
-        $name_missing = false;
         if (($submit == $LANG_GF01['SAVE'])) {
             $name = isset($_POST['name']) ? gf_preparefordb($_POST['name'],'text') : '';
             if (empty(trim($name))) {
