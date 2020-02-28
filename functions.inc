@@ -789,7 +789,8 @@ function plugin_getfeedcontent_forum ($feed, &$link, &$update)
 
         $desc = $preface . $comment;
 
-        $link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
+        //$link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
+		$link = forum_buildForumPostURL($A['id']);
 
         $content[] = array ('title'     => $A['forum_name'] . ' :: ' . $A['subject'],
                             'summary'   => $desc,
