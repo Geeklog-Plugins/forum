@@ -64,13 +64,20 @@ $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])      
 $onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopic'])      : ''; // Used for preview of topic
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)      : '';
 // $show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)      : '';
-$showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : '';
+$showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : ''; // Should only be a parent topic 
 
 $result = DB_query("SELECT forum, pid, subject FROM {$_TABLES['forum_topic']} WHERE id = '$showtopic'"); // <- new
 list($forum, $topic_pid, $subject) = DB_fetchArray($result); // <- new
 
+// *****************************
+// As of Forum 2.9.4 (and Geeklog v2.2.1)
+// Lets clean up the view topic URLs so no duplicate content issues. See: https://github.com/Geeklog-Plugins/forum/issues/87
+// - $showtopic: Now required to be a parent topic so reply posts will not return content and be redirected
+// - $show: Now removed from URL and internally can only be changed via user prefs or config. This way search engine will always show the same number of posts per page
+// - $lastpost: Not used anymore. Proper urls with page number is now used so. When lastpost was used in url, content would differ over time as new posts added. Redirect now happens (which is not perfect since it can still change)
+// *****************************
 
-// Lets depreciate some url variables so when search engines visit site content on the page for the url cannot change
+depreciate some url variables so when search engines visit site content on the page for the url cannot change
 // Pages are now required to use defaults of user where warranted
 // $show, $lastpost
 
@@ -80,10 +87,24 @@ if ($topic_pid == '') {
     exit;
 }
 if ($topic_pid != 0) {
-    $showtopic = $topic_pid;
+    //$showtopic = $topic_pid;
+	// *****************************
+	// As of Forum 2.9.4 (and Geeklog v2.2.1)
+	// For above commented out code: Do a 301 redirect now as we don't want duplicate content issues for the parent topic 
+	// as it would create multiple urls for the parent post since a switch like this may actually not show the post if it is on for example page 2 of the topic
+	$url = html_entity_decode(forum_buildForumPostURL($showtopic)); // For some reason urldecode was not converting the &amp; in the query string so used html_entity_decode
+	if (!empty($url)) {
+		//* Permanently redirect page
+		header("Location: $url", true, 301);
+		die(1);
+	} else {
+		COM_handle404('/forum/index.php');
+	}
+	// *****************************
 }
 
 // *****************************
+// As of Forum 2.9.4 (and Geeklog v2.2.1)
 // The problem with last post with search engines is that the content would change as new post is added for the same URL 
 // Option either redirect to the parent post or continue the tradition
 // $lastpost is now not used anywhere else (including center block)
@@ -97,8 +118,7 @@ if ($lastpost) {
 		$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$showtopic");
 		list($lastrecid) = DB_fetchArray($sql);
 		
-		// For some reason urldecode was not converting the &amp; in the query string
-		$url = html_entity_decode(forum_buildForumPostURL($lastrecid));
+		$url = html_entity_decode(forum_buildForumPostURL($lastrecid));  // For some reason urldecode was not converting the &amp; in the query string so used html_entity_decode
 		if (!empty($url)) {
 			//* Permanently redirect page
 			header("Location: $url", true, 301);
