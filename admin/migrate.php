@@ -42,7 +42,7 @@ if (COM_versionCompare(VERSION, '2.2.0', '>=')) {
 }
 
 $page     = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
-$show     = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
+//$show     = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
 $migrate  = isset($_POST['migrate'])        ? COM_applyFilter($_POST['migrate'])             : '';
 $selforum = isset($_POST['selforum'])       ? COM_applyFilter($_POST['selforum'])            : '';
 $curtopic = isset($_POST['seltopic'])       ? COM_applyFilter($_POST['seltopic'])            : '';
@@ -233,11 +233,7 @@ $display .= gf_showVariables();
 
 
 // Check if the number of records was specified to show - part of page navigation.
-if ($show == 0 AND $CONF_FORUM['show_messages_perpage'] > 0) {
-	$show = $CONF_FORUM['show_messages_perpage'];
-} elseif ($show == 0) {
-	$show = 20;
-}
+$show = $CONF_FORUM['show_messages_perpage'];
 
 // Check if this is the first page.
 if (empty($page)) {

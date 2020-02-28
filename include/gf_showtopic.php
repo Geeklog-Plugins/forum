@@ -395,6 +395,7 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
             $topictemplate->set_var ('posted_date', '');
             $topictemplate->set_var ('preview_topic_subject', $showtopic['subject']);
         } else {
+			$topictemplate->set_var ('topic_post_id', $showtopic['id']);
             $topictemplate->set_var ('preview_topic_subject', '');
         }
         $topictemplate->set_var ('read_msg', '');

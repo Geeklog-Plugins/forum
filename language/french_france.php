@@ -357,7 +357,7 @@ $LANG_GF02 = array(
     'msg200' => 'Voir la liste des membres',
     'msg201' => 'Voir les sujets les plus populaires',
     'msg202' => 'Pas de nouvelles contributions',
-    'msg300' => 'Vos préférences ne permettent pas l\'affichage des contributions anonymes.',
+    'msg300' => 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.',
     'msg301' => 'Marquer toutes les catégories comme lues ?',
     'msg302' => 'Marquer tous les sujets comme lus ?',
     'PostReply' => 'Poster une nouvelle réponse',

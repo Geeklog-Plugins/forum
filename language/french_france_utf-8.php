@@ -351,7 +351,7 @@ $LANG_GF02['forumsearchresults']   = 'Resultats des recherches dans le Forum';
 $LANG_GF02['forumsearchfor']   = 'Resultats des recherches dans le Forum pour "%s"';
 $LANG_GF02['msg202']   =  'Pas de nouvelles contributions';
 $LANG_GF02['msg203']   = 'Aucune publications trouvees.';
-$LANG_GF02['msg300']   = 'Vos preferences ne permettent pas l\'affichage des contributions anonymes.';
+$LANG_GF02['msg300']   = 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.';
 $LANG_GF02['msg301']   = 'Marquer toutes les categories comme lues ?';
 $LANG_GF02['msg302']   = 'Tout marquer comme lu ?';
 $LANG_GF02['PostReply']   = 'Poster une nouvelle reponse';

@@ -136,6 +136,18 @@ if (!empty($_USER['uid']) AND ($_USER['uid'] > 1) AND DB_getItem($_TABLES['forum
     $CONF_FORUM['notify_once']          = $userprefs['notify_once'];
 }
 
+// Now make sure config options are setup okay and meet requirements else set to defaults (not min values)
+// If make changes here make sure reflected in checks on userprefs.php page as these below can be affected by user prefs
+$CONF_FORUM['show_topics_perpage'] = (isset($CONF_FORUM['show_topics_perpage']) && $CONF_FORUM['show_topics_perpage'] > 9) 			? $CONF_FORUM['show_topics_perpage']	: 10; // This default is also stored in DB
+$CONF_FORUM['show_posts_perpage'] = (isset($CONF_FORUM['show_posts_perpage']) && $CONF_FORUM['show_posts_perpage'] > 2) 			? $CONF_FORUM['show_posts_perpage']		: 10; // This default is also stored in DB
+$CONF_FORUM['popular_limit'] = isset($CONF_FORUM['popular_limit'])		 															? $CONF_FORUM['popular_limit']			: 0;  // This default is in config file
+$CONF_FORUM['show_members_perpage'] = (isset($CONF_FORUM['show_members_perpage']) && $CONF_FORUM['show_members_perpage'] > 9) 		? $CONF_FORUM['show_members_perpage']	: 20; // This default is in config file
+$CONF_FORUM['show_search_perpage'] = (isset($CONF_FORUM['show_search_perpage']) && $CONF_FORUM['show_search_perpage'] > 9) 			? $CONF_FORUM['show_search_perpage']	: 20; // This default is also stored in DB
+// These below do not have user specific preference and are site wide
+$CONF_FORUM['show_messages_perpage'] = (isset($CONF_FORUM['show_messages_perpage']) && $CONF_FORUM['show_messages_perpage'] > 9) 	? $CONF_FORUM['show_messages_perpage']	: 20; // This default is also stored in DB
+$CONF_FORUM['show_newposts_perpage'] = (isset($CONF_FORUM['show_newposts_perpage']) && $CONF_FORUM['show_newposts_perpage'] > 9) 	? $CONF_FORUM['show_newposts_perpage']	: 20; // This default is in config file
+$CONF_FORUM['show_popular_perpage'] = (isset($CONF_FORUM['show_popular_perpage']) && $CONF_FORUM['show_popular_perpage'] > 9) 		? $CONF_FORUM['show_popular_perpage']	: 20; // This default is in config file
+
 $CONF_FORUM['installed_version'] = floatval(DB_getItem($_TABLES['plugins'], 'pi_version', "pi_name = 'forum'"));
 
 /**
@@ -634,7 +646,7 @@ function plugin_searchformat_forum($id, $contentType, $content)
 {
 	// Remove any BBCode from forum post
 	if ($contentType == 'description') {
-		return stripBBCode($content);
+		return forum_stripBBCode($content);
 	}
 }
 
@@ -1185,9 +1197,11 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
                 break;
             case 'url':
                 if (empty($A['id'])) {
-                    $props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $id;
+                    //$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $id;
+					$props['url'] = forum_buildForumPostURL($id);
                 } else {
-                    $props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+                    //$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+					$props['url'] = forum_buildForumPostURL($A['id']);
                 }
                 break;
             default:
@@ -1221,6 +1235,71 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     }
 
     return $retval;
+}
+
+/**
+* Create URL for a forum post. Permissions are not checked and is assumed done before hand
+*
+* @param   id   	int     Id of forum post
+* @param   query   	string  Extra url parameters (placed just before anchor)
+* @param   query   	string  empty string uses $CONF_FORUM['sort_order_asc'] or ASC or DESC
+* @return           string   A URL to the forum post
+*/
+function forum_buildForumPostURL($id, $query = '', $order = '') 
+{
+	global $_CONF, $CONF_FORUM, $_TABLES;
+	
+	$retval = '';
+	
+	// Check if the number of records was specified to show
+	// Note: $CONF_FORUM['show_posts_perpage'] gets overridden in functions.inc with user setting
+	$show = $CONF_FORUM['show_posts_perpage'];
+
+	// Get parent topic id
+	$id = (int) $id; // very basic check just to make sure SQL doesn't fail
+	$pid = DB_getItem($_TABLES['forum_topic'], 'pid', "id = $id");
+	if ($pid != '') { // If empty does not exist
+		if ($pid == 0) {
+			$pid = $id;
+		}
+		// Lets find position of post in the topic. Then we can calculate the page number
+		if (empty($order)) {
+			if ($CONF_FORUM['sort_order_asc']) {
+				$order = 'ASC';
+			} else {
+				$order = 'DESC';
+			}
+		}
+		$sql  = "(SELECT id FROM {$_TABLES['forum_topic']} WHERE id = $pid)"
+			  . " UNION ALL (SELECT id FROM {$_TABLES['forum_topic']} WHERE pid = $pid)"
+			  . " ORDER BY id $order";
+		$result = DB_query($sql);
+		$numRows = DB_numRows($result);
+		$found = false;
+		for ($i = 1; $i <= $numRows; $i++) {
+			$A = DB_fetchArray($result);
+			if ($id == $A['id']) {
+				$found = true;
+				break;
+			}
+		}
+		
+		$page = 1;
+		if ($i > $show && $found) {
+			$page =  $i / $show;
+			// If no decimal then
+			if ($page != floor($page)) {
+				$page = floor($page) + 1;
+			}
+		}
+
+		$page_url = '';
+		if ($page > 1) {
+			$page_url = "&amp;page=$page";
+		}
+		$retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$pid$page_url$query#$id";	
+	}
+	return $retval;
 }
 
 function phpblock_forum_newposts() {
@@ -1349,6 +1428,7 @@ function phpblock_forum_newposts() {
                 $block->set_var ('img_dir', $CONF_FORUM['imgset']);
                 $block->set_var ('forum_id', $A['forum']);
                 $block->set_var ('forum_name', DB_getItem($_TABLES['forum_forums'],'forum_name',"forum_id='{$A['forum']}'"));
+				$block->set_var ('postURL', forum_buildForumPostURL($A['id']));
                 $block->set_var ('topic_id', $A['id']);
                 $block->set_var ('topic_subject', $A['subject']);
                 $block->set_var ('fullsubject', $fullsubject);
@@ -1550,7 +1630,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         }
 
         $lastpostinfo = strip_tags(COM_truncate($lastcomment, $CONF_FORUM['contentinfo_numchars'], '...'));
-        $lastpostinfo = stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
+        $lastpostinfo = forum_stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
         $lastpostinfo = forum_mb_wordwrap($lastpostinfo, $CONF_FORUM['linkinfo_width'], LB);
         $lastpostinfo = htmlspecialchars($lastpostinfo); // Escape things like " so it displays properly in tooltip
         $lastpostinfo = str_replace(LB, "<br" . XHTML . ">", $lastpostinfo); // Do this last
@@ -1559,7 +1639,8 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 
         if ($f_tooltip) {
             $block->set_var('gl-tooltip', true); // Used to verify gl tooltip is being set
-            $lastpostlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}&amp;lastpost=true#{$lastid}";
+            //$lastpostlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}&amp;lastpost=true#{$lastid}";
+			$lastpostlink = forum_buildForumPostURL($lastid);
             $block->set_var ('tooltip_date', COM_getTooltip($lastdate, $lastpostinfo, $lastpostlink));
             $topiclink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
             $block->set_var ('tooltip_topic_subject', COM_getTooltip($A['subject'], $topicinfo, $topiclink));
@@ -1572,7 +1653,8 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
         $block->set_var ('date', $lastdate);
         $block->set_var ('topic_subject', $A['subject']);
 
-        $block->set_var ('lastpostid', $lastid);
+        $block->set_var ('lastpostURL', forum_buildForumPostURL($lastid));
+		$block->set_var ('lastpostid', $lastid);
         $block->set_var ('cssid', $cssid);
         $block->set_var ('img_dir', $CONF_FORUM['imgset']);
         $block->set_var ('forum_id', $A['forum']);
@@ -1596,7 +1678,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
     return $retval;
 }
 
-function stripBBCode($text_to_search) {
+function forum_stripBBCode($text_to_search) {
 	// Replace paragraph tags
 	$pattern = '[p]';
 	$replace = LB;

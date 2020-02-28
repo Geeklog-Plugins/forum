@@ -15,7 +15,7 @@
 <table style="border:0px; width:100%; padding:0; border-spacing:0; border-collapse: collapse;">
 <tr>
     <td class="pluginRow{css_id} alignleft" style="width:100%">
-        <img src="{img_dir}/redarrow.gif" alt=""{xhtml}><b><a href="{site_url}/forum/viewtopic.php?showtopic={topic_id}" title="{fullsubject}">{topic_subject}</a></b><br{xhtml}>&nbsp;<small><b>{LANG_BY}</b>&nbsp;{user_name}</small><br{xhtml}>&nbsp;<small><b>{LANG_ON}</b>&nbsp;{date}</small><br{xhtml}>&nbsp;<small><b>{LANG_VIEWS}</b>&nbsp;{views}&nbsp;<b>{LANG_REPLIES}</b>&nbsp;{replies}</small><br{xhtml}>
+        <img src="{img_dir}/redarrow.gif" alt=""{xhtml}><b><a href="{postURL}" title="{fullsubject}">{topic_subject}</a></b><br{xhtml}>&nbsp;<small><b>{LANG_BY}</b>&nbsp;{user_name}</small><br{xhtml}>&nbsp;<small><b>{LANG_ON}</b>&nbsp;{date}</small><br{xhtml}>&nbsp;<small><b>{LANG_VIEWS}</b>&nbsp;{views}&nbsp;<b>{LANG_REPLIES}</b>&nbsp;{replies}</small><br{xhtml}>
     </td>
 </tr>
 </table> 

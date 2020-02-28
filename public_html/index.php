@@ -48,7 +48,7 @@ forum_chkUsercanAccess();
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $op        = isset($_REQUEST['op'])        ? COM_applyFilter($_REQUEST['op'])          : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])             : '';
-$show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)   : '';
+//$show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)   : '';
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)   : '';
 $sort      = isset($_REQUEST['sort'])      ? COM_applyFilter($_REQUEST['sort'],true)   : '';
 $order     = isset($_REQUEST['order'])     ? COM_applyFilter($_REQUEST['order'],true)  : '';
@@ -120,11 +120,8 @@ if ($page == 0) {
 
 if ($op == 'newposts' AND !COM_isAnonUser()) {
 	// Check if the number of records was specified to show - part of page navigation.
-	if ($show == 0 AND $CONF_FORUM['show_newposts_perpage'] > 0) {
-		$show = $CONF_FORUM['show_newposts_perpage'];
-	} elseif ($show == 0) {
-		$show = 20;
-	}	
+	$show = $CONF_FORUM['show_newposts_perpage'];
+	
     $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $report->set_file (array (
                     'report'         => 'reports/report_results.thtml',
@@ -238,7 +235,7 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
 		$numpages = 1;
 	}
 	$offset = ($page - 1) * $show;
-	$base_url = "{$_CONF['site_url']}/forum/index.php?op=newposts&amp;show=$show";
+	$base_url = "{$_CONF['site_url']}/forum/index.php?op=newposts";
 	if ($forum > 0) {
 		$base_url .= "&amp;order=$order&amp;sort=$sort&amp;forum=$forum";  	
 		$report->set_var ('sort_url_extra', "&amp;forum=$forum");
@@ -308,11 +305,7 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
 if ($op == 'search') {
 	// Figure out page stuff
 	// Check if the number of records was specified to show - part of page navigation.
-	if ($show == 0 AND $CONF_FORUM['show_search_perpage'] > 0) {
-		$show = $CONF_FORUM['show_search_perpage'];
-	} elseif ($show == 0) {
-		$show = 20;
-	}
+	$show = $CONF_FORUM['show_search_perpage'];
 	
     $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $report->set_file (array (
@@ -422,7 +415,7 @@ if ($op == 'search') {
 		$numpages = 1;
 	}
 	$offset = ($page - 1) * $show;
-	$base_url = "{$_CONF['site_url']}/forum/index.php?op=search&amp;show=$show" . $base_url;
+	$base_url = "{$_CONF['site_url']}/forum/index.php?op=search" . $base_url;
 	// Check to see if requesting a page that does not exist
 	if ($page > $numpages) {
 		COM_handle404($base_url);    
@@ -441,69 +434,8 @@ if ($op == 'search') {
         for ($i = 1; $i <= $nrows; $i++) {
             $P = DB_fetchArray($result);
             
-			// ***********************************************************************
-			// Need to link to correct page etc.. and jump down to right post
-			// A bit of a dog to figure out
-			$jumppoint = "";
-			$topicid = $P['id'];
-			if ($P['pid'] == 0) {
-				$topicparentid = $P['id'];
-				
-				$topicCount = $P['replies'];
-			} else {
-				$topicparentid = $P['pid'];
-				$jumppoint = "#{$P['id']}";
-				
-				// Retrive Parent info
-				$sql = "SELECT * FROM {$_TABLES['forum_topic']} WHERE id=$topicparentid";
-				$result2  = DB_query($sql);	
-				$P2 = DB_fetchArray($result2);
-				
-				$topicCount = $P2['replies'];
-				$P['replies'] = $P2['replies'];
-				$P['views'] = $P2['views'];
-			}
-			if ($CONF_FORUM['sort_order_asc']) {
-				$order2 = 'ASC';
-			} else {
-				$order2 = 'DESC';
-			}
-            $show2 = $show;
-			if ($show2 == 0 AND $CONF_FORUM['show_topics_perpage'] > 0) {
-				$show2 = $CONF_FORUM['show_topics_perpage'];
-			} elseif ($show2 == 0) {
-				$show2 = 20;
-			}
+			$link = '<a href="' . forum_buildForumPostURL($P['id'], "&amp;highlight=$query") . '">';
 			
-			$pageurl = "";
-			$showcount = 0;
-			$pagecount = 1;
-			$sql  = "(SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$topicparentid') "
-				  . "UNION ALL (SELECT * FROM {$_TABLES['forum_topic']} WHERE pid='$topicparentid') "
-				  . "ORDER BY id $order2";
-			$result2  = DB_query($sql);	
-			$nrows2 = DB_numRows($result2);
-			if ($nrows2 > 0) {
-				for ($z = 1; $z <= $nrows2; $z++) {			
-					$P2 = DB_fetchArray($result2);
-					$showcount++; 
-					if ($showcount > $show2) {
-						
-						$showcount = 0;
-						$pagecount++;
-					}
-					if ($P2['id'] == $topicid) {	
-						// Found post now set page stuff
-						if ($pagecount > 1) {
-							$pageurl = "&amp;show=$show2&amp;page=$pagecount";
-						}
-						$z = $nrows2;
-					}
-				}
-			}
-			// ***********************************************************************
-
-			$link = "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$topicid$pageurl&amp;highlight=$query$jumppoint\">";
 			$report->set_var('post_start_ahref',$link);
 			$report->set_var('post_subject', $P['subject']);
 			$report->set_var('post_end_ahref', '</a>');
@@ -541,11 +473,7 @@ if ($op == 'search') {
 if ($op == 'popular') {
 	// Figure out page stuff
 	// Check if the number of records was specified to show - part of page navigation.
-	if ($show == 0 AND $CONF_FORUM['show_popular_perpage'] > 0) {
-		$show = $CONF_FORUM['show_popular_perpage'];
-	} elseif ($show == 0) {
-		$show = 20;
-	}
+	$show = $CONF_FORUM['show_popular_perpage'];
 	
 	// Number of posts before calling a topic popular
     if ($populartype == 'views') {
@@ -570,7 +498,7 @@ if ($op == 'popular') {
 		$numpages = 1;
 	}
 	$offset = ($page - 1) * $show;
-	$base_url = "{$_CONF['site_url']}/forum/index.php?op=popular&amp;populartype=$populartype&amp;show=$show";
+	$base_url = "{$_CONF['site_url']}/forum/index.php?op=popular&amp;populartype=$populartype";
 	// Check to see if requesting a page that does not exist
 	if ($page > $numpages) {
 		COM_handle404($base_url);    
@@ -690,7 +618,9 @@ if ($op == 'popular') {
 		for ($i = 0; $i < $nrows; $i++) {
 			$P = DB_fetchArray($result);
 				
-			$link = "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum={$P['forum']}&amp;showtopic={$P['id']}\">";
+			//$link = "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum={$P['forum']}&amp;showtopic={$P['id']}\">";
+			$link = '<a href="' . forum_buildForumPostURL($P['id']) . '">';
+			
 			$report->set_var('post_start_ahref',$link);
 			$report->set_var('post_subject', $P['subject']);
 			$report->set_var('post_end_ahref', '</a>');
@@ -739,12 +669,7 @@ isset($showtopic) or $showtopic = ''; // FIXME
 ForumHeader($forum,$showtopic,$display);
 
 // Check if the number of records was specified to show - part of page navigation.
-// Will be 0 if not set - as I'm now passing this tru gf_applyFilte() at top of script
-if ($show == 0 AND $CONF_FORUM['show_topics_perpage'] > 0) {
-    $show = $CONF_FORUM['show_topics_perpage'];
-} elseif ($show == 0) {
-    $show = 20;
-}
+$show = $CONF_FORUM['show_topics_perpage'];
 
 if ($forum > 0) {
     $addforumvar = "&amp;forum=" .$forum;
@@ -758,7 +683,7 @@ if ($numpages == 0) {
     $numpages = 1;
 }
 $offset = ($page - 1) * $show;
-$base_url = $_CONF['site_url'] . '/forum/index.php?forum='.$forum.'&amp;show='.$show;
+$base_url = $_CONF['site_url'] . "/forum/index.php?forum=$forum";
 // Check to see if requesting a page that does not exist
 if ($page > $numpages) {
 	COM_handle404($base_url);    
@@ -956,6 +881,7 @@ if ($forum == 0) {
             $forumlisting->set_var ('posts', COM_numberFormat($postCount));
             $forumlisting->set_var ('topic_id', $topicparent);
             $forumlisting->set_var ('lastpostid', $B['id']);
+			$forumlisting->set_var ('lastpostURL', forum_buildForumPostURL($B['id']));
             $forumlisting->set_var ('LANGGF01_LASTPOST', $LANG_GF01['LASTPOST']);
             $forumlisting->parse ('forum_record', 'forum_record',true);
         }
@@ -1103,9 +1029,11 @@ if ($forum > 0) {
 
     $base_url .= "&amp;order=$order&amp;sort=$sort";
 
-    // Retrieve all the Topic Records - where pid is 0 - check to see if user does not want to see anonymous posts
+    // Retrieve all the Topic Records - where pid is 0 - check to see if user does not want to see anonymous posts. Remove any topic that does not have at least 1 post by a regular user
     if (!COM_isAnonUser() AND $CONF_FORUM['show_anonymous_posts'] == 0) {
-        $sql  = "SELECT * FROM {$_TABLES['forum_topic']} topic WHERE forum = '$forum' AND pid = 0 AND uid > 1 ";
+        $sql  = "SELECT * FROM {$_TABLES['forum_topic']} topic WHERE forum = '$forum' AND pid = 0 
+			AND (uid > 1 
+			OR (SELECT uid FROM {$_TABLES['forum_topic']} ft2 WHERE ft2.pid = topic.id AND uid > 1 LIMIT 1) > 1)";
     } else {
         $sql  = "SELECT * FROM {$_TABLES['forum_topic']} topic WHERE forum = '$forum' AND pid = 0 ";
     }
@@ -1328,7 +1256,7 @@ if ($forum > 0) {
         }
         $topicinfo =  "<b>{$LANG_GF01['STARTEDBY']} {$firstposterName}, {$firstdate}</b><br" . XHTML . ">";
         $lastpostinfo = strip_tags(COM_truncate($record['comment'], $CONF_FORUM['contentinfo_numchars'], '...'));
-        $lastpostinfo = stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
+        $lastpostinfo = forum_stripBBCode($lastpostinfo); // Simple function to strip out bbcode so tooltips display better
         $lastpostinfo = htmlspecialchars($lastpostinfo); // Escape things like " so it displays properly in tooltip
         $topicinfo .= str_replace(LB, "<br" . XHTML . ">", forum_mb_wordwrap($lastpostinfo, $CONF_FORUM['linkinfo_width'], LB));
         
@@ -1354,6 +1282,7 @@ if ($forum > 0) {
         $topiclisting->set_var ('replies', COM_numberFormat($record['replies']));
         $topiclisting->set_var ('lastdate', $lastdate);
         $topiclisting->set_var ('lastpostid', $lastreply['id']);
+		$topiclisting->set_var ('lastpostURL', forum_buildForumPostURL($lastreply['id']));
         $topiclisting->set_var ('LANG_BY', $LANG_GF01['BY']);
         $topiclisting->parse ('topic_record', 'topic_record',true);
     }

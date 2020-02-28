@@ -353,7 +353,7 @@ $LANG_GF02 = array(
     'msg200' => 'Informe de miembros del sitio',
     'msg201' => 'Tópicos populares',
     'msg202' => 'No hay mensajes nuevos',
-    'msg300' => 'Your preferences have block anonymous posts enabled',
+    'msg300' => 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.',
     'msg301' => 'Realy mark all categories read?',
     'msg302' => 'Realy mark all topics read?',
     'PostReply' => 'Enviar nueva respuesta',

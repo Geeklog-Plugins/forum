@@ -353,7 +353,7 @@ $LANG_GF02['forumsearchresults']   = 'Forum Search Results';
 $LANG_GF02['forumsearchfor']   = 'Forum Search results for "%s"';
 $LANG_GF02['msg202']   = 'No new posts.';
 $LANG_GF02['msg203']   = 'No posts found.';
-$LANG_GF02['msg300']   = 'Your preferences have block anonymous posts enabled';
+$LANG_GF02['msg300']   = 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.';
 $LANG_GF02['msg301']   = 'Realy mark all categories read?';
 $LANG_GF02['msg302']   = 'Realy mark all topics read?';
 $LANG_GF02['PostReply']   = 'Post New Reply';

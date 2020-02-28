@@ -38,7 +38,7 @@ require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
 $id         = isset($_REQUEST['id'])         ? COM_applyFilter($_REQUEST['id'],true)         : '';
 $op         = isset($_REQUEST['op'])  		 ? COM_applyFilter($_REQUEST['op'])       		 : '';
-$show       = isset($_REQUEST['show'])       ? COM_applyFilter($_REQUEST['show'], true)      : '';
+//$show       = isset($_REQUEST['show'])       ? COM_applyFilter($_REQUEST['show'], true)      : '';
 $page       = isset($_REQUEST['page'])       ? COM_applyFilter($_REQUEST['page'],true)       : '';
 $forum      = isset($_REQUEST['forum'])      ? COM_applyFilter($_REQUEST['forum'],true)      : '';
 $member     = isset($_REQUEST['member'])     ? COM_applyFilter($_REQUEST['member'],true)     : '';
@@ -162,10 +162,7 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
 }
 
 // Page Navigation Logic
-
-if (empty($show)) {
-    $show = $CONF_FORUM['show_messages_perpage'];
-}
+$show = $CONF_FORUM['show_messages_perpage'];
 // Check if this is the first page.
 if (empty($page)) {
      $page = 1;

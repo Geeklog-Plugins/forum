@@ -740,8 +740,10 @@ function alertMessage($message, $title = '', $prompt = '') {
     global $_CONF, $CONF_FORUM, $LANG_GF01, $LANG_GF02;
 
     $retval = '';
-    
-    if (empty($title)) {
+
+    if ($prompt == "0") {
+        $title = ''; // No Prompt
+    } elseif (empty($title)) {
     	$title = $LANG_GF01['MESSAGE'];
 	}
     

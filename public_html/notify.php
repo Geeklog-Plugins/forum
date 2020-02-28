@@ -52,7 +52,7 @@ $msg        = isset($_GET['msg'])        ? COM_applyFilter($_GET['msg'], true)  
 $notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'])     : '';
 $op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         : '';
 $page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      : '';
-$show       = isset($_GET['show'])       ? COM_applyFilter($_GET['show'],true)      : '';
+//$show       = isset($_GET['show'])       ? COM_applyFilter($_GET['show'],true)      : '';
 $topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) : '';
 
 $display = '';
@@ -132,9 +132,7 @@ if (isset($_REQUEST['submit'])) {
 
 // NOTIFY MAIN
 // Page Navigation Logic
-if ($show == 0) {
-    $show = $CONF_FORUM['show_messages_perpage'];
-}
+$show = $CONF_FORUM['show_messages_perpage'];
 // Check if this is the first page.
 if ($page == 0) {
      $page = 1;
@@ -215,7 +213,7 @@ $notifications = DB_query($sql);
 $nrows = DB_numRows($notifications);
 $numpages = ceil($nrows / $show);
 $offset = ($page - 1) * $show;
-$base_url = $_CONF['site_url'] . "/forum/notify.php?filter={$notifytype}&amp;forum=$forum&amp;show={$show}";
+$base_url = $_CONF['site_url'] . "/forum/notify.php?filter={$notifytype}&amp;forum=$forum";
 
 $sql .= " LIMIT $offset, $show";
 $notifications = DB_query($sql);
@@ -255,11 +253,13 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
     $report->set_var ('linksubject', htmlspecialchars($subject,ENT_QUOTES,$CONF_FORUM['charset']));
     $report->set_var ('is_forum', $is_forum);
     $report->set_var ('topic_link', $topic_link);
-    $report->set_var ('topicauthor', $A['name']);
-    $report->set_var ('date_added', $date_added);
-    $report->set_var ('uid', $A['uid']);
-    $report->set_var ('views', $A['views']);
-    $report->set_var ('replies', $A['replies']);
+	$report->set_var ('date_added', $date_added);
+	if (isset($A['name'])) {
+		$report->set_var ('topicauthor', $A['name']);
+		$report->set_var ('uid', $A['uid']);
+		$report->set_var ('views', $A['views']);
+		$report->set_var ('replies', $A['replies']);
+	}
     $report->set_var ('topic_id', $topic_id);
     $report->set_var ('notify_id', $notify_recid);
     $report->set_var ('LANG_REMOVE', $LANG_GF01['REMOVE']);

@@ -58,7 +58,7 @@ $op          = isset($_GET['op'])              ? COM_applyFilter($_GET['op'])   
 $order       = isset($_GET['order'])           ? COM_applyFilter($_GET['order'],true)           : '';
 $page        = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
 $prevorder   = isset($_GET['prevorder'])       ? COM_applyFilter($_GET['prevorder'],true)       : '';
-$show        = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
+//$show        = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
 $showuser    = isset($_GET['showuser'])        ? COM_applyFilter($_GET['showuser'],true)        : '';
 $sort        = isset($_GET['sort'])            ? COM_applyFilter($_GET['sort'],true)            : '';
 
@@ -144,9 +144,9 @@ if ($op == "lastposts") {
     $nrows = DB_numRows($result);
     if ($nrows > 0) {
         for ($i = 1; $i <= $nrows; $i++) {
-            $postdate = COM_getUserDateTimeFormat($P['date']);
             $P = DB_fetchArray($result);
-            $report->set_var('post_start_ahref', '<a href="' . $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $P['id'] . '">');
+			$postdate = COM_getUserDateTimeFormat($P['date']);
+            $report->set_var('post_start_ahref', '<a href="' . forum_buildForumPostURL($P['id']) . '">');
             $report->set_var('post_subject', $P['subject']);
             $report->set_var('post_end_ahref', '</a>');
             $report->set_var('post_date', $postdate[0]);
@@ -183,11 +183,7 @@ if ($op == "lastposts") {
     }    
 
     // Check if the number of records was specified to show
-    if (empty($show) AND $CONF_FORUM['show_members_perpage'] > 0) {
-        $show = $CONF_FORUM['show_members_perpage'];
-    } elseif (empty($show)) {
-        $show = 20;
-    }
+	$show = $CONF_FORUM['show_members_perpage'];
     // Check if this is the first page.
     if ($page == 0) {
         $page = 1;
@@ -238,7 +234,7 @@ if ($op == "lastposts") {
     $membercount = DB_numRows($memberlistsql);
     $numpages = ceil($membercount / $show);
     $offset = ($page - 1) * $show;
-    $base_url = "{$_CONF['site_url']}/forum/memberlist.php?show={$show}&amp;order={$order}&amp;sort=$sort";
+    $base_url = "{$_CONF['site_url']}/forum/memberlist.php?order={$order}&amp;sort=$sort";
     $base_url .= "&amp;chkactivity=$chkactivity";
     /*
     if ($chkactivity) {

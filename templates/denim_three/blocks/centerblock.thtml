@@ -24,9 +24,9 @@
 			</div>
 			<div class="uk-width-1-2@m">
 				{!!if ($this->get_var('replies') == '0') !!} 
-					<span class="uk-text-right uk-text-muted uk-align-right"><a href="{site_url}/forum/viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}">{repliesinfo}</a> <span uk-icon="icon:comments"></span></span>
+					<span class="uk-text-right uk-text-muted uk-align-right"><a href="{lastpostURL}">{repliesinfo}</a> <span uk-icon="icon:comments"></span></span>
 				{!else} 
-					<span class="uk-text-right uk-text-muted uk-align-right"><a href="{site_url}/forum/viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" data-uk-tooltip title="{lastpostinfo}">{repliesinfo}</a> <span uk-icon="icon:comments"></span></span>
+					<span class="uk-text-right uk-text-muted uk-align-right"><a href="{lastpostURL}" data-uk-tooltip title="{lastpostinfo}">{repliesinfo}</a> <span uk-icon="icon:comments"></span></span>
 				{!endif}
 			</div>
 		</div>

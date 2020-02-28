@@ -355,7 +355,7 @@ $LANG_GF02['forumsearchresults']   = '掲示板の検索結果';
 $LANG_GF02['forumsearchfor']   = '掲示板の検索結果: "%s"';
 $LANG_GF02['msg202']   = '新規書込なし';
 $LANG_GF02['msg203']   = '投稿はありません。';
-$LANG_GF02['msg300']   = 'ゲストユーザの書き込みは非表示の設定になっています。';
+$LANG_GF02['msg300']   = 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.';
 $LANG_GF02['msg301']   = '全カテゴリを既読にしてもいいですか?';
 $LANG_GF02['msg302']   = 'このカテゴリの全ての投稿を既読にしてもいいですか?';
 $LANG_GF02['PostReply']   = '新しく書き込む';

@@ -19,11 +19,11 @@
             	<a class="tooltip" style="text-decoration:none;" href="{site_url}/forum/viewtopic.php?showtopic={topic_id}">{topic_subject}<span style="left:50px;">{topicinfo}</span></a>
 			{!endif}
         </td>
-        <td class="pluginLinks" onclick="window.location.href='{site_url}/forum/viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}'" onmouseover="this.style.cursor='pointer';" style="padding-right:6px; white-space:nowrap;">
+        <td class="pluginLinks" onclick="window.location.href='{lastpostURL}'" onmouseover="this.style.cursor='pointer';" style="padding-right:6px; white-space:nowrap;">
             {!!if ($this->get_var('gl-tooltip') == '1') !!}
             	{tooltip_date}
             {!else}
-            	<a class="tooltip" style="text-decoration:none;" href="{site_url}/forum/viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" rel="nofollow">{date}<span style="left:-270px;">{lastpostinfo}</span></a>            	
+            	<a class="tooltip" style="text-decoration:none;" href="{lastpostURL}" rel="nofollow">{date}<span style="left:-270px;">{lastpostinfo}</span></a>            	
             {!endif}
         </td>
     </tr>

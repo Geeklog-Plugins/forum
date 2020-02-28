@@ -80,9 +80,9 @@
 	</td>
 	<td>
 		<div class="glforum-lastpost">
-			<div><a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}">{lastpostmsgTopic}</a></div>
+			{!if lastpostURL}<div><a href="{lastpostURL}">{lastpostmsgTopic}</a></div>{!endif}
 			<div>{lastpostmsgDate}</div>
-			<div>{lastpostmsgBy} {moderator}</div>
+			{!if lastpostURL}<div>{lastpostmsgBy}{!if moderator}<br>{moderator}{!endif}</div>{!endif}
 		</div>
 	</td>
 </tr>

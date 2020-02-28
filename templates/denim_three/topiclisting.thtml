@@ -83,7 +83,7 @@
 	</td>
     <td>
         <div class="glforum-topic-lastpost">
-            <a href="viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}" data-uk-tooltip title="{LANG_lastpost}">{LANG_BY}{lastposter}<br{xhtml}>
+            <a href="{lastpostURL}" data-uk-tooltip title="{LANG_lastpost}">{LANG_BY}{lastposter}<br{xhtml}>
             {lastdate}</a>
         </div>
     </td>

@@ -356,7 +356,7 @@ $LANG_GF02 = array(
     'msg200' => 'Relazione sugli Utenti del Sito',
     'msg201' => 'Argomenti Popolari',
     'msg202' => 'Nessun nuovo messaggio',
-    'msg300' => 'Il blocco per messaggi anonimi é attivo nelle tue preferenze',
+    'msg300' => 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.',
     'msg301' => 'Davvero segnare tutte le categorie come lette?',
     'msg302' => 'Davvero segnare tutti gli argomenti come letti?',
     'PostReply' => 'Invia Nuova Risposta',

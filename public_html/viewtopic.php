@@ -58,16 +58,21 @@ $display = '';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $highlight = isset($_REQUEST['highlight']) ? COM_applyFilter($_REQUEST['highlight'])      : '';
-$lastpost  = isset($_REQUEST['lastpost'])  ? COM_applyFilter($_REQUEST['lastpost'])       : '';
+$lastpost  = isset($_REQUEST['lastpost'])  ? COM_applyFilter($_REQUEST['lastpost'])       : ''; // Depreciated as last page is calculated now for the center block. Left in to keep backwards compatibility
 $mode      = isset($_REQUEST['mode'])      ? COM_applyFilter($_REQUEST['mode'])           : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])                : '';
-$onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopic'])      : '';
+$onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopic'])      : ''; // Used for preview of topic
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)      : '';
-$show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)      : '';
+// $show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)      : '';
 $showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : '';
 
 $result = DB_query("SELECT forum, pid, subject FROM {$_TABLES['forum_topic']} WHERE id = '$showtopic'"); // <- new
 list($forum, $topic_pid, $subject) = DB_fetchArray($result); // <- new
+
+
+// Lets depreciate some url variables so when search engines visit site content on the page for the url cannot change
+// Pages are now required to use defaults of user where warranted
+// $show, $lastpost
 
 if ($topic_pid == '') {
     // Topic doesn't exist so exit gracefully
@@ -78,6 +83,37 @@ if ($topic_pid != 0) {
     $showtopic = $topic_pid;
 }
 
+// *****************************
+// The problem with last post with search engines is that the content would change as new post is added for the same URL 
+// Option either redirect to the parent post or continue the tradition
+// $lastpost is now not used anywhere else (including center block)
+if ($lastpost) {
+	// Should be a parent topic passed when $lastpost is used
+	if ($topic_pid == 0) {
+		// Example URL using lastpost: http://www.example.com/forum/viewtopic.php?showtopic=5486&lastpost=true#18046
+		// Unfortunately we cannot parse out the hash tag as is is never passed to the server (which contains the actual post we are looking for)
+		
+		// So, lets find the current last post in topic (unfortunately this will still change as new posts are added)
+		$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$showtopic");
+		list($lastrecid) = DB_fetchArray($sql);
+		
+		// For some reason urldecode was not converting the &amp; in the query string
+		$url = html_entity_decode(forum_buildForumPostURL($lastrecid));
+		if (!empty($url)) {
+			//* Permanently redirect page
+			header("Location: $url", true, 301);
+			die(1);
+		} else {
+			// This shouldn't happen as it should happen when $topic_pid is checked
+			COM_handle404('/forum/index.php');
+		}
+	} else {
+		COM_handle404('/forum/index.php');
+	}
+}
+// *****************************
+
+// Used to return preview of topic in iframe for create topic
 if ($onlytopic == 1) {
     // Send out the HTML headers and load the stylesheet for the iframe preview
     switch ($_CONF['doctype']) {
@@ -111,6 +147,7 @@ if ($onlytopic == 1) {
     $display .= "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=$LANG_CHARSET\"" . XHTML . ">" . LB;
     $display .= '<meta name="robots" content="NOINDEX"' . XHTML . '>' . LB;
     $display .= '<title>Forum Preview</title>' . LB;
+	$display .= PLG_getHeaderCode(); // This allows plugins to add their css etc to scripts class
 	$display .= $_SCRIPTS->getHeader();
     $display .= '</head>' . LB;
         
@@ -167,11 +204,7 @@ if ($onlytopic == 1) {
 }
 
 // Check if the number of records was specified to show
-if (empty($show) AND $CONF_FORUM['show_posts_perpage'] > 0) {
-    $show = $CONF_FORUM['show_posts_perpage'];
-} elseif (empty($show)) {
-    $show = 20;
-}
+$show = $CONF_FORUM['show_posts_perpage'];
 
 // Find topic assignment if exists for topic or at a higher level
 forum_getGeeklogTopic(TOPIC_TYPE_FORUM_TOPIC, $showtopic);
@@ -185,26 +218,12 @@ $viewtopic = DB_fetchArray(DB_query($sql),false);
 $numpages = ceil(($viewtopic['replies'] + 1) / $show);
 
 if ($CONF_FORUM['sort_order_asc']) {
-    if ($lastpost) {
-        if ($page == 0) {
-            $page = $numpages;
-        }
-        $order = 'ASC';
-    } else {
-        if ($page == 0) {
-            $page = 1;
-        }
-        if ($onlytopic == 1) {
-            $order = 'DESC';
-        } else {
-            $order = 'ASC';
-        }
-    }
+	$order = 'ASC';
 } else {
-    if ($page == 0) {
-        $page = 1;
-    }
     $order = 'DESC';
+}
+if ($page == 0) {
+	$page = 1;
 }
 if ($page > 1) {
     $offset = ($page - 1) * $show;
@@ -212,11 +231,15 @@ if ($page > 1) {
     $offset = 0;
 }
 
+$mode_url = '';
+if (!empty($mode)) {
+	$mode_url = "&amp;mode=$mode";
+}
+
+$base_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic$mode_url";
 if ($onlytopic == 1) {
 	// If using submission forum post read preview mode
-	$base_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic&amp;mode=$mode&amp;onlytopic=1";
-} else {	
-	$base_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic&amp;mode=$mode&amp;show=$show";
+	$base_url .= "&amp;onlytopic=1";
 }
 
 // Check to see if requesting a forum topic page that does not exist
@@ -425,9 +448,7 @@ while ($topicRec = DB_fetchArray($result)) {
     //$intervalTime = $mytimer->stopTimer();
     //COM_errorLog("Topic Display Time: $intervalTime");
     if ($CONF_FORUM['show_anonymous_posts'] == 0 AND $topicRec['uid'] == 1) {
-        $display .= '<div class="pluginAlert" style="padding:10px;margin:10px;">' . $LANG_GF02['msg300'] . '</div>';
-        break;
-        //Do nothing - but this way I don't always have to do this check
+		$display .= alertMessage($LANG_GF02['msg300'], '', '0'); 
     } else {
         $display .= showtopic($topicRec,$mode,$postcount,$onetwo,$page);
         $onetwo = ($onetwo == 1) ? 2 : 1;

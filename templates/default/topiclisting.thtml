@@ -59,7 +59,7 @@
     </td>
     <td class="aligncenter pluginCol" style="width:45px; white-space:nowrap;">{views}</td>
     <td class="aligncenter pluginCol" style="width:45px; white-space:nowrap;">{replies}</td>
-    <td style="width:20%;" onmouseover="this.style.cursor='pointer';" onclick="window.location.href='viewtopic.php?showtopic={topic_id}&amp;lastpost=true#{lastpostid}'" title="{LANG_lastpost}">
+    <td style="width:20%;" onmouseover="this.style.cursor='pointer';" onclick="window.location.href='{lastpostURL}'" title="{LANG_lastpost}">
             <table width="100%" border="0" cellspacing="0" cellpadding="0">
                     <tr>
                             <td style="padding-left:2px; white-space:nowrap;" class="pluginLinks">{LANG_BY}{lastposter}</td>

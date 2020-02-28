@@ -466,7 +466,10 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nid','$uid',now() )");
                     }
                     COM_updateSpeedlimit ('forum');
-                    COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$id&amp;lastpost=true#$lastid");
+                    //COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$id&amp;lastpost=true#$lastid");
+					$url = html_entity_decode(forum_buildForumPostURL($lastid));
+					COM_redirect($url);
+					
                 }
 
             } else {
@@ -714,6 +717,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         }
         $edittopic['mood'] = '';
         if ($quoteid > 0) {
+			$topicnavbar->set_var ('quoteid', $quoteid);
             $quotesql = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$quoteid'");
             $quotearray = DB_fetchArray($quotesql);
             $quotearray['comment'] = stripslashes($quotearray['comment']);
@@ -827,7 +831,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         if ($mood != '' OR $submit == $LANG_GF01['PREVIEW']) {
             $edittopic['mood'] = $mood;
 			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
-		} elseif ($edittopic['mood'] != '') {
+		} elseif (isset($edittopic['mood']) && $edittopic['mood'] != '') {
 			$mood = $edittopic['mood'];
 			$moodoptions = '<option value="">' . $LANG_GF01['NOMOOD'] . "</option>\n";
         } else {
@@ -1146,7 +1150,13 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     //Topic Review
     if (($method != 'newtopic' && $editpost != 'yes') && ($method == 'postreply' || $submit == $LANG_GF01['PREVIEW'])) {
         if ($CONF_FORUM['show_topicreview']) {
-        	$topicfooter->set_var ('topic_id', $id);
+			if ($quoteid > 0) {
+				$gotoId = $quoteid;
+			} else {
+				$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$id");
+				list($gotoId) = DB_fetchArray($sql);			
+			}
+			$topicfooter->set_var ('previewlastpostURL', forum_buildForumPostURL($gotoId, '&amp;mode=preview&amp;onlytopic=1'));
         	$topicfooter->parse ('topic_review', 'topic_review');
         } else {
         	$topicfooter->set_var ('topic_review', '');

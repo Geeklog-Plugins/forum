@@ -353,7 +353,7 @@ $LANG_GF02 = array(
     'msg200' => '게시판 사이트 회원의 레포트 읽기',
     'msg201' => '인기토픽 레포트 읽기',
     'msg202' => 'No new posts',
-    'msg300' => 'Your preferences have block anonymous posts enabled',
+    'msg300' => 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.',
     'msg301' => 'Realy mark all categories read?',
     'msg302' => 'Realy mark all topics read?',
     'PostReply' => '새로 글달기',
