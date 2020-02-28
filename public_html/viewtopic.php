@@ -77,10 +77,6 @@ list($forum, $topic_pid, $subject) = DB_fetchArray($result); // <- new
 // - $lastpost: Not used anymore. Proper urls with page number is now used so. When lastpost was used in url, content would differ over time as new posts added. Redirect now happens (which is not perfect since it can still change)
 // *****************************
 
-depreciate some url variables so when search engines visit site content on the page for the url cannot change
-// Pages are now required to use defaults of user where warranted
-// $show, $lastpost
-
 if ($topic_pid == '') {
     // Topic doesn't exist so exit gracefully
     COM_handle404('/forum/index.php');
