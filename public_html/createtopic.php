@@ -387,7 +387,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
             if ($aname != '') {
                 $name = gf_preparefordb($aname,'text');
             } else {
-                $name = gf_preparefordb($_POST['name'],'text');
+				if (isset($_POST['name'])) {
+					$name = gf_preparefordb($_POST['name'],'text');
+				} else {
+						$name = '';
+				}
             }
             
             if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND 
