@@ -1156,8 +1156,13 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 			if ($quoteid > 0) {
 				$gotoId = $quoteid;
 			} else {
+				// Find last post id in topic
 				$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$id");
-				list($gotoId) = DB_fetchArray($sql);			
+				list($gotoId) = DB_fetchArray($sql);
+				if (empty($gotoId)) {
+					// Must only be one post in topic
+					$gotoId = $id;
+				}
 			}
 			$topicfooter->set_var ('previewlastpostURL', forum_buildForumPostURL($gotoId, '&amp;mode=preview&amp;onlytopic=1'));
         	$topicfooter->parse ('topic_review', 'topic_review');
