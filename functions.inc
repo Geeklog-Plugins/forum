@@ -1640,7 +1640,6 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 
         if ($f_tooltip) {
             $block->set_var('gl-tooltip', true); // Used to verify gl tooltip is being set
-            //$lastpostlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}&amp;lastpost=true#{$lastid}";
 			$lastpostlink = forum_buildForumPostURL($lastid);
             $block->set_var ('tooltip_date', COM_getTooltip($lastdate, $lastpostinfo, $lastpostlink));
             $topiclink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";

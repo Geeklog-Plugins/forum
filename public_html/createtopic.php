@@ -466,7 +466,6 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nid','$uid',now() )");
                     }
                     COM_updateSpeedlimit ('forum');
-                    //COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$id&amp;lastpost=true#$lastid");
 					$url = html_entity_decode(forum_buildForumPostURL($lastid));
 					COM_redirect($url);
 					
@@ -1257,10 +1256,10 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
                         $message  = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
                         if ($type=='forum') {
                             $forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-                            $message .= sprintf($LANG_GF02['msg23b'],$A['subject'],$A['name'],$forum_name, $_CONF['site_name'],$_CONF['site_url'],$pid);
+                            $message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
                         } else {
-                            $message .= sprintf($LANG_GF02['msg23a'],$A['subject'],$postername, $A['name'],$_CONF['site_name']);
-                            $message .= sprintf($LANG_GF02['msg23c'],$_CONF['site_url'],$pid);
+                            $message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
+                            $message .= sprintf($LANG_GF02['msg23c'], html_entity_decode(forum_buildForumPostURL($topicid)));
                         }
                         $message .= $LANG_GF02['msg26'];
                         $message .= sprintf($LANG_GF02['msg27'],"{$_CONF['site_url']}/forum/notify.php");

@@ -236,8 +236,8 @@ $LANG_GF02['msg18']    = 'Erreur! Tous les champs requis n\'ont pas ete remplis 
 $LANG_GF02['msg19']    = 'Votre message a ete poste.';
 $LANG_GF02['msg22']    = '- Notification de reponse au sujet';
 $LANG_GF02['msg23a']   = "\nUne reponse a ete faite au sujet '%s' par %s.\nCe sujet a ete cree par : %s dans le forum de %s.\n";
-$LANG_GF02['msg23b']   = "Un nouveau sujet '%s' a ete poste par %s dans le forum %s sur %s.\nVous pouvez le voir sur la page : %s/forum/viewtopic.php?showtopic=%s\n";
-$LANG_GF02['msg23c']   = "\nVous pouvez utiliser le lien suivant pour voir la reponse : %s/forum/viewtopic.php?showtopic=%s&lastpost=true\n";
+$LANG_GF02['msg23b']   = "Un nouveau sujet '%s' a ete poste par %s dans le forum %s sur %s.\nVous pouvez le voir sur la page : %s\n";
+$LANG_GF02['msg23c']   = "\nVous pouvez utiliser le lien suivant pour voir la reponse : %s\n";
 $LANG_GF02['msg25']    = "\nMerci et bonne journee ! \n";
 $LANG_GF02['msg26']    = "\nVous avez recu ce mail parce que vous avez choisi d'etre averti quand une reponse est faite a ce sujet. \n";
 $LANG_GF02['msg27']    = 'Si vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant:\n%s\n';

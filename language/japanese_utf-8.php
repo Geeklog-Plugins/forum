@@ -240,8 +240,8 @@ $LANG_GF02['msg18']    = 'エラー! 必須項目が入力されていないか�
 $LANG_GF02['msg19']    = 'メッセージが登録されました';
 $LANG_GF02['msg22']    = '- 掲示板投稿通知';
 $LANG_GF02['msg23a']   = "掲示板[%s]に%sさんから新しく書き込みがありました。\n（トピック作成者：%sさん　掲示板：%s）";
-$LANG_GF02['msg23b']   = "新しいトピック '%s' が\n%s さんによって %s 掲示板に投稿されました。\n（サイト：%s）\n\n%s/forum/viewtopic.php?showtopic=%s\n";
-$LANG_GF02['msg23c']   = "%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n";
+$LANG_GF02['msg23b']   = "新しいトピック '%s' が\n%s さんによって %s 掲示板に投稿されました。\n（サイト：%s）\n\n%s\n";
+$LANG_GF02['msg23c']   = "%s\n";
 $LANG_GF02['msg25']    = "\n";
 $LANG_GF02['msg26']    = "\n※このトピックはメール通知が設定されています。";
 $LANG_GF02['msg27']    = "\nメール通知解除: \n%s\n";

@@ -236,8 +236,8 @@ $LANG_GF02 = array(
     'msg19' => 'Your message has been posted.',
     'msg22' => '- Forum Post Notification',
     'msg23a' => "A reply has been made to the thread '%s' by %s.\n\nThis topic was started by %s in the %s forum. ",
-    'msg23b' => "A new topic '%s' has been posted by %s in the %s forum on the %s website. You may view it at:\n%s/forum/viewtopic.php?showtopic=%s\n",
-    'msg23c' => "You may view it at:\n%s/forum/viewtopic.php?showtopic=%s&lastpost=true\n",
+    'msg23b' => "A new topic '%s' has been posted by %s in the %s forum on the %s website. You may view it at:\n%s\n",
+    'msg23c' => "You may view it at:\n%s\n",
     'msg25' => "\nHave a great day! \n",
     'msg26' => "\nYou are receiving this email because you have chosen to be notified when a reply has been made to this topic. ",
     'msg27' => "To stop receiving notifications on this topic go to:\n%s\n";
