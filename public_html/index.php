@@ -835,11 +835,7 @@ if ($forum == 0) {
                     $folderimg = "quiet_icon";
                 }
 
-                $lastdate1 = strftime('%d', $B['date']);
-                if ($lastdate1 == date('d')) {
-                    $lasttime = (substr($_USER['language'],0,2) == "ja") ? strftime('%p&nbsp;%I:%M', $B['date']) : strftime('%I:%M&nbsp;%p', $B['date']); // need examination
-                    $lastdate = $LANG_GF01['TODAY'] .$lasttime;
-                } elseif (isset($CONF_FORUM['use_userdate_format']) && $CONF_FORUM['use_userdate_format']) { // FIXME: why would it not be set?
+				if (isset($CONF_FORUM['use_userdate_format']) && $CONF_FORUM['use_userdate_format']) { // FIXME: why would it not be set?
                     $lastdate = COM_getUserDateTimeFormat($B['date']);
                     $lastdate = $lastdate[0];
                 } else {
@@ -1179,11 +1175,7 @@ if ($forum > 0) {
                 $lastreply['subject'] .= "...";
             }
 
-            $lastdate1 = strftime($format1, $lastreply['date']);
-            if ($lastdate1 == date($format2)) {
-                $lasttime = strftime($format3, $lastreply['date']);
-                $lastdate = $LANG_GF01['TODAY'] . $lasttime;
-            } elseif (isset($CONF_FORUM['use_userdate_format']) AND $CONF_FORUM['use_userdate_format']) {
+			if (isset($CONF_FORUM['use_userdate_format']) AND $CONF_FORUM['use_userdate_format']) {
                 $lastdate = COM_getUserDateTimeFormat($lastreply['date']);
                 $lastdate = $lastdate[0];
             } else {
