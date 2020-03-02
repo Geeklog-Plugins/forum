@@ -598,10 +598,17 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     // Make sure the query is SQL safe
     $query = trim(addslashes($query));
 
+	/*
     $sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
          . "CONCAT('/forum/viewtopic.php?showtopic=', ft.id) AS url "
          . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
          . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";
+	*/
+	
+    $sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
+         . "'' AS url " // empty URL means will be defined later based on id
+         . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
+         . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";		 
 
 	if (!empty($datestart) || !empty($dateend)) {
 		// Do some date checking and fill in missing dates
@@ -636,7 +643,7 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     $search->setSQL($sql);
     $search->setFTSQL($ftsql);
     $search->setRank(3);
-    $search->setAppendQuery(false);
+    $search->setAppendQuery(true);
 
     return $search;
 }
@@ -647,6 +654,9 @@ function plugin_searchformat_forum($id, $contentType, $content)
 	// Remove any BBCode from forum post
 	if ($contentType == 'description') {
 		return forum_stripBBCode($content);
+	} elseif ($contentType == 'url') {
+		// For URL content contain query info
+		return html_entity_decode(forum_buildForumPostURL($id));  // For some reason urldecode was not converting the &amp; in the query string so used html_entity_decode
 	}
 }
 
@@ -1243,10 +1253,11 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 *
 * @param   id   	int     Id of forum post
 * @param   query   	string  Extra url parameters (placed just before anchor)
-* @param   query   	string  empty string uses $CONF_FORUM['sort_order_asc'] or ASC or DESC
+* @param   order   	string  Empty string uses $CONF_FORUM['sort_order_asc'] or ASC or DESC
+* @param   anchor  	boolean True will add hashtag id
 * @return           string   A URL to the forum post
 */
-function forum_buildForumPostURL($id, $query = '', $order = '') 
+function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true) 
 {
 	global $_CONF, $CONF_FORUM, $_TABLES;
 	
@@ -1298,7 +1309,11 @@ function forum_buildForumPostURL($id, $query = '', $order = '')
 		if ($page > 1) {
 			$page_url = "&amp;page=$page";
 		}
-		$retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$pid$page_url$query#$id";	
+		if ($anchor) {
+			$hashtag = "#$id";
+		}
+		
+		$retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$pid$page_url$query$hashtag";
 	}
 	return $retval;
 }

@@ -91,10 +91,9 @@ function showrank($rank, $rankname)
     return $retval;
 }
 
-function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
+function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $query = '')
 {
     global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09, $LANG28;
-    global $highlight;
     global $oldPost;
 
     $oldPost = 0;
@@ -299,9 +298,9 @@ function showtopic($showtopic,$mode='',$postcount=1,$onetwo=1,$page=1)
         }
     }
 
-    if ($highlight != '') {
-        $showtopic['subject'] = str_replace("$highlight","<span class=\"highlight\">$highlight</span>", $showtopic['subject']);
-        $showtopic['comment'] = str_replace("$highlight","<span class=\"highlight\">$highlight</span>", $showtopic['comment']);
+    if ($query != '') {
+		$showtopic['subject'] = COM_highlightQuery($showtopic['subject'], $query);
+		$showtopic['comment'] = COM_highlightQuery($showtopic['comment'], $query);
     }
 	
 	if (!isset($showtopic['pid'])) {

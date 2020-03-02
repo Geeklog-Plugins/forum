@@ -57,7 +57,7 @@ $mytimer->startTimer();
 $display = '';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$highlight = isset($_REQUEST['highlight']) ? COM_applyFilter($_REQUEST['highlight'])      : '';
+$query	   = isset($_REQUEST['query']) 	   ? COM_applyFilter($_REQUEST['query'])      	  : ''; // used for highlight
 $lastpost  = isset($_REQUEST['lastpost'])  ? COM_applyFilter($_REQUEST['lastpost'])       : ''; // Depreciated as last page is calculated now for the center block. Left in to keep backwards compatibility
 $mode      = isset($_REQUEST['mode'])      ? COM_applyFilter($_REQUEST['mode'])           : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])                : '';
@@ -435,8 +435,8 @@ if ($mode != 'preview') {
 // Update the topic view counter and user access log
 DB_query("UPDATE {$_TABLES['forum_topic']} SET views=views+1 WHERE id='$showtopic'");
 if (!COM_isAnonUser()) {
-    $query = DB_query("SELECT pid,forum FROM {$_TABLES['forum_topic']} WHERE id='$showtopic'");
-    list ($showtopicpid,$forumid) = DB_fetchArray($query);
+    $sql = DB_query("SELECT pid,forum FROM {$_TABLES['forum_topic']} WHERE id='$showtopic'");
+    list ($showtopicpid,$forumid) = DB_fetchArray($sql);
     if ($showtopicpid == 0 ) {
         $showtopicpid = $showtopic;
     }
@@ -466,7 +466,7 @@ while ($topicRec = DB_fetchArray($result)) {
     if ($CONF_FORUM['show_anonymous_posts'] == 0 AND $topicRec['uid'] == 1) {
 		$display .= alertMessage($LANG_GF02['msg300'], '', '0'); 
     } else {
-        $display .= showtopic($topicRec,$mode,$postcount,$onetwo,$page);
+        $display .= showtopic($topicRec,$mode,$postcount,$onetwo,$page, $query);
         $onetwo = ($onetwo == 1) ? 2 : 1;
     }
     $postcount++;

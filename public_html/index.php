@@ -434,7 +434,7 @@ if ($op == 'search') {
         for ($i = 1; $i <= $nrows; $i++) {
             $P = DB_fetchArray($result);
             
-			$link = '<a href="' . forum_buildForumPostURL($P['id'], "&amp;highlight=$query") . '">';
+			$link = '<a href="' . forum_buildForumPostURL($P['id'], "&amp;query=$query") . '">';
 			
 			$report->set_var('post_start_ahref',$link);
 			$report->set_var('post_subject', $P['subject']);
