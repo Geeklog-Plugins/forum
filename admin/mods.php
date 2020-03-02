@@ -208,7 +208,7 @@ if (DB_count($_TABLES['forum_forums']) == 0) {
         $addmod->set_var ('LANG_ADDMessage', $LANG_GF93['addmessage']);
         $addmod->set_var ('LANG_CANCEL', $LANG_GF01['CANCEL']);
         $addmod->set_var ('sel_forums', COM_optionList($_TABLES['forum_forums'], 'forum_id,forum_name'));
-        $addmod->set_var ('sel_users', COM_optionList($_TABLES['users'], 'uid,username'));
+        $addmod->set_var ('sel_users', COM_optionList($_TABLES['users'], 'uid,username', '', 1, 'status = ' . USER_ACCOUNT_ACTIVE));
         $addmod->set_var ('sel_groups', COM_optionList($_TABLES['groups'], 'grp_id,grp_name'));
         $addmod->set_var ('LANG_functions', $LANG_GF93['allowedfunctions']);
         $addmod->set_var ('LANG_addmod', $LANG_GF93['addmoderator']);

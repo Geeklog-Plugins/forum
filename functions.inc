@@ -1036,6 +1036,23 @@ function plugin_autouninstall_forum()
     return $out;
 }
 
+/**
+ * This function is called when a user's information
+ * (profile or preferences) has changed.
+ *
+ * @param    int $uid user id
+ * @return   void
+ */
+function plugin_user_changed_forum($uid)
+{
+    global $_TABLES;
+
+	if ($uid > 1) { // For only regular users
+		DB_query("UPDATE {$_TABLES['forum_moderators']} SET mod_username = (SELECT username FROM {$_TABLES['users']} WHERE uid = mod_uid) WHERE mod_uid = $uid");
+		
+	}
+}
+
 
 function plugin_collectSitemapItems_forum($uid, $limit)
 {
