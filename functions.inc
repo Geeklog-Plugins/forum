@@ -598,17 +598,19 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     // Make sure the query is SQL safe
     $query = trim(addslashes($query));
 
-	/*
-    $sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
-         . "CONCAT('/forum/viewtopic.php?showtopic=', ft.id) AS url "
-         . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
-         . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";
-	*/
-	
-    $sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
-         . "'' AS url " // empty URL means will be defined later based on id
-         . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
-         . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";		 
+	if (COM_versionCompare(VERSION, '2.2.2', '>=')) {
+		$sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
+			 . "'' AS url " // empty URL means will be defined later based on id
+			 . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
+			 . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";		 
+	} else {
+		// https://github.com/Geeklog-Plugins/forum/issues/87
+		// As of Forum v2.9.4 forum topic URL now required to use parent topic and page number. In search sql URL can now be changed before display (as of Geeklog v2.2.2)
+		$sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
+			 . "CONCAT('/forum/viewtopic.php?showtopic=', ft.id) AS url "
+			 . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
+			 . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";
+	}
 
 	if (!empty($datestart) || !empty($dateend)) {
 		// Do some date checking and fill in missing dates
