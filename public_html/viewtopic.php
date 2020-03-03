@@ -57,7 +57,6 @@ $mytimer->startTimer();
 $display = '';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$query	   = isset($_REQUEST['query']) 	   ? COM_applyFilter($_REQUEST['query'])      	  : ''; // used for highlight
 $lastpost  = isset($_REQUEST['lastpost'])  ? COM_applyFilter($_REQUEST['lastpost'])       : ''; // Depreciated as last page is calculated now for the center block. Left in to keep backwards compatibility
 $mode      = isset($_REQUEST['mode'])      ? COM_applyFilter($_REQUEST['mode'])           : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])                : '';
@@ -65,6 +64,18 @@ $onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopi
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)      : '';
 // $show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)      : '';
 $showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : ''; // Required to be parent topic, if other topic id found then will be redirected
+
+// Set search criteria (same as Geeklog Search) for highlight
+if (isset($_REQUEST['query'])) { 
+	$query = Geeklog\Input::request('query'); // use request instead of frequest so no filtering
+	$query = urldecode($query);
+	$query = GLText::remove4byteUtf8Chars($query);
+	$query = GLText::stripTags($query);
+	$queryEncoded = urlencode($query);
+} else {
+	$query = '';
+	$queryEncoded = '';
+}
 
 $result = DB_query("SELECT forum, pid, subject FROM {$_TABLES['forum_topic']} WHERE id = '$showtopic'"); // <- new
 list($forum, $topic_pid, $subject) = DB_fetchArray($result); // <- new
@@ -88,10 +99,11 @@ if ($topic_pid != 0) {
 	// As of Forum 2.9.4 (and Geeklog v2.2.1)
 	// For above commented out code: Do a 301 redirect now as we don't want duplicate content issues for the parent topic 
 	// as it would create multiple urls for the parent post since a switch like this may actually not show the post if it is on for example page 2 of the topic
+	$query_string = '';
 	if (!empty($query)) {
-			$query = "&amp;query=$query";
+		$query_string = "&amp;query=$queryEncoded";
 	}
-	$url = html_entity_decode(forum_buildForumPostURL($showtopic, $query)); // For some reason urldecode was not converting the &amp; in the query string so used html_entity_decode
+	$url = html_entity_decode(forum_buildForumPostURL($showtopic, $query_string)); // For some reason urldecode was not converting the &amp; in the query string so used html_entity_decode
 	if (!empty($url)) {
 		//* Permanently redirect page
 		header("Location: $url", true, 301);
@@ -260,9 +272,8 @@ if ($onlytopic == 1) {
 	// If using submission forum post read preview mode
 	$base_url .= "&amp;onlytopic=1";
 } elseif (!empty($query)) {
-	$base_url .= "&amp;query=$query";
+	$base_url .= "&amp;query=$queryEncoded";
 }
-
 
 // Check to see if requesting a forum topic page that does not exist
 if ($page > $numpages) {

@@ -52,11 +52,25 @@ $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])      
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)   : '';
 $sort      = isset($_REQUEST['sort'])      ? COM_applyFilter($_REQUEST['sort'],true)   : '';
 $order     = isset($_REQUEST['order'])     ? COM_applyFilter($_REQUEST['order'],true)  : '';
-$query     = isset($_REQUEST['query'])     ? addslashes(strip_tags(COM_stripslashes($_REQUEST['query']))) : '';
 $forum     = isset($_REQUEST['forum'])     ? COM_applyFilter($_REQUEST['forum'],true)  : '';
 $cat_id    = isset($_REQUEST['cat_id'])    ? COM_applyFilter($_REQUEST['cat_id'],true) : ''; // Used by marking posts read by category
 $category  = isset($_REQUEST['category'])  ? COM_applyFilter($_REQUEST['category'],true) : ''; // Used for display category forum index
 $populartype = isset($_REQUEST['populartype']) ? COM_applyFilter($_REQUEST['populartype']) : '';
+
+// Set search criteria (same as Geeklog Search) for highlight
+if (isset($_REQUEST['query'])) { 
+	$query = Geeklog\Input::request('query'); // use request instead of frequest so no filtering
+	$query = urldecode($query);
+	$query = GLText::remove4byteUtf8Chars($query);
+	$query = GLText::stripTags($query);
+	$queryEncoded = urlencode($query);
+	$queryEscaped = DB_escapeString($query);
+	
+} else {
+	$query = '';
+	$queryEncoded = '';
+	$queryEscaped = '';
+}
 
 $display = '';
 
@@ -361,11 +375,11 @@ if ($op == 'search') {
 	}
 
 	if ($forum > 0) {
-		$base_url = "&amp;order=$order&amp;sort=$sort&amp;query=$query&amp;forum=$forum";  	
-		$report->set_var ('sort_url_extra', "&amp;query=$query&amp;forum=$forum");
+		$base_url = "&amp;order=$order&amp;sort=$sort&amp;query=$queryEncoded&amp;forum=$forum";  	
+		$report->set_var ('sort_url_extra', "&amp;query=$queryEncoded&amp;forum=$forum");
 	} else {
-		$base_url = "&amp;order=$order&amp;sort=$sort&amp;query=$query";  	
-		$report->set_var ('sort_url_extra', "&amp;query=$query");
+		$base_url = "&amp;order=$order&amp;sort=$sort&amp;query=$queryEncoded";  	
+		$report->set_var ('sort_url_extra', "&amp;query=$queryEncoded");
 	}
     
 	$title = sprintf($LANG_GF02['forumsearchfor'], $query);
@@ -407,7 +421,7 @@ if ($op == 'search') {
     $sql  = "SELECT id FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
     		 WHERE ft.forum = ff.forum_id 
     		 $grouplist 
-    		 AND ((subject LIKE '%$query%') OR (comment LIKE '%$query%')) $inforum";	
+    		 AND ((subject LIKE '%$queryEscaped%') OR (comment LIKE '%$queryEscaped%')) $inforum";	
 	$result = DB_query($sql);
 	$topicCount = DB_numRows($result);
 	$numpages = ceil($topicCount / $show);
@@ -424,7 +438,7 @@ if ($op == 'search') {
     $sql  = "SELECT ft.* FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
     		 WHERE ft.forum = ff.forum_id
     		 $grouplist  
-    		 AND ((subject LIKE '%$query%') OR (comment LIKE '%$query%')) $inforum ";
+    		 AND ((subject LIKE '%$queryEscaped%') OR (comment LIKE '%$queryEscaped%')) $inforum ";
 	$sql .= "ORDER BY $sortOrder, id DESC LIMIT $offset, $show";
 
     $result = DB_query($sql);
@@ -434,7 +448,7 @@ if ($op == 'search') {
         for ($i = 1; $i <= $nrows; $i++) {
             $P = DB_fetchArray($result);
             
-			$link = '<a href="' . forum_buildForumPostURL($P['id'], "&amp;query=$query") . '">';
+			$link = '<a href="' . forum_buildForumPostURL($P['id'], "&amp;query=$queryEncoded") . '">';
 			
 			$report->set_var('post_start_ahref',$link);
 			$report->set_var('post_subject', $P['subject']);
