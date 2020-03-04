@@ -1150,8 +1150,7 @@ if ($forum > 0) {
                 $split_pages = true;
             }
             for ($p=1; $p <= $pages; $p++) {
-                $displaypageslink .= "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum=$forum";
-                $displaypageslink .= "&amp;showtopic={$record['id']}&amp;show={$CONF_FORUM['show_posts_perpage']}&amp;page=$p\">";
+                $displaypageslink .= "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$record['id']}&amp;page=$p\">";
                 $displaypageslink .= "$p</a>&nbsp;";
                 
                 if ($split_pages AND $p == 5) {
