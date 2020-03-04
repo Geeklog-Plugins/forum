@@ -424,8 +424,6 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     }
                     DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
 
-                    // Check for any users subscribed notifications
-                    gf_chknotifications($forum,$id,$uid);
                     $postmode = gf_chkpostmode($postmode,$mode_switch);
                     $subject = gf_preparefordb($_POST['subject'],'text');
                     $comment = gf_preparefordb($_POST['comment'],$postmode);
@@ -438,6 +436,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     // Find the id of the last inserted topic
                     list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+					
+                    // Check for any users subscribed notifications
+                    gf_chknotifications($forum,$id,$uid);
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
@@ -1194,7 +1195,9 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
     global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM;
 
     $pid = DB_getItem($_TABLES['forum_topic'],'pid',"id='$topicid'");
+	$pid_flag = false;
     if ($pid == 0) {
+		$pid_flag = true;
         $pid = $topicid;
     }
 
@@ -1264,11 +1267,24 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
                         $subjectline = "{$_CONF['site_name']} {$LANG_GF02['msg22']}";
                         $message  = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
                         if ($type=='forum') {
+							// New Topic (first post in topic)
                             $forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
                             $message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
                         } else {
-                            $message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
-                            $message .= sprintf($LANG_GF02['msg23c'], html_entity_decode(forum_buildForumPostURL($topicid)));
+							// Reply or Edit Post
+							// 2 scenarios here. Either it is an edit of a post or a reply.
+							if ($pid_flag) {
+								// Reply then
+								$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
+								// Lets find the current last post in $topic
+								$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
+								list($lastrecid) = DB_fetchArray($sql);
+								$message .= sprintf($LANG_GF02['msg23c'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
+							} else {
+								// Edit of existing post then
+								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
+								$message .= sprintf($LANG_GF02['msg23e'], html_entity_decode(forum_buildForumPostURL($topicid)));
+							}
                         }
                         $message .= $LANG_GF02['msg26'];
                         $message .= sprintf($LANG_GF02['msg27'],"{$_CONF['site_url']}/forum/notify.php");
