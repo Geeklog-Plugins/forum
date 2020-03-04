@@ -538,7 +538,18 @@ $intervalTime = $mytimer->stopTimer();
 
 if ($onlytopic != 1) {
     $display .= BaseFooter();
-    $display = gf_createHTMLDocument($display, $subject);
+	
+	if (empty($mode)) {
+		$page_url = '';
+		if ($page > 1) {
+			$page_url = "&page=$page";
+		}
+		$canonical_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic$page_url";
+	} else {
+		$canonical_url = '';
+	}
+	
+    $display = gf_createHTMLDocument($display, $subject, 0 , $canonical_url);
 } else {
 	// need to call this in case plugin doesn't use script class OR footercode function is used to set required javascript file
 	$display .= PLG_getFooterCode();
