@@ -41,7 +41,7 @@ if (!class_exists('StringParser') ) {
     require_once $CONF_FORUM['path_include'] . 'bbcode/stringparser_bbcode.class.php';
 }
 
-function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
+function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0, $canonical_url = '') {
     global $CONF_FORUM, $LANG_GF01;
 
     // Display Common headers
@@ -49,6 +49,15 @@ function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
     if (!isset($CONF_FORUM['usermenu'])) $CONF_FORUM['usermenu'] = 'blockmenu';
 
     $information = array();
+	// see if noindex or canonical url passed (can't have both)
+    if ($noIndex) {
+        $information['headercode'] = '<meta name="robots" content="noindex"' . XHTML . '>';
+    } else {
+		if (!empty($canonical_url)) {
+			$information['headercode'] = '<link rel="canonical" href="' . $canonical_url . '"' . XHTML . '>';		
+		}
+	}
+	
     if ($subject != '') {
         $information['pagetitle'] = $subject;
     } else {
@@ -56,9 +65,6 @@ function gf_createHTMLDocument(&$content = '', $subject = '', $noIndex = 0) {
     }
     $information['what'] = 'menu';
     $information['rightblock'] = false;
-    if ($noIndex) {
-        $information['headercode'] = '<meta name="robots" content="noindex"' . XHTML . '>';
-    }
 
     if ($CONF_FORUM['showblocks'] == 'noblocks' OR $CONF_FORUM['showblocks'] == 'rightblocks') {
         $information['what'] = 'none';
