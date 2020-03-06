@@ -427,7 +427,7 @@ if ($type == "forum") {
         if (($confirm == 1) && SEC_checkToken()) {
             // Delete Forum and all topics within it
             forum_deleteForum($id);
-            COM_redirec($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=6');
+            COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=6');
         } else {
             $boards_delforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_delforum->set_file (array ('boards_delforum'=>'boards_delete.thtml'));
@@ -743,16 +743,12 @@ function forum_deleteCategory($id) {
 * @return       boolean            Returns true
 */
 function forum_deleteForum($id) {
+	global $_TABLES;
+	
     // Cycle through each forum post in forum and delete related items
     $query = DB_query("SELECT id, pid FROM {$_TABLES['forum_topic']} WHERE forum='$id'");
     while (list($topic_id, $topic_parent_id) = DB_fetchArray($query)) {
-        LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $topic_id);
-        
-        if ($topic_parent_id == 0) { // Root Forum Topic Post
-            TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $topic_id, TOPIC_TYPE_FORUM_TOPIC);
-        }
-        
-        PLG_itemDeleted($topic_id, 'forum');
+		forum_deleteForumPost($topic_id);
     }    
     // Now delete all these forum posts for all topics in the forum
     DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE forum='$id'");
