@@ -85,70 +85,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         if ($submit == $LANG_GF01['CANCEL']) {
             COM_redirect("viewtopic.php?showtopic=$msgpid");
         } else {
-
-            $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'");
-            if ($top == 'yes') {
-                LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $msgid);
-                
-                TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $msgid, TOPIC_TYPE_FORUM_TOPIC);
-                
-                DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
-                
-                PLG_itemDeleted($msgid, 'forum');
-                
-                DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (pid='$msgid')");
-
-                DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE (id='$msgid')");
-                $postCount = DB_Count($_TABLES['forum_topic'],'forum',$forum);
-                DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=topic_count-1,post_count=$postCount WHERE forum_id=$forum");
-                $query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE forum=$forum");
-                list($last_topic) = DB_fetchArray($query);
-                if ($last_topic > 0) {
-                    DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=$last_topic WHERE forum_id=$forum");
-                } else {
-                    DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=0 WHERE forum_id=$forum");
-                }
-            } else {
-                LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $msgid);
-                
-                DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies-1 WHERE id=$topicparent");
-                DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE (id='$msgid')");
-                
-                PLG_itemDeleted($msgid, 'forum');
-               
-                DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count-1 WHERE forum_id=$forum");
-                // Get the post id for the last post in this topic
-                $query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE forum=$forum");
-                list($last_topic) = DB_fetchArray($query);
-                if ($last_topic > 0) {
-                    DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=$last_topic WHERE forum_id=$forum");
-                }
-            }
-
-            if ($topicparent == 0) {
-                $topicparent = $msgid;
-            } else {
-                $lsql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$topicparent");
-                list($lastrecid) = DB_fetchArray($lsql);
-                if ($lastrecid == NULL) {
-					// Means just the original parent forum post and no replies
-                    $topicdatecreated = DB_getItem($_TABLES['forum_topic'], 'date', "id=$topicparent");
-                    DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec=0, lastupdated='$topicdatecreated' WHERE id=$topicparent");
-                } else {
-                    $topicdatecreated = DB_getItem($_TABLES['forum_topic'], 'date', "id=$lastrecid");
-                    DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec=$lastrecid, lastupdated='$topicdatecreated' WHERE id=$topicparent");
-                }
-            }
-
-            // Remove any lastviewed records in the log so that the new updated topic indicator will appear
-            DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$topicparent'");
-            
-            COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-            // Remove new block and centerblock cached items
-            $cacheInstance = 'forum__newpostsblock_';
-            CACHE_remove_instance($cacheInstance);
-            $cacheInstance = 'forum__centerblock_';
-            CACHE_remove_instance($cacheInstance);
+			forum_deleteForumPost($msgid);
 
             if ($top == 'yes') {
                 COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");

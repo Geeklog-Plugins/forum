@@ -183,7 +183,7 @@ function plugin_autotags_forum($op,$content='',$autotag='') {
         if (!empty($id)) {
             $linktext = $LANG_GF01['HERE'];
             if (!empty($autotag['parm2'])) $linktext = $autotag['parm2'];
-            $url = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $id;
+            $url = forum_buildForumPostURL($id);
             $filelink = COM_createLink($linktext, $url);
             $content = str_replace($autotag['tagstr'], $filelink, $content);
         }
@@ -371,7 +371,7 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
             $numposts++;
             $postdate = COM_getUserDateTimeFormat ($date);
             $template->set_var ('row_number', $numposts . '.');
-            $articleUrl = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $postid;
+			$articleUrl = forum_buildForumPostURL($postid);
             $template->set_var('item_title',
                 COM_createLink(
                     stripslashes($subject),
@@ -507,7 +507,7 @@ function plugin_showstats_forum($showsitestats)
             $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum_id'");
             $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
             if (SEC_inGroup($groupname) OR $grp_id == 2) {
-                $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
+				$url = forum_buildForumPostURL($id);
                 $S['topicsubject'] = '<a href="' . $url . '">' . $subject . '</a>';
                 $S['views']  = COM_numberFormat($views);
                 $data_arr[$displaycount] = $S;
@@ -540,8 +540,7 @@ function plugin_showstats_forum($showsitestats)
             $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum_id'");
             $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
             if (SEC_inGroup($groupname) OR $grp_id == 2) {
-                $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
-                $url = $_CONF['site_url']. "/forum/viewtopic.php?showtopic=$id";
+                $url = forum_buildForumPostURL($id);
                 $S['topicsubject'] = '<a href="' . $url . '">' . $subject . '</a>';
                 $S['replies']  = COM_numberFormat($replies);
                 $data_arr[$displaycount] = $S;
@@ -598,7 +597,7 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     // Make sure the query is SQL safe
     $query = trim(addslashes($query));
 
-	if (COM_versionCompare(VERSION, '2.2.2', '>=')) {
+	if (COM_versionCompare(VERSION, '2.2.1', '>=')) {
 		$sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
 			 . "'' AS url " // empty URL means will be defined later based on id
 			 . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
@@ -801,7 +800,6 @@ function plugin_getfeedcontent_forum ($feed, &$link, &$update)
 
         $desc = $preface . $comment;
 
-        //$link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
 		$link = forum_buildForumPostURL($A['id']);
 
         $content[] = array ('title'     => $A['forum_name'] . ' :: ' . $A['subject'],
@@ -1108,7 +1106,7 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 					}
 					break;
 				case 'url':
-					$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+					$props['url'] = html_entity_decode(forum_buildForumPostURL($A['id']));
 					break;
 				}
 			}
@@ -1226,12 +1224,11 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
                 $props['title'] = stripslashes($A['subject']);
                 break;
             case 'url':
+				// Decode as could be used in redirect etc...
                 if (empty($A['id'])) {
-                    //$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $id;
-					$props['url'] = forum_buildForumPostURL($id);
+					$props['url'] = html_entity_decode(forum_buildForumPostURL($id));
                 } else {
-                    //$props['url'] = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
-					$props['url'] = forum_buildForumPostURL($A['id']);
+					$props['url'] = html_entity_decode(forum_buildForumPostURL($A['id']));
                 }
                 break;
             default:
@@ -1265,6 +1262,66 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     }
 
     return $retval;
+}
+
+/**
+* Delete a forum post and everything associated with it.
+* Assumed have permission to do this so check before hand.
+*
+* @param   id   	int     Id of forum post
+* @return           boolean 
+*/
+function forum_deleteForumPost($id) 
+{
+	global $_TABLES;
+	
+	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $id");
+	list($forum, $pid) = DB_fetchArray($result);	 
+
+	if ($forum > 0) { // must exist
+		$parentTopic = false;
+		if ($pid == 0) {
+			$parentTopic = true;
+			$pid = $id;
+		}
+		DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id = $id");
+			
+		PLG_itemDeleted($id, 'forum');			
+		
+		if ($parentTopic) {
+			// Deleting a parent topic requires removing as well
+			TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+		   
+		   // Cycle through all replies and delete any likes
+			$query = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE pid = $id");
+			while ($A = DB_fetchArray($query)) {
+				LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $A['id']);
+			}
+			// Now lets delete those replies
+			DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE pid = $id");
+
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id = $id");
+		}
+		
+		// Delete Likes for current message being deleted
+		LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
+
+		// Remove any lastviewed records in the log so that the new updated topic indicator will appear
+		DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic = $pid");
+		
+		gf_updateLastPost($forum, $pid);    			
+		
+		COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+		// Remove new block and centerblock cached items
+		$cacheInstance = 'forum__newpostsblock_';
+		CACHE_remove_instance($cacheInstance);
+		$cacheInstance = 'forum__centerblock_';
+		CACHE_remove_instance($cacheInstance);
+
+		return true;
+	} else {
+		return false;
+	}
 }
 
 /**
@@ -1676,7 +1733,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
             $block->set_var('gl-tooltip', true); // Used to verify gl tooltip is being set
 			$lastpostlink = forum_buildForumPostURL($lastid);
             $block->set_var ('tooltip_date', COM_getTooltip($lastdate, $lastpostinfo, $lastpostlink));
-            $topiclink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}";
+			$topiclink = forum_buildForumPostURL($A['id']);
             $block->set_var ('tooltip_topic_subject', COM_getTooltip($A['subject'], $topicinfo, $topiclink));
         }
 
@@ -2644,7 +2701,7 @@ function plugin_getrelateditems_forum($tids, $max, $trim)
         for ($x = 0; $x < $nrows; $x++) {
             $A = DB_fetchArray($result);
 
-            $url = $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id'];
+			$url = forum_buildForumPostURL($A['id']);
 
             $title = COM_undoSpecialChars(stripslashes($A['title']));
             if ($trim > 0) {

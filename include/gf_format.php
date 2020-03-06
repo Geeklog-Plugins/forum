@@ -1011,34 +1011,49 @@ function f_forumrules() {
 
 }
 
-function gf_updateLastPost($forumid,$topicparent=0) {
+function gf_updateLastPost($forumid = 0, $topicparent = 0) {
     global $_TABLES;
-
-    if ($topicparent == 0) {
-        // Get the last topic in this forum
-        $query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE forum=$forumid");
-        list($topicparent) = DB_fetchArray($query);
-        if ($topicparent > 0) {
-            $lastrecid = $topicparent;
-            DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=$lastrecid WHERE forum_id=$forumid");
-        }
-    } else {
+    
+	// Used to skip forum sync in gf_resyncforum when syncing each topic in forum
+	if ($forumid > 0) {
+		// Update forum record for: last_post_rec, topic_count, post_count
+		
+		// Get the last topic in this forum
+		// Assuming that the forumid is the topicparent forum
+		$query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE forum=$forumid");
+		list($lastrecid) = DB_fetchArray($query);
+		if ($lastrecid > 0) {
+			// If topicparent not already specified set it now
+			if ($topicparent == 0) {
+				$topicparent = $lastrecid;
+			}
+			
+			$topicCount = DB_count($_TABLES['forum_topic'], array('forum', 'pid'), array($forumid, 0));
+			$postCount = DB_Count($_TABLES['forum_topic'],'forum',$forumid);
+			 
+			// Update the forum definition record to know the number of topics and number of posts
+			DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=$lastrecid, topic_count=$topicCount, post_count=$postCount WHERE forum_id=$forumid");		
+		}
+	}
+	
+    if ($topicparent > 0) {
+		// Update topic record for: lastupdated, last_reply_rec, numreplies
+		
         $query = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$topicparent");
         list($lastrecid) = DB_fetchArray($query);
-    }
-
-    if ($lastrecid == NULL AND $topicparent > 0) {
-        $topicdatecreated = DB_getItem($_TABLES['forum_topic'],'date',"id=$topicparent");
-        DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec=$topicparent, lastupdated='$topicdatecreated' WHERE id=$topicparent");
-    } elseif ($topicparent > 0) {
-        $topicdatecreated = DB_getItem($_TABLES['forum_topic'],'date',"id=$lastrecid");
-        DB_query("UPDATE {$_TABLES['forum_topic']}  SET last_reply_rec=$lastrecid, lastupdated='$topicdatecreated' WHERE id=$topicparent");
-    }
-    if ($topicparent > 0) {
-        // Recalculate and Update the number of replies
-        $numreplies = DB_Count($_TABLES['forum_topic'], "pid", $topicparent);
-        DB_query("UPDATE {$_TABLES['forum_topic']} SET replies = '$numreplies' WHERE id=$topicparent");
-    }
+		if ($lastrecid == NULL) {
+			// Means just the original parent forum post and no replies
+			$topicdatecreated = DB_getItem($_TABLES['forum_topic'],'date',"id=$topicparent");
+			DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec=0, lastupdated='$topicdatecreated' WHERE id=$topicparent");
+		} else {
+			$topicdatecreated = DB_getItem($_TABLES['forum_topic'],'date',"id=$lastrecid");
+			DB_query("UPDATE {$_TABLES['forum_topic']}  SET last_reply_rec=$lastrecid, lastupdated='$topicdatecreated' WHERE id=$topicparent");
+		}
+		
+		// Recalculate and Update the number of replies
+		$numreplies = DB_Count($_TABLES['forum_topic'], "pid", $topicparent);
+		DB_query("UPDATE {$_TABLES['forum_topic']} SET replies = $numreplies WHERE id=$topicparent");
+	}
 }
 
 /**

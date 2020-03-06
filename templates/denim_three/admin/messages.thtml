@@ -94,7 +94,7 @@
 	<td class="uk-text-center uk-text-nowrap">
         <div>
             <a class="uk-button uk-button-default uk-button-small" href="{phpself}?op=delrecord&amp;id={id}&amp;{gltoken_name}={gltoken}" onclick='return confirm("{LANG_DELCONFIRM}");'>{LANG_Delete}</a>
-            <a class="uk-button uk-button-default uk-button-small" href="{siteurl}/forum/viewtopic.php?forum={forum}&amp;showtopic={topicid}">{LANG_Moderate}</a>
+            <a class="uk-button uk-button-default uk-button-small" href="{topicURL}">{LANG_Moderate}</a>
         </div>
 	</td>
 </tr>

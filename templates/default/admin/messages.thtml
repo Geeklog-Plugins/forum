@@ -43,7 +43,7 @@
 	<td>{subject}</td>
 	<td class="aligncenter">{views}</td>
 	<td class="aligncenter">{replies}</td>
-	<td class="aligncenter"><a href="{phpself}?op=delrecord&amp;id={id}&amp;{gltoken_name}={gltoken}" onclick='return confirm("{LANG_DELCONFIRM}");'>{LANG_Delete}</a>&nbsp;|&nbsp;<a href="{siteurl}/forum/viewtopic.php?forum={forum}&amp;showtopic={topicid}">{LANG_Moderate}</a></td>
+	<td class="aligncenter"><a href="{phpself}?op=delrecord&amp;id={id}&amp;{gltoken_name}={gltoken}" onclick='return confirm("{LANG_DELCONFIRM}");'>{LANG_Delete}</a>&nbsp;|&nbsp;<a href="{topicURL}">{LANG_Moderate}</a></td>
 </tr>
 <!-- END report_record -->
 

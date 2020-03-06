@@ -38,7 +38,6 @@ require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
 $id         = isset($_REQUEST['id'])         ? COM_applyFilter($_REQUEST['id'],true)         : '';
 $op         = isset($_REQUEST['op'])  		 ? COM_applyFilter($_REQUEST['op'])       		 : '';
-//$show       = isset($_REQUEST['show'])       ? COM_applyFilter($_REQUEST['show'], true)      : '';
 $page       = isset($_REQUEST['page'])       ? COM_applyFilter($_REQUEST['page'],true)       : '';
 $forum      = isset($_REQUEST['forum'])      ? COM_applyFilter($_REQUEST['forum'],true)      : '';
 $member     = isset($_REQUEST['member'])     ? COM_applyFilter($_REQUEST['member'],true)     : '';
@@ -99,65 +98,16 @@ if (strcasecmp($_SERVER['REQUEST_METHOD'], 'POST') === 0 AND $op == 'delchecked'
         $chk_record_delete = $_POST['chk_record_delete'];
     }
     foreach ($chk_record_delete as $id) {
-        $id = COM_applyFilter($id,true);
+        $id = COM_applyFilter($id, true);
         
-        // Retrieve post info
-        $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$id'");
-        $nrows = DB_numRows($result);
-        if ($nrows > 0) {
-            $A = DB_fetchArray($result);
-            $forum = $A['forum'];
-            $topicparent = $A['pid'];
-            
-            LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
-            
-            if ($topicparent == 0) { // Root Forum Topic Post
-                TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
-            }            
-        
-            // Delete Record
-            DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
-            
-            // Update the Last Post Information
-            gf_updateLastPost($forum, $topicparent);        
-            
-            PLG_itemDeleted($id, 'forum');
+		if (DB_count($_TABLES['forum_topic'], 'id', $id) > 0) {
+			forum_deleteForumPost($id);
         }
     }
-    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-    // Remove new block and centerblock cached items
-    $cacheInstance = 'forum__newpostsblock_';
-    CACHE_remove_instance($cacheInstance);
-    $cacheInstance = 'forum__centerblock_';
-    CACHE_remove_instance($cacheInstance);    
 } elseif ($op == 'delrecord' AND SEC_checkToken()) {
-    // Retrieve post info
-    $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$id'");
-    $nrows = DB_numRows($result);
-    if ($nrows > 0) {
-        $A = DB_fetchArray($result);
-        $forum = $A['forum'];
-        $topicparent = $A['pid'];
-        
-        LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
-        
-        if ($topicparent == 0) { // Root Forum Topic Post
-            TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
-        }
-    
-        // Delete Record
-        DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id='$id'");
-        
-        // Update the Last Post Information
-        gf_updateLastPost($forum, $topicparent);        
-        
-        PLG_itemDeleted($id, 'forum');
-        COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-        // Remove new block and centerblock cached items
-        $cacheInstance = 'forum__newpostsblock_';
-        CACHE_remove_instance($cacheInstance);
-        $cacheInstance = 'forum__centerblock_';
-        CACHE_remove_instance($cacheInstance);    
+	$id = COM_applyFilter($id, true);
+	if (DB_count($_TABLES['forum_topic'], 'id', $id) > 0) {		
+		forum_deleteForumPost($id);
     }
 }
 
@@ -207,8 +157,7 @@ $report->set_block('forum_links', 'trash_link');
 $report->set_var('phpself', $_CONF['site_admin_url'] .'/plugins/forum/messages.php');
 $report->set_var('imgset', $CONF_FORUM['imgset']);
 $report->set_var('LANG_deleteall', $LANG_GF01['DELETEALL']);
-$report->set_var('LANG_DELCONFIRM', $LANG_GF01['DELCONFIRM']);
-$report->set_var('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM']);
+$report->set_var('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM_PARENT']);
 $report->set_var('LANG_selectforum', $LANG_GF02['msg106']);
 $report->set_var('LANG_select1', $LANG_GF93['allforums']);
 $report->set_var('LANG_selectmember', $LANG_GF02['msg107']);
@@ -261,11 +210,13 @@ if ($nrows > 0) {
             $report->set_var('name', COM_getDisplayName($A['uid']));
         }
         if ($A['pid'] == "0") {
-            $id = $A['id'];
-            $report->set_var('topicid', $id);
+            $report->set_var('topicid', $A['id']);
+			$report->set_var('LANG_DELCONFIRM', $LANG_GF01['DELCONFIRM_PARENT']);
         } else {
             $report->set_var('topicid', $A['pid']);
+			$report->set_var('LANG_DELCONFIRM', $LANG_GF01['DELCONFIRM']);
         }
+		$report->set_var('topicURL', forum_buildForumPostURL($A['id']));
         $report->set_var('csscode', $csscode);
         $report->set_var('subject', $A['subject']);
         $report->set_var('siteurl', $_CONF['site_url']);
