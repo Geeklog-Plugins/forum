@@ -236,8 +236,8 @@ function upgrade_294() {
     forum_update_ConfValues_2_9_4();
 	
 	// For Github issue #89 https://github.com/Geeklog-Plugins/forum/issues/89
-	// last_reply_rec should only be used by parent topics
-	DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec = 0 WHERE pid> 0 AND last_reply_rec > 0");
+	// For Github issue #82 https://github.com/Geeklog-Plugins/forum/issues/82
+	gf_cleanforum(); 
 
     COM_errorLog("Success - Completed Forum plugin version 2.9.4 update",1);
     return 0;

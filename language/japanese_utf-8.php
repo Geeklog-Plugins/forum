@@ -579,7 +579,8 @@ $LANG_GF93 = array (
     'hidepostsdscp'      => '新規投稿ブロックとRSSフィードから投稿を隠す',
     'mod_title'          => 'モデレータ',
     'allforums'          => 'すべての掲示板',
-    'namerequired'       => 'Name is required.'
+    'namerequired'       => 'Name is required.',
+	'resyncedmsg' => 'ReSynch and Clean Complete for selected category or forum!<br><ul><li>%s topic posts re-synced.</li><li>%s Orphan topic records (those without a parent topic) found and fixed.</li><li>%s orphan records found and cleaned from all other Forum tables.</li></ul>'
 );
 
 // Posts

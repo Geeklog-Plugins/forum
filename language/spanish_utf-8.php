@@ -531,7 +531,8 @@ $LANG_GF93 = array(
     'hidepostsdscp' => 'Las actualizaciones no aparecerán en el bloque de mensajes nuevos o alimentaciones RSS',
     'mod_title' => 'Moderadores de foro',
     'allforums' => 'Todos los foros',
-    'namerequired' => 'Name is required.'
+    'namerequired' => 'Name is required.',
+	'resyncedmsg' => 'ReSynch and Clean Complete for selected category or forum!<br><ul><li>%s topic posts re-synced.</li><li>%s Orphan topic records (those without a parent topic) found and fixed.</li><li>%s orphan records found and cleaned from all other Forum tables.</li></ul>'
 );
 
 $LANG_GF95 = array(

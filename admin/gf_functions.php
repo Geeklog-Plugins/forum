@@ -76,6 +76,8 @@ $navbar->set_onclick($LANG_GF06['2'], 'location.href="' . "{$_CONF['site_admin_u
 
 function gf_resyncforum($id) {
     global $_CONF,$_TABLES;
+	
+	$recCount = 0;
 
     COM_errorLog("Re-Syncing Forum id:$id");
     // Update all the Topics lastupdated timestamp to that of the last posted comment
@@ -94,7 +96,6 @@ function gf_resyncforum($id) {
         // Update the forum definition record to know the number of topics and number of posts
         DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=$topicCount, post_count=$postCount WHERE forum_id=$id");
 		*/
-        $recCount = 0;
         while($trecord = DB_fetchArray($topicsQuery)) {
             $recCount++;
 			
@@ -124,6 +125,106 @@ function gf_resyncforum($id) {
     } else {
         COM_errorLog("No topic records to resync");
     }
+	
+	return $recCount;
+}
+
+// This function was created to clean the forum tables of orphan records.
+// This could happen mainly due to deleting of forum posts in the Admin Posts list where not all records associated was also deleted
+// For Github issue #82 https://github.com/Geeklog-Plugins/forum/issues/82
+function gf_cleanforum($id = 0) {
+    global $_CONF,$_TABLES;
+
+	$delRowCount = 0;
+	$orphanTopicRowCount = 0;
+	
+	if ($id > 0) {
+		COM_errorLog("Cleaning Forum id:$id");
+		$forumSQL = "AND forum = $id";
+		$forumModSQL = "AND mod_forum = $id";
+		$forumWatchSQL = "AND forum_id = $id";
+	} else {
+		COM_errorLog("Cleaning all Forums");
+		$forumSQL = "";
+		$forumModSQL = "";
+		$forumWatchSQL = "";
+	}
+
+	// last_reply_rec should only be used by parent topics
+	// This could happen prior to Forum v2.9.4 where gf_updateLastPost was not used to recalculate for most post actions
+	DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec = 0 WHERE pid > 0 AND last_reply_rec > 0 $forumSQL");
+	
+	// *************************************
+	// Recorded the SQL below just for testing purposes if needed later
+	// The SQL below will return all parent topics with replies that are correct
+	// SELECT * FROM gl_forum_topic ft1 WHERE pid != 0 AND EXISTS (SELECT id from gl_forum_topic ft2 WHERE ft2.id = ft1.pid AND ft2.pid = 0)	
+	// The SQL below will return all parent topics with no replies that are correct
+	// SELECT * FROM gl_forum_topic ft1 WHERE pid = 0 AND NOT EXISTS (SELECT id from gl_forum_topic ft2 WHERE ft2.id = ft1.pid AND ft2.pid = 0)
+	// The total number of records from these 2 SQL statements above should match the total number of posts on the Forum Statistics page
+	// *************************************
+	// Find orphan replies that do not have a parent topic that exists.
+	// This could happen prior to Forum v2.9.4 where Forum Posts Admin list allowed deleting of parent topic, and the replies of these parent topics where not also deleted (there should not be a lot of these).
+	$sql = "SELECT MIN(id), pid FROM {$_TABLES['forum_topic']} ft1 
+			WHERE pid != 0 $forumSQL 
+			AND NOT EXISTS (SELECT id from {$_TABLES['forum_topic']} ft2 WHERE ft2.id = ft1.pid) 
+			GROUP BY pid";
+    $result = DB_query($sql);
+    $numRows = DB_numRows($result);
+    if ($numRows > 0) {
+        while($A = DB_fetchArray($result)) {
+            $orphanTopicRowCount++;
+			// Now update old pid with new min forum post id
+			DB_query("UPDATE {$_TABLES['forum_topic']} SET pid = {$A['id']} WHERE pid = {$A['pid']}");
+			// Now update min forum post id and give pid of 0
+			DB_query("UPDATE {$_TABLES['forum_topic']} SET pid = 0 WHERE id = {$A['id']}");
+		}
+	}
+	
+	// ***********************
+	// Clean forum_moderators table
+	// If user doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_moderators']} WHERE mod_uid NOT IN (SELECT uid from {$_TABLES['users']}) $forumModSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	
+	// ***********************
+	// Clean forum_userinfo table
+	// If user doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_userinfo']} WHERE uid NOT IN (SELECT uid from {$_TABLES['users']})");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	
+	// ***********************
+	// Clean forum_userprefs table
+	// If user doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_userprefs']} WHERE uid NOT IN (SELECT uid from {$_TABLES['users']})");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+		
+	// ***********************
+	// Clean forum_log table
+	// If user doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE uid NOT IN (SELECT uid from {$_TABLES['users']}) $forumSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	// If forum doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE forum NOT IN (SELECT forum_id from {$_TABLES['forum_forums']}) $forumSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	// If topic (and it is parent) doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic NOT IN (SELECT id from {$_TABLES['forum_topic']}) $forumSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);	
+	
+	// ***********************
+	// Clean forum_watch table
+	// If user doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid NOT IN (SELECT uid from {$_TABLES['users']}) $forumWatchSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	// If forum doesn't exist anymore then delete
+	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE forum_id NOT IN (SELECT forum_id from {$_TABLES['forum_forums']}) $forumWatchSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	// If topic (and it is parent) doesn't exist anymore then delete (also check negative topic_ids)
+	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE ABS(topic_id) NOT IN (SELECT id from {$_TABLES['forum_topic']}) $forumWatchSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+
+	COM_errorLog("Number of Orphan Topic Records (no parent topic found) Fixed: $orphanTopicRowCount - Number of Records Cleaned from Forum Tables: $delRowCount");
+	
+	return array($orphanTopicRowCount, $delRowCount);
 }
 
 function gf_updateSystem() {

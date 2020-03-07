@@ -248,11 +248,20 @@ if ($type === 'category') {
         exit();
 
     } elseif ($mode == $LANG_GF01['RESYNCCAT'])  {
+		$recCount = 0;
+		$orphanTopicRowCount = 0;
+		$delRowCount = 0;
+		
         // Resync each forum in this category
         $query = DB_query("SELECT forum_id FROM {$_TABLES['forum_forums']} WHERE forum_cat='$id'");
         while (list($forum_id) = DB_fetchArray($query)) {
-            gf_resyncforum($forum_id);
+			$recCount = $recCount + gf_resyncforum($forum_id);
+			
+			list($temp_orphanTopicRowCount, $temp_delRowCount) = gf_cleanforum($forum_id);
+			$orphanTopicRowCount = $orphanTopicRowCount + $temp_orphanTopicRowCount;
+			$delRowCount = $delRowCount + $temp_delRowCount;
         }
+		COM_setSystemMessage(sprintf($LANG_GF93['resyncedmsg'], COM_numberFormat($recCount), COM_numberFormat($orphanTopicRowCount), COM_numberFormat($delRowCount)));
     }
 
 }
@@ -472,8 +481,10 @@ if ($type == "forum") {
         
         COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=8');
     } elseif ($mode == $LANG_GF01['RESYNC'])  {
-        gf_resyncforum($id);
+        $recCount = gf_resyncforum($id);
+		list($orphanTopicRowCount, $delRowCount) = gf_cleanforum($id);
 
+		COM_setSystemMessage(sprintf($LANG_GF93['resyncedmsg'], COM_numberFormat($recCount), COM_numberFormat($orphanTopicRowCount), COM_numberFormat($delRowCount)));
     } elseif ($mode == $LANG_GF01['EDIT']) {
 		$grouplist = '';
         $sql  = "SELECT forum_name,forum_cat,forum_dscp,grp_id,forum_order,is_hidden,is_readonly,no_newposts ";
