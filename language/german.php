@@ -532,7 +532,7 @@ $LANG_GF93 = array(
     'mod_title' => 'Forummoderatoren',
     'allforums' => 'All Forums',
     'namerequired' => 'Name is required.',
-	'resyncedmsg' => 'ReSynch and Clean Complete for selected category or forum!<br><ul><li>%s topic posts re-synced.</li><li>%s Orphan topic records (those without a parent topic) found and fixed.</li><li>%s orphan records found and cleaned from all other Forum tables.</li></ul>'
+	'resyncedmsg' => 'ReSynch and Clean completed for selected category or forum.<br><ul><li>%s topic posts re-synced.</li><li>%s orphan topic records (those without a parent topic) found and fixed.</li><li>%s orphan records found and cleaned from all other Forum tables.</li></ul>'
 );
 
 $LANG_GF95 = array(
