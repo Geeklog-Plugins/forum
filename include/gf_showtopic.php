@@ -119,6 +119,7 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     $topictemplate->set_block('topictemplate', 'location');
     $topictemplate->set_block('topictemplate', 'ip_address');
     $topictemplate->set_block('topictemplate', 'anon_ip_address');
+	$topictemplate->set_block('topictemplate', 'banned_ip_address');
     $topictemplate->set_block('topictemplate', 'user_signature');
     $topictemplate->set_block('topictemplate', 'mod_functions');
     
@@ -438,13 +439,21 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     if (forum_modPermission($showtopic['forum'],'','mod_ban')) {
 		if (isset($showtopic['ip'])) {
 			$topictemplate->set_var ('ip', $showtopic['ip']);
+			
+			if (DB_getItem($_TABLES['forum_banned_ip'], 'host_ip', "host_ip = '{$showtopic['ip']}'")) {
+				$topictemplate->set_var ('banned_ip', $showtopic['ip']);
+				$topictemplate->parse ('ip', 'banned_ip_address');
+			} else {
+				$topictemplate->set_var ('ip', $showtopic['ip']);
+			}
+			
+			if ($showtopic['uid'] == 1) {
+				$topictemplate->parse ('ip_address', 'anon_ip_address');
+			} else {
+				$topictemplate->parse ('ip_address', 'ip_address');
+			}
 		} else {
 			$topictemplate->set_var ('ip', '');
-		}
-		if ($showtopic['uid'] == 1) {
-			$topictemplate->parse ('ip_address', 'anon_ip_address');
-		} else {
-			$topictemplate->parse ('ip_address', 'ip_address');
 		}
 	} else {
 		$topictemplate->set_var ('ip_address', '');
@@ -476,7 +485,7 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     }
     $topictemplate->set_var ('forumid', $showtopic['forum']);
     $topictemplate->set_var ('topic_id', $showtopic['id']);
-    $topictemplate->set_var ('member_badge',forumPLG_getMemberBadge($showtopic['uid']));
+    $topictemplate->set_var ('member_badge', forumPLG_getMemberBadge($showtopic['uid']));
     if ($uservalid) {
     	$topictemplate->parse ('user_name', 'block_user_name');
     	$topictemplate->parse ('user_information', 'block_user_information');
@@ -526,7 +535,11 @@ function forum_getmodFunctions($showtopic) {
         $options .= '<option value="deletepost">' .$LANG_GF03['delete']. '</option>';
     }
     if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_ban')) {
-        $options .= '<option value="banippost">' .$LANG_GF03['banippost']. '</option>';
+		if (DB_getItem($_TABLES['forum_banned_ip'], 'host_ip', "host_ip = '{$showtopic['ip']}'")) {
+			$options .= '<option value="banippost">' .$LANG_GF03['banippostremove']. '</option>';	
+		} else {
+			$options .= '<option value="banippost">' .$LANG_GF03['banippost']. '</option>';
+		}
     }
     if (forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_ban')) {
     	if (function_exists('BAN_for_plugins_check_access') AND BAN_for_plugins_check_access()) {

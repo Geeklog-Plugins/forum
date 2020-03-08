@@ -205,6 +205,7 @@ if ($onlytopic == 1) {
         $display .= COM_showMessageText($LANG_GF02['msg55']);
     }
     if ($msg==6) {
+		// Banned IP
         $display .= COM_showMessageText($LANG_GF02['msg56']);
     }
     if ($msg==7) {
@@ -229,6 +230,10 @@ if ($onlytopic == 1) {
     	// Notification Saved but no email address reminder
         $display .= COM_showMessageText($LANG_GF02['msg143']);
     }      
+    if ($msg==13) {
+		// Un Ban IP
+        $display .= COM_showMessageText($LANG_GF02['msg57']);
+    }
     
     // Now display the forum header
     ForumHeader($forum, $showtopic, $display);

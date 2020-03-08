@@ -83,30 +83,35 @@ if (forum_modPermission($forum,$_USER['uid'])) {
     //Moderator check OK, everything dealing with moderator permissions go here.
     if ($modconfirmdelete == 1 && $msgid != '') {
         if ($submit == $LANG_GF01['CANCEL']) {
-            COM_redirect("viewtopic.php?showtopic=$msgpid");
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid)));
         } else {
 			forum_deleteForumPost($msgid);
 
             if ($top == 'yes') {
                 COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");
             } else {
-                COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=5&amp;showtopic=$msgpid");
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '&amp;msg=5')));
             }
         }
     }
 
     if ($confirmbanip == '1') {
         if ($submit == $LANG_GF01['CANCEL']) {
-            COM_redirect("viewtopic.php?showtopic=$fortopicid");
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($fortopicid)));
         } else {
-            DB_query("INSERT INTO {$_TABLES['forum_banned_ip']} (host_ip) VALUES ('$hostip')");
-            COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=6&amp;showtopic=$fortopicid");
+			if (DB_getItem($_TABLES['forum_banned_ip'], 'host_ip', "host_ip = '$hostip'")) {
+				DB_query("DELETE FROM {$_TABLES['forum_banned_ip']} WHERE host_ip = '$hostip'");
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($fortopicid, '&amp;msg=13')));
+			} else {
+				DB_query("INSERT INTO {$_TABLES['forum_banned_ip']} (host_ip) VALUES ('$hostip')");
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($fortopicid, '&amp;msg=6')));
+			}
         }
     }
 
     if ($confirm_move == '1' AND forum_modPermission($forum,$_USER['uid'],'mod_move') AND $moveid != 0) {
         if ($submit == $LANG_GF01['CANCEL']) {
-            COM_redirect("viewtopic.php?showtopic=$moveid");
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($moveid)));
         } else {
             $date = time();
             $movetoforum = gf_preparefordb($movetoforum,'text');
@@ -290,10 +295,10 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         
         if (BAN_for_plugins_ban_found($ip_address)) {
 			BAN_for_plugins_ban_ip($ip_address, 'forum', false);
-			COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=11&amp;showtopic=$msgpid");
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($fortopicid, '&amp;msg=11')));
 		} else {
 			BAN_for_plugins_ban_ip($ip_address, 'forum');
-			COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=10&amp;showtopic=$msgpid");
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($fortopicid, '&amp;msg=10')));
 		}
     } elseif ($modfunction == 'banippost' AND forum_modPermission($forum,$_USER['uid'],'mod_ban') AND $fortopicid != 0) {
         $iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='$fortopicid'");
@@ -302,13 +307,19 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             $display .= alertMessage($LANG_GF02['msg174']);
             exit;
         }
-        $alertmessage =  $LANG_GF02['msg68'];
-        $ip_address = $forumpostipnum['ip'];
-        if (!empty($_CONF['ip_lookup'])) {
-            $iplookup = str_replace('*', $ip_address, $_CONF['ip_lookup']);
-            $ip_address = COM_createLink($ip_address, $iplookup);
-        }
-        $alertmessage .= ' ' . sprintf($LANG_GF02['msg69'], $ip_address);
+        
+		$ip_address = $forumpostipnum['ip'];
+		
+		if (DB_getItem($_TABLES['forum_banned_ip'], 'host_ip', "host_ip = '$ip_address'")) {
+			$alertmessage = sprintf($LANG_GF02['msg68'], $ip_address);
+		} else {
+			
+			if (!empty($_CONF['ip_lookup'])) {
+				$iplookup = str_replace('*', $ip_address, $_CONF['ip_lookup']);
+				$ip_address = COM_createLink($ip_address, $iplookup);
+			}
+			$alertmessage = sprintf($LANG_GF02['msg69'], $ip_address);
+		}
         
         $page = COM_newTemplate(CTL_plugin_templatePath('forum', 'moderator'));
         $page->set_file(array('page'=>'ban.thtml'));

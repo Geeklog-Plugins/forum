@@ -253,14 +253,15 @@ $LANG_GF02['msg44']    = '<p style="margin:0px; padding:5px;">Vous ne surveillez
 $LANG_GF02['msg49']    = '(Lu %s fois) ';
 $LANG_GF02['msg55']    = 'Contribution effacee.';
 $LANG_GF02['msg56']    = 'IP Bannie.';
+$LANG_GF02['msg57']    = 'IP removed from being Banned.';
 $LANG_GF02['msg59']    = 'Sujet Normal';
 $LANG_GF02['msg60']    = 'Nouvelle Contribution';
 $LANG_GF02['msg61']    = ' Sujet important';
 $LANG_GF02['msg62']    = 'M\'avertir en cas de reponse';
 $LANG_GF02['msg64']    = 'Etes vous sur de vouloir effacer le sujet %s : %s ?';
 $LANG_GF02['msg65']    = '<br' . XHTML . '>Ceci est un sujet parent, toutes les reponses postees seront aussi effacees.';
-$LANG_GF02['msg68']    = 'Note: ATTENTION QUAND VOUS BANISSEZ, seuls les administrateurs ont le droit de de-bannir quelqu\'un.';
-$LANG_GF02['msg69']    = '<br' . XHTML . '>Voulez vous vraiment bannir l\'adresse IP : %s?';
+$LANG_GF02['msg68']    = 'Do you really want to remove the ban for the ip address: %s?';
+$LANG_GF02['msg69']    = 'Voulez vous vraiment bannir l\'adresse IP : %s?';
 $LANG_GF02['msg71']    = 'Aucune fonction selectionnee, choisissez une contribution puis une fonction de moderation.<br' . XHTML . '>Note: Vous devez etre moderateur pour utiliser ces fonctions.';
 $LANG_GF02['msg72']    = 'Attention,  vous n\'avez pas le droit d\'utiliser cette fonction de moderation.';
 $LANG_GF02['msg74']    = '%s dernieres contributions publiees';

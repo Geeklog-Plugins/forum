@@ -130,6 +130,10 @@
 {ip}
 <!-- END anon_ip_address -->
 
+<!-- BEGIN banned_ip_address -->
+<span style="text-decoration: line-through;">{banned_ip}</span>
+<!-- END banned_ip_address -->
+
 <!-- BEGIN mod_functions -->
 <form action="{site_url}/forum/moderation.php" method="post">
 <div>
