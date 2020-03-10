@@ -413,7 +413,7 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
     $count = $A['count_uid'];
 
     $template->set_var ('lang_number_field', $LANG_GF02['msg156']);
-    $template->set_var ('number_field', $count);
+    $template->set_var ('number_field', COM_numberFormat($count));
     $template->parse('field_statistics', 'field_statistic', true);
 
     /* Display Instant Messaging Handles */
@@ -597,7 +597,7 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
     // Make sure the query is SQL safe
     $query = trim(addslashes($query));
 
-	if (COM_versionCompare(VERSION, '2.2.1', '>=')) {
+	if (COM_versionCompare(VERSION, '2.2.2', '>=')) {
 		$sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
 			 . "'' AS url " // empty URL means will be defined later based on id
 			 . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
@@ -2552,7 +2552,6 @@ function plugin_getBlockLocations_forum()
 
     return $block_locations;
 }
-
 
 /**
  * Did user create any forum posts
