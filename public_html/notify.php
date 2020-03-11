@@ -256,7 +256,11 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
 	$report->set_var ('date_added', $date_added);
 	if (isset($A['name'])) {
 		$report->set_var ('topicauthor', $A['name']);
-		$report->set_var ('uid', $A['uid']);
+		if ($A['uid'] > 1) {
+			$report->set_var ('uid', $A['uid']);
+		} else {
+			$report->set_var ('uid', '');
+		}
 		$report->set_var ('views', $A['views']);
 		$report->set_var ('replies', $A['replies']);
 	}
