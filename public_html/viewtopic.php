@@ -58,12 +58,19 @@ $display = '';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $lastpost  = isset($_REQUEST['lastpost'])  ? COM_applyFilter($_REQUEST['lastpost'])       : ''; // Depreciated as last page is calculated now for the center block. Left in to keep backwards compatibility
-$mode      = isset($_REQUEST['mode'])      ? COM_applyFilter($_REQUEST['mode'])           : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])                : '';
-$onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopic'])      : ''; // Used for preview of topic
+$onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopic'])      : ''; // Used for preview of topic when in post editor
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)      : '';
-// $show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)      : '';
 $showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : ''; // Required to be parent topic, if other topic id found then will be redirected
+
+
+// If set to 1 then show preview of topic. For iframe for createtopic.php
+if ($onlytopic != 1) {
+	$onlytopic = 0;
+	$showTopicMode = '';
+} else {
+	$showTopicMode = 'preview'; // used just by showtopic function
+}
 
 // Set search criteria (same as Geeklog Search) for highlight
 if (isset($_REQUEST['query'])) { 
@@ -145,7 +152,7 @@ if ($lastpost) {
 // *****************************
 
 // Used to return preview of topic in iframe for create topic
-if ($onlytopic == 1) {
+if ($onlytopic) {
     // Send out the HTML headers and load the stylesheet for the iframe preview
     switch ($_CONF['doctype']) {
     case 'html401transitional':
@@ -267,13 +274,8 @@ if ($page > 1) {
     $offset = 0;
 }
 
-$mode_url = '';
-if (!empty($mode)) {
-	$mode_url = "&amp;mode=$mode";
-}
-
-$base_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic$mode_url";
-if ($onlytopic == 1) {
+$base_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic";
+if ($onlytopic) {
 	// If using submission forum post read preview mode
 	$base_url .= "&amp;onlytopic=1";
 } elseif (!empty($query)) {
@@ -294,7 +296,7 @@ if ($numpages > 1) {
 // $intervalTime = $mytimer->stopTimer();
 // COM_errorLog("Start Topic Display Time: $intervalTime");
 
-if ($mode != 'preview') {
+if (!$onlytopic) {
 
     $topicnavbar = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $topicnavbar->set_file (array (
@@ -488,13 +490,13 @@ while ($topicRec = DB_fetchArray($result)) {
     if ($CONF_FORUM['show_anonymous_posts'] == 0 AND $topicRec['uid'] == 1) {
 		$display .= alertMessage($LANG_GF02['msg300'], '', '0'); 
     } else {
-        $display .= showtopic($topicRec,$mode,$postcount,$onetwo,$page, $query);
+        $display .= showtopic($topicRec,$showTopicMode,$postcount,$onetwo,$page, $query);
         $onetwo = ($onetwo == 1) ? 2 : 1;
     }
     $postcount++;
 }
 
-if ($mode != 'preview') {
+if (!$onlytopic) {
     $topic_footer = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $topic_footer->set_file (array ('topicfooter'=>'topicfooter.thtml',
 			'forum_links'    => 'forum_links.thtml'));                    
@@ -541,18 +543,14 @@ $display .= $topic_footer->finish($topic_footer->get_var('output'));
 $intervalTime = $mytimer->stopTimer();
 //COM_errorLog("End Topic Display Time: $intervalTime");
 
-if ($onlytopic != 1) {
+if (!$onlytopic) {
     $display .= BaseFooter();
 	
-	if (empty($mode)) {
-		$page_url = '';
-		if ($page > 1) {
-			$page_url = "&page=$page";
-		}
-		$canonical_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic$page_url";
-	} else {
-		$canonical_url = '';
+	$page_url = '';
+	if ($page > 1) {
+		$page_url = "&page=$page";
 	}
+	$canonical_url = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$showtopic$page_url";
 	
     $display = gf_createHTMLDocument($display, $subject, 0 , $canonical_url);
 } else {

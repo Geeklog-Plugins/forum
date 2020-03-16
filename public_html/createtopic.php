@@ -577,11 +577,17 @@ if ($submit == $LANG_GF01['PREVIEW']) {
     $previewitem['subject']   = gf_checkHTML($subject);
     $previewitem['postmode']  = gf_chkpostmode($postmode,$mode_switch);
     $previewitem['mood']      = $mood;
-    $previewitem['pid']       = $edittopic['pid'];
+	if (isset($edittopic)) {
+		$previewitem['pid']       = $edittopic['pid'];
+		$previewitem['locked']    = $edittopic['locked'];
+		$previewitem['forum']     = $edittopic['forum'];
+	} else {
+		$previewitem['pid']       = '';
+		$previewitem['locked']    = '';
+		$previewitem['forum']     = $forum;
+	}
     $previewitem['id']        = 0;
-    $previewitem['locked']    = $edittopic['locked'];
     $previewitem['views']     = 0;
-    $previewitem['forum']     = $edittopic['forum'];
 
     $previewitem['comment'] = trim($comment);
 
@@ -1165,7 +1171,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 					$gotoId = $id;
 				}
 			}
-			$topicfooter->set_var ('previewlastpostURL', forum_buildForumPostURL($gotoId, '&amp;mode=preview&amp;onlytopic=1'));
+			$topicfooter->set_var ('previewlastpostURL', forum_buildForumPostURL($gotoId, '&amp;onlytopic=1'));
         	$topicfooter->parse ('topic_review', 'topic_review');
         } else {
         	$topicfooter->set_var ('topic_review', '');
@@ -1210,15 +1216,12 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
     $mail_language = $_CONF['language'];
     $last_mail_language = $mail_language;
     $plugin_path = $_CONF['path'] . 'plugins/forum/';
-    
     for ($i =1; $i <= $nrows; $i++) {
         $N = DB_fetchArray($sqlresult);
         // Don't need to send a notification to the user that posted this message and users with NOTIFY disabled
         if ($N['uid'] > 1 AND $N['uid'] != $userid AND $CONF_FORUM['allow_notification'] == '1' ) {
-
             // if the topic_id is 0 for this record - user has subscribed to complete forum. Check if they have opted out of this forum topic.
             if (DB_count($_TABLES['forum_watch'],array('uid','forum_id','topic_id'),array($N['uid'],$forumid,-$topicid)) == 0) {
-
                 // Check if user does not want to receive multiple notifications for same topic and already has been notified
                 $userNotifyOnceOption = DB_getItem($_TABLES['forum_userprefs'],'notify_once',"uid='{$N['uid']}'");
                 // Retrieve the log record for this user if it exists then check if user has viewed this topic yet
