@@ -1216,6 +1216,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
     $mail_language = $_CONF['language'];
     $last_mail_language = $mail_language;
     $plugin_path = $_CONF['path'] . 'plugins/forum/';
+
     for ($i =1; $i <= $nrows; $i++) {
         $N = DB_fetchArray($sqlresult);
         // Don't need to send a notification to the user that posted this message and users with NOTIFY disabled
@@ -1273,6 +1274,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
 							// New Topic (first post in topic)
                             $forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
                             $message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
+							$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
                         } else {
 							// Reply or Edit Post
 							// 2 scenarios here. Either it is an edit of a post or a reply.
@@ -1288,9 +1290,9 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
 								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
 								$message .= sprintf($LANG_GF02['msg23e'], html_entity_decode(forum_buildForumPostURL($topicid)));
 							}
+							$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
                         }
-                        $message .= $LANG_GF02['msg26'];
-                        $message .= sprintf($LANG_GF02['msg27'],"{$_CONF['site_url']}/forum/notify.php");
+						
                         $message .= "{$LANG_GF02['msg25']}{$_CONF['site_name']} {$LANG_GF01['ADMIN']}\n";
                         // Check and see if Site admin has enabled email notifications
                         if ($CONF_FORUM['allow_notification']) {
