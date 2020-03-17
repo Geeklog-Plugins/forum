@@ -84,7 +84,6 @@ $page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['
 $quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
 $showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
 $silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
-$subject     = isset($_POST['subject'])            ? COM_applyFilter($_POST['subject'])                 : '';
 $submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
 $postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 
@@ -491,7 +490,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
 
 // EDIT MESSAGE
-$comment = isset($_POST['comment']) ? COM_stripslashes( $_POST['comment'] ) : '';
+$comment = isset($_POST['comment']) ? COM_stripslashes($_POST['comment']) : '';
+$subject = isset($_POST['subject']) ? COM_stripslashes($_POST['subject']) : '';
 
 if ($id > 0) {
     $sql  = "SELECT a.forum,a.pid,a.comment,a.date,a.locked,a.subject,a.mood,a.sticky,a.uid,a.name,a.postmode,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name,c.id ";

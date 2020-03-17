@@ -576,7 +576,7 @@ function forum_getmodFunctions($showtopic) {
         }
         $retval .= '</select>&nbsp;&nbsp;';
         $retval .= '<input type="submit" name="submit" value="' .$LANG_GF01['GO'].'!"' . XHTML . '>';
-        $retval .= '<input type="hidden" name="fortopicid" value="' .$showtopic['id']. '"' . XHTML . '>';
+        $retval .= '<input type="hidden" name="msgid" value="' .$showtopic['id']. '"' . XHTML . '>';
         $retval .= '<input type="hidden" name="forum" value="' .$showtopic['forum']. '"' . XHTML . '>';
         $retval .= '<input type="hidden" name="msgpid" value="' .$msgpid. '"' . XHTML . '>';
         $retval .= '<input type="hidden" name="top" value="' .$top. '"' . XHTML . '>';

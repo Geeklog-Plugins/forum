@@ -2,9 +2,8 @@
 
 <div style="padding:10px 0 5px 0px;">
 	<form action="{site_url}/forum/moderation.php" method="post">
-		<input type="hidden" name="moveid" value="{fortopicid}"{xhtml}>
+		<input type="hidden" name="msgid" value="{fortopicid}"{xhtml}>
 		<input type="hidden" name="confirm_move" value="1"{xhtml}>
-		<input type="hidden" name="forum" value="{forum}"{xhtml}>
 		<div>
 			{$LANG_GF03[selectforum]}&nbsp;
 			<select name="movetoforum" style="width:120px;">
