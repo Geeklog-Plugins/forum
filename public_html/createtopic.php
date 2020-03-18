@@ -1213,27 +1213,26 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
 	// Notify Site Email if enabled in Configuration
     if (isset($_CONF['notification']) && in_array('forum', $_CONF['notification'])) {	
 		$topicrec = DB_query("SELECT subject,name,forum FROM {$_TABLES['forum_topic']} WHERE id='$pid'");
+		$A = DB_fetchArray($topicrec);
+		$message = '';
 		// ***************************************************************
 		// This code logic is very similar to the user notifications below. If change here make sure it is reflected below
-		$A = DB_fetchArray($topicrec);
 		if ($type=='forum') {
 			// New Topic (first post in topic)
 			$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-			$message = sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
+			$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
 		} else {
 			// Reply or Edit Post
 			// 2 scenarios here. Either it is an edit of a post or a reply.
 			if ($pid_flag) {
 				// Reply then
-				$message = sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
 				// Lets find the current last post in $topic
 				$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 				list($lastrecid) = DB_fetchArray($sql);
-				$message .= sprintf($LANG_GF02['msg23c'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
+				$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
 			} else {
 				// Edit of existing post then
-				$message = sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
-				$message .= sprintf($LANG_GF02['msg23e'], html_entity_decode(forum_buildForumPostURL($topicid)));
+				$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
 			}
 		}
 		// ***************************************************************
@@ -1320,15 +1319,13 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
 							// 2 scenarios here. Either it is an edit of a post or a reply.
 							if ($pid_flag) {
 								// Reply then
-								$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
 								// Lets find the current last post in $topic
 								$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 								list($lastrecid) = DB_fetchArray($sql);
-								$message .= sprintf($LANG_GF02['msg23c'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
+								$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
 							} else {
 								// Edit of existing post then
-								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name']);
-								$message .= sprintf($LANG_GF02['msg23e'], html_entity_decode(forum_buildForumPostURL($topicid)));
+								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
 							}
 							$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
                         }
