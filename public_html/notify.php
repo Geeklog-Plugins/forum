@@ -42,9 +42,6 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-// Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess(true);
-
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $forum      = isset($_REQUEST['forum'])  ? COM_applyFilter($_REQUEST['forum'],true) : '';
 $id         = isset($_REQUEST['id'])     ? COM_applyFilter($_REQUEST['id'],true)    : '';
@@ -52,8 +49,10 @@ $msg        = isset($_GET['msg'])        ? COM_applyFilter($_GET['msg'], true)  
 $notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'])     : '';
 $op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         : '';
 $page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      : '';
-//$show       = isset($_GET['show'])       ? COM_applyFilter($_GET['show'],true)      : '';
 $topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) : '';
+
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess(true, $forum, $topic);
 
 $display = '';
 
@@ -83,7 +82,7 @@ if (isset($_REQUEST['submit'])) {
             $A = DB_fetchArray($notifyquery);
             if ($A['topic_id'] == 0) {     // User has subscribed to complete forum
                // Check and see if user has a non-subscribe record for this topic id
-                $query = DB_query("SELECT id FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id < '0' " );
+                $query = DB_query("SELECT id FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND forum_id=$forum AND topic_id < 0 " );
                 if (DB_numRows($query) > 0) {
                     list($watchrec) = DB_fetchArray($query);
                     DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$watchrec");
@@ -120,11 +119,12 @@ if (isset($_REQUEST['submit'])) {
         // Check and see if subscribed to complete forum and if so - unsubscribe to just this topic
         if (DB_getItem($_TABLES['forum_watch'], 'topic_id', "id='$id'") == 0 ) {
             $ntopic = -$topic;  // Negative Value
+			// Need to include user id for security
             DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$topic'");
             DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$ntopic'");
             DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$ntopic','{$_USER['uid']}',now() )");
         } else {
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE (id='$id')");
+            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND id=$id");
         }
         COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=4&amp;showtopic=$topic");
     }
@@ -142,9 +142,7 @@ if ($page == 0) {
 if ($op == 'delchecked' && isset($_POST['chk_record_delete'])) {
     foreach ($_POST['chk_record_delete'] as $id) {
         $id = COM_applyFilter($id);
-        if (DB_getItem($_TABLES['forum_watch'],'uid',"id='$id'") == $_USER['uid']) {
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id='$id'");
-        }
+		DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND id='$id'");
     }
 }
 
@@ -262,8 +260,8 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
 		} else {
 			$report->set_var ('topicauthor', $A['name']);
 		}
-		$report->set_var ('views', $A['views']);
-		$report->set_var ('replies', $A['replies']);
+		$report->set_var ('views', COM_numberFormat($A['views']));
+		$report->set_var ('replies', COM_numberFormat($A['replies']));		
 	}
     $report->set_var ('topic_id', $topic_id);
     $report->set_var ('notify_id', $notify_recid);

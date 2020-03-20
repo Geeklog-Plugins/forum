@@ -45,9 +45,47 @@ if (!in_array('forum', $_PLUGINS)) {
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
+// Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
+$aname       = isset($_POST['aname'])              ? strip_tags($_POST['aname'])                        : '';
+$editid      = isset($_POST['editid'])             ? COM_applyFilter($_POST['editid'],true)             : '';
+$editpid     = isset($_POST['editpid'])            ? COM_applyFilter($_POST['editpid'],true)            : '';
+$editpost    = isset($_POST['editpost'])           ? COM_applyFilter($_POST['editpost'])                : '';
+$forum       = isset($_REQUEST['forum'])           ? COM_applyFilter($_REQUEST['forum'],true)           : '';
+$id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : ''; // Reply Topic Id
+$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : '';
+$mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
+$mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
+$notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
+$page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['page'],true)            : '';
+$quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
+$showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
+$silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
+$submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
+$postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
+
+// Not sure why but we have several topic id variables that can be passed in (this should be fixed at some point)
+// Lets figure out which one is being used and do some security checks. One passed will be >=0, not pssed will be ''
+// If not then $topic will be empty
+if ($id > 0) {
+	$topic = $id;
+} elseif ($editid > 0) {
+	$topic = $editid;
+} else {
+	$topic = '';
+}
 
 // Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess();	
+forum_chkUsercanAccess(false, $forum, $topic);
+
+// Lets check quote id now for security if passed
+if ($quoteid > 0) {
+	forum_chkUsercanAccess(false, '', $quoteid);
+}
+
+// If have topic id grab its forum id
+if (!empty($topic)) {
+	$forum = DB_getItem($_TABLES['forum_topic'],'forum',"id = $topic");
+}
 
 // Check if user is anonymous and can post as forum_chkUsercanAccess does not do this
 if ($CONF_FORUM['registered_to_post'] && COM_isAnonUser()) {
@@ -62,30 +100,12 @@ $ip = getenv("REMOTE_ADDR");
 $sqlresult = DB_query ("SELECT * FROM {$_TABLES['forum_banned_ip']} WHERE host_ip like '$ip'");
 $numRows = DB_numRows($sqlresult);
 if ($numRows > 0) {
+	ForumHeader($forum, $showtopic, $display);
     $display .= alertMessage(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']);
-    
     $display = COM_createHTMLDocument($display);
     COM_output($display);
     exit();
 }
-
-// Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$aname       = isset($_POST['aname'])              ? strip_tags($_POST['aname'])                        : '';
-$editid      = isset($_POST['editid'])             ? COM_applyFilter($_POST['editid'],true)             : '';
-$editpid     = isset($_POST['editpid'])            ? COM_applyFilter($_POST['editpid'],true)            : '';
-$editpost    = isset($_POST['editpost'])           ? COM_applyFilter($_POST['editpost'])                : '';
-$forum       = isset($_REQUEST['forum'])           ? COM_applyFilter($_REQUEST['forum'],true)           : '';
-$id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : '';
-$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : '';
-$mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
-$mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
-$notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
-$page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['page'],true)            : '';
-$quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
-$showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
-$silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
-$submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
-$postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 
 // Debug Code to show variables
 $display .= gf_showVariables();
@@ -727,7 +747,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         }
         $edittopic['mood'] = '';
         if ($quoteid > 0) {
-			$topicnavbar->set_var ('quoteid', $quoteid);
             $quotesql = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE id='$quoteid'");
             $quotearray = DB_fetchArray($quotesql);
             $quotearray['comment'] = stripslashes($quotearray['comment']);
@@ -1242,7 +1261,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
 		COM_mail($_CONF['site_mail'], $subjectline, $message);
 	}
 
-    $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id='$pid') OR ((forum_id='$forumid') AND (topic_id='0') )) GROUP BY uid";
+    $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id = $pid) OR ((forum_id = $forumid) AND (topic_id = 0) )) GROUP BY uid";
     $sqlresult = DB_query($sql);
     $nrows = DB_numRows($sqlresult);
 

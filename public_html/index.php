@@ -42,13 +42,9 @@ if (!in_array('forum', $_PLUGINS)) {
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-// Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess();
-
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $op        = isset($_REQUEST['op'])        ? COM_applyFilter($_REQUEST['op'])          : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])             : '';
-//$show      = isset($_REQUEST['show'])      ? COM_applyFilter($_REQUEST['show'],true)   : '';
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)   : '';
 $sort      = isset($_REQUEST['sort'])      ? COM_applyFilter($_REQUEST['sort'],true)   : '';
 $order     = isset($_REQUEST['order'])     ? COM_applyFilter($_REQUEST['order'],true)  : '';
@@ -56,6 +52,10 @@ $forum     = isset($_REQUEST['forum'])     ? COM_applyFilter($_REQUEST['forum'],
 $cat_id    = isset($_REQUEST['cat_id'])    ? COM_applyFilter($_REQUEST['cat_id'],true) : ''; // Used by marking posts read by category
 $category  = isset($_REQUEST['category'])  ? COM_applyFilter($_REQUEST['category'],true) : ''; // Used for display category forum index
 $populartype = isset($_REQUEST['populartype']) ? COM_applyFilter($_REQUEST['populartype']) : '';
+
+// Check is anonymous users can access and if not, regular user can access
+// Plus if can access forum
+forum_chkUsercanAccess(false, $forum);
 
 // Set search criteria (same as Geeklog Search) for highlight
 if (isset($_REQUEST['query'])) { 
@@ -664,11 +664,11 @@ if ($op == 'popular') {
 }
 
 if ($op == 'subscribe') {
-    if ($forum != 0) {
+    if ($forum > 0 AND $_USER['uid'] > 1) {
         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','0','{$_USER['uid']}', now() )");
         // Delete all individual topic notification records
         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' and topic_id > '0' " );
-        COM_redirect($_CONF['site_url'] .'/forum/index.php?msg=1&amp;forum=' .$forum);
+        COM_redirect($_CONF['site_url'] .'/forum/index.php?msg=1&amp;forum=' . $forum);
     } else {
         $display .= alertMessage($LANG_GF02['msg136'], $LANG_GF01['ERROR']);
     }
@@ -680,13 +680,13 @@ if ($op == 'subscribe') {
 // MAIN CODE BEGINS to view forums or topics within a forum
 
 isset($showtopic) or $showtopic = ''; // FIXME
-ForumHeader($forum,$showtopic,$display);
+ForumHeader($forum, $showtopic, $display);
 
 // Check if the number of records was specified to show - part of page navigation.
 $show = $CONF_FORUM['show_topics_perpage'];
 
 if ($forum > 0) {
-    $addforumvar = "&amp;forum=" .$forum;
+    $addforumvar = "&amp;forum=" . $forum;
     $topicCount = DB_count($_TABLES['forum_topic'], array('pid', 'forum'), array(0, $forum));
 } else {
     $topicCount = DB_count($_TABLES['forum_topic'], 'pid', 0);
@@ -716,7 +716,6 @@ if ($forum == 0) {
         $groups[] = $group;
     }
     $groupAccessList = implode(',',$groups);
-    //$category = 1;
     $sql = "SELECT * FROM {$_TABLES['forum_categories']}";
     if ($category > 0) {
     	$sql .= " WHERE id = $category";
@@ -1055,7 +1054,7 @@ if ($forum > 0) {
     $sql  = "SELECT forum.forum_name,category.id,category.cat_name,forum.is_readonly FROM {$_TABLES['forum_forums']} forum ";
     $sql .= "LEFT JOIN {$_TABLES['forum_categories']} category ON category.id=forum.forum_cat ";
     $sql .= "WHERE forum.forum_id = $forum";
-    $category = DB_fetchArray(DB_query($sql));
+    $categoryRecord = DB_fetchArray(DB_query($sql));
     if ($totalresults < 1) {
         $LANG_MSG05 = $LANG_GF02['msg05'];
         $topiclisting->set_var ('records_message', $LANG_GF02['msg05']);
@@ -1083,11 +1082,11 @@ if ($forum > 0) {
         }
     }
 
-    $topiclisting->set_var ('cat_name', $category['cat_name']);
-    $topiclisting->set_var ('category_id', $category['id']);
-    $topiclisting->set_var ('forum_name', $category['forum_name']);
+    $topiclisting->set_var ('cat_name', $categoryRecord['cat_name']);
+    $topiclisting->set_var ('category_id', $categoryRecord['id']);
+    $topiclisting->set_var ('forum_name', $categoryRecord['forum_name']);
     $topiclisting->set_var ('forum_id', $forum);
-    $topiclisting->set_var ('forum_name_forum', sprintf($LANG_GF01['FORUMNAME'], $category['forum_name']));
+    $topiclisting->set_var ('forum_name_forum', sprintf($LANG_GF01['FORUMNAME'], $categoryRecord['forum_name']));
     
     $geeklog_topic = '';
     if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
@@ -1108,7 +1107,7 @@ if ($forum > 0) {
     $topiclisting->set_var ('LANG_MSG05',$LANG_GF01['LASTPOST']);
     $topiclisting->set_var ('LANG_newforumposts', $LANG_GF02['msg113']);
 
-    if ($category['is_readonly'] == 0 OR forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
+    if ($categoryRecord['is_readonly'] == 0 OR forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
         $topiclisting->set_var ('LANG_newtopic', $LANG_GF01['NEWTOPIC']);
         $topiclisting->set_var('newtopiclinktext', $LANG_GF09['newtopic']);
         $topiclisting->set_var('newtopiclinkimg', gf_getImage('post_newtopic'));
@@ -1125,10 +1124,10 @@ if ($forum > 0) {
     $_STRUCT_DATA->add_BreadcrumbList('forum-breadcrumb', $forum_bc_id);
     $url = "{$_CONF['site_url']}/forum/index.php";
     $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 1, $url, $LANG_GF01['INDEXPAGE']);
-    $url = "{$_CONF['site_url']}/forum/index.php?category={$category['id']}";
-    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $category['cat_name']);
+    $url = "{$_CONF['site_url']}/forum/index.php?category={$categoryRecord['id']}";
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $categoryRecord['cat_name']);
     $url = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
-    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 3, $url, $category['forum_name']);    
+    $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 3, $url, $categoryRecord['forum_name']);    
 
     while ($record = DB_fetchArray($topicResults,false)) {
 
@@ -1308,12 +1307,10 @@ if ($forum > 0) {
 }
 
 $title = $LANG_GF01['FORUM'];
-if (isset($_REQUEST['forum'])) {
-    $forum_id = COM_applyFilter($_REQUEST['forum'],true);
-    $title = stripslashes(DB_getItem($_TABLES['forum_forums'],'forum_name',"forum_id='{$forum_id}'"));
+if ($forum > 0) {
+    $title = stripslashes(DB_getItem($_TABLES['forum_forums'],'forum_name',"forum_id=$forum"));
 }
-if (isset($_REQUEST['category'])) $title = $A['cat_name'];
-
+if ($category > 0) $title = $A['cat_name'];
 
 $display .= BaseFooter();
 $display = gf_createHTMLDocument($display, $title);

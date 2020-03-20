@@ -283,6 +283,7 @@ function ForumHeader($forum, $showtopic, &$display) {
     $navbar->parse ('output', 'topicheader');
     $display .= $navbar->finish($navbar->get_var('output'));
 
+/*
     if (($forum != '') || ($showtopic != '')) {
         if ($showtopic != '') {
             $forum_id = DB_getItem($_TABLES['forum_topic'],'forum',"id='$showtopic'");
@@ -303,6 +304,8 @@ function ForumHeader($forum, $showtopic, &$display) {
             exit;
         }
     }
+*/	
+	
 }
 
 function gf_checkHTMLforSQL($str,$postmode='html') {
@@ -1060,35 +1063,56 @@ function gf_updateLastPost($forumid = 0, $topicparent = 0) {
  * Check is anonymous users can access and if not, regular user can access.
  * If $secure then will be a feature check and if user logged in (elseif before takes care of user security check for features as well)
  */
-function forum_chkUsercanAccess($secure = false) {
-    global $_CONF, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER;
+function forum_chkUsercanAccess($secure = false, $forum = '', $showtopic = '') {
+    global $_CONF, $LANG_GF01, $LANG_GF02, $CONF_FORUM, $_USER, $_TABLES;
 
-    
+    $display = '';
+	
 	// Can anonymous users view posts
 	if ($CONF_FORUM['registration_required'] && COM_isAnonUser()) {
     	$message = sprintf($LANG_GF01['loginreqview'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
     	$display = alertMessage($message);
         $display = gf_createHTMLDocument($display);
         COM_output($display);
-
         exit;
 	// Can regular users view posts
 	} elseif ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {
     	$display = alertMessage($LANG_GF02['msg02'], $LANG_GF01['ACCESSERROR']);
         $display = gf_createHTMLDocument($display);
         COM_output($display);
-
         exit;
 	// Login required to use this feature of the forum
-    //} elseif ($secure AND empty($_USER['uid'])) {
     } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
 		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-		$display = alertMessage($message, $LANG_GF01['ACCESSERROR']);
+		ForumHeader($forum, $showtopic, $display);
+		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
 		$display = gf_createHTMLDocument($display);
 		COM_output($display);
-	
 		exit;    	
     }
+	
+	// Check for forum and topic access if passed
+    if (($forum != '') || ($showtopic != '')) {
+        if ($showtopic != '') {
+            $forum_id = DB_getItem($_TABLES['forum_topic'],'forum',"id='$showtopic'");
+            $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum_id'");
+        } elseif ($forum != "") {
+            $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum'");
+        }
+        // Double check forum and/or topic exists
+        if ($grp_id == "") {
+            COM_handle404("{$_CONF['site_url']}/forum/index.php");
+            exit;
+        }        
+        $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
+        if (!SEC_inGroup($groupname)) {
+			ForumHeader($forum, $showtopic, $display);
+        	$display .= alertMessage($LANG_GF02['msg77'], $LANG_GF01['ACCESSERROR']);
+            $display = gf_createHTMLDocument($display);
+            COM_output($display);            
+            exit;
+        }
+    }	
 }
 
 /**

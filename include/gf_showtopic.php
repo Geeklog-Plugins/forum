@@ -156,8 +156,6 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         $isUserBanned = USER_isBanned($showtopic['uid']);
         $userarray = DB_fetchArray($userQuery);
         $username = COM_getDisplayName($showtopic['uid']);
-        //$userlink = "<a href=\"{$_CONF['site_url']}/users.php?mode=profile&amp;uid={$showtopic['uid']}\" ";
-        //$userlink .= "class=\"authorname {$onetwo}\"><b>{$username}</b></a>";
         $userlink = COM_getProfileLink($showtopic['uid'], $username);
         
         $uservalid = true;
@@ -290,7 +288,8 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
             $editAllowed = true;
         }
         if ($editAllowed) {
-            $editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;forum={$showtopic['forum']}&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
+			//$editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;forum={$showtopic['forum']}&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
+            $editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
             $editlinktext = $LANG_GF09['edit'];
             $topictemplate->set_var ('editlink', $editlink);
             $topictemplate->set_var ('editlinktext', $editlinktext);
@@ -334,7 +333,8 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         if ($is_lockedtopic == 0) {
             $is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly','forum_id=' . $showtopic['forum']);
             if ($is_readonly == 0 OR forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_edit')) {
-                $quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum={$showtopic['forum']}&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";
+                //$quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum={$showtopic['forum']}&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";
+				$quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";
                 $quotelinktext = $LANG_GF09['quote'];
                 $topictemplate->set_var ('quotelink', $quotelink);
                 $topictemplate->set_var ('quotelinktext', $quotelinktext);

@@ -58,7 +58,6 @@ $op          = isset($_GET['op'])              ? COM_applyFilter($_GET['op'])   
 $order       = isset($_GET['order'])           ? COM_applyFilter($_GET['order'],true)           : '';
 $page        = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
 $prevorder   = isset($_GET['prevorder'])       ? COM_applyFilter($_GET['prevorder'],true)       : '';
-//$show        = isset($_GET['show'])            ? COM_applyFilter($_GET['show'],true)            : '';
 $showuser    = isset($_GET['showuser'])        ? COM_applyFilter($_GET['showuser'],true)        : '';
 $sort        = isset($_GET['sort'])            ? COM_applyFilter($_GET['sort'],true)            : '';
 

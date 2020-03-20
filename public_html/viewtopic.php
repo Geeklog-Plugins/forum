@@ -48,9 +48,6 @@ $mytimer->startTimer();
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
-// Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess();
-
 $mytimer = new timerobject();
 $mytimer->startTimer();
 
@@ -63,6 +60,8 @@ $onlytopic = isset($_REQUEST['onlytopic']) ? COM_applyFilter($_REQUEST['onlytopi
 $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)      : '';
 $showtopic = isset($_REQUEST['showtopic']) ? COM_applyFilter($_REQUEST['showtopic'],true) : ''; // Required to be parent topic, if other topic id found then will be redirected
 
+// Check is anonymous users can access and if not, regular user can access
+forum_chkUsercanAccess(false, '', $showtopic);
 
 // If set to 1 then show preview of topic. For iframe for createtopic.php
 if ($onlytopic != 1) {
@@ -250,6 +249,7 @@ if ($onlytopic) {
 $show = $CONF_FORUM['show_posts_perpage'];
 
 // Find topic assignment if exists for topic or at a higher level
+// Note: We don't care about Geeklog topic security for forum topics
 forum_getGeeklogTopic(TOPIC_TYPE_FORUM_TOPIC, $showtopic);
 
 $sql  = "SELECT a.forum,a.pid,a.locked,a.subject,a.replies,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name ";
@@ -321,7 +321,8 @@ if (!$onlytopic) {
         $newtopiclinktext = $LANG_GF09['newtopic'];
         $newtopiclinkimg = gf_getImage('post_newtopic');
         if ($viewtopic['locked'] != 1) {
-            $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
+			//$replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
+            $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopic_id";
             $topicnavbar->set_var ('replytopiclink', $replytopiclink);
             $topicnavbar->set_var ('replytopiclinkimg', gf_getImage('post_reply'));
             $topicnavbar->set_var ('replytopiclinktext', $LANG_GF09['replytopic']);
@@ -519,7 +520,8 @@ if (!$onlytopic) {
         $topic_footer->parse ('newtopic_link', 'newtopic_link');
 
         if ($viewtopic['locked'] != 1) {
-            $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
+			//$replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
+            $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopic_id";
             $topic_footer->set_var ('replytopiclink', $replytopiclink);
             $topic_footer->set_var ('replytopiclinkimg', gf_getImage('post_reply'));
             $topic_footer->set_var ('replytopiclinktext', $LANG_GF09['replytopic']);
