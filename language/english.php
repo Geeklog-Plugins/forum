@@ -296,12 +296,14 @@ $LANG_GF02['msg134']   = 'Subscription Added';
 $LANG_GF02['msg135']   = 'You will now be notified of all posts to this forum.';
 $LANG_GF02['msg136']   = 'You must choose a forum to subscribe to.';
 $LANG_GF02['msg137']   = 'Notification for topic enabled';
-$LANG_GF02['msg138']   = '<b>Subscribed to complete forum</b>';
+$LANG_GF02['msg138a']  = 'Listed below are all the forum topics you have subscribed to. This means for these subscriptions you will receive an email notification when someone replies to one of your subscribed topics.';
+$LANG_GF02['msg138b']  = 'Listed below are all the forums you have subscribed to. This means for these subscriptions you will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).';
+$LANG_GF02['msg138c']  = 'Listed below are all the topics that belong to the forum(s) you have subscribed to (see Forum Notifications), but you have unsubscribed from and chosen not to receive any more topic reply email notifications for.';
 $LANG_GF02['msg142']   = 'Notification saved.';
 $LANG_GF02['msg143']   = 'Notification saved but, no email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg144']   = 'Return to topic';
 $LANG_GF02['msg145']   = 'No email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
-$LANG_GF02['msg146']   = 'Notification Deleted';
+$LANG_GF02['msg146']   = 'Notification(s) Deleted.';
 $LANG_GF02['msg147']   = 'Forum [printable version of topic %s]';
 $LANG_GF02['msg148']   = 'Click <a href="javascript:history.back()">HERE</a> to return';
 $LANG_GF02['msg149']   = 'Forum post canceled.';
@@ -445,7 +447,7 @@ $LANG_GF07 = array (
 /* Forum User Features */
 $LANG_GF08 = array (
     1   => 'Topic Notifications',
-    2   => 'Track Forum Notifications',
+    2   => 'Forum Notifications',
     3   => 'Topic Exception Notifications'
 );
 

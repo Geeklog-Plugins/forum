@@ -28,6 +28,7 @@
 <div class="uk-grid">
   	<div class="uk-width-7-10">
 		<form class="uk-form" action="{phpself}" method="post">
+			{!if forum}<input type="hidden" name="forum" value="{forum}"{xhtml}>{!endif}
 			<div class="uk-form-controls">
 				<select name="filter" onchange="this.form.submit();">{filter_options}</select>
 			</div>
@@ -38,10 +39,16 @@
 	</div>
 </div>
 
+{!if lang_notify_filter_desc}
+<p>{lang_notify_filter_desc}</p>
+{!endif}
+
 <div class="uk-overflow-container uk-margin">
 	<form class="uk-form" action="{phpself}" method="post" name="report_table">
 		<div class="uk-form-controls">
 			<input type="hidden" name="op" value=""{xhtml}>
+			{!if forum}<input type="hidden" name="forum" value="{forum}"{xhtml}>{!endif}
+			<input type="hidden" name="filter" value="{notifytype}"{xhtml}>
 			<table class="uk-table uk-table-hover uk-table-striped uk-table-condensed uk-text-nowrap">
 				<thead>
 					<tr>
@@ -90,13 +97,13 @@
 	<td class="uk-text-center">
 		<input type="checkbox" name="chk_record_delete[]" value="{id}"{xhtml}>
 	</td>
-	<td>{forum}</td>
-	<td>{is_forum}&nbsp;{topic_link}</td>
+	<td>{forum_link}</td>
+	<td>{topic_link}</td>
 	<td>{date_added}</td>
 	<td>{topicauthor}</td>
 	<td class="uk-visible-large uk-text-center">{views}</td>
 	<td class="uk-visible-large uk-text-center">{replies}</td>
-	<td><a class="uk-button uk-button-small" href="notify.php?submit=delete&amp;id={notify_id}&amp;filter={notifytype}">{LANG_REMOVE}</a></td>
+	<td><a class="uk-button uk-button-small" href="notify.php?submit=delete&amp;id={notify_id}{!if forum}&amp;forum={forum}{!endif}&amp;filter={notifytype}">{LANG_REMOVE}</a></td>
 </tr>
 <!-- END notification_record -->
 

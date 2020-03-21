@@ -78,7 +78,7 @@ if ($id > 0) {
 forum_chkUsercanAccess(false, $forum, $topic);
 
 // Lets check quote id now for security if passed
-if ($quoteid > 0) {
+if (!empty($quoteid)) {
 	forum_chkUsercanAccess(false, '', $quoteid);
 }
 
@@ -359,7 +359,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     // Check for any users subscribed notifications - would only be for users subscribed to the forum
                     gf_chknotifications($forum,$lastid,$uid,"forum");
-                    //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
+                    // NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
                     $currentNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
                     if ($notify == 1 AND $currentNotifyRecID < 1) {
                         DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$lastid','{$_USER['uid']}',now() )");
@@ -476,7 +476,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     $currentForumNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
                     $currentTopicNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$id AND uid='$uid'");
                     $currentTopicUnNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$nid AND uid='$uid'");
-                    if ($notify == 1 AND $currentForumNotifyRecID < 1) {
+					// Only insert topic notification if not already subscribed to forum or parent topic
+                    if ($notify == 1 AND $currentForumNotifyRecID < 1 AND $currentTopicNotifyRecID < 1) {
                         $sql = "INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) ";
                         $sql .= "VALUES ('$forum','$id','$_USER[uid]',now() )";
                         DB_query($sql);
