@@ -1036,6 +1036,9 @@ function gf_updateLastPost($forumid = 0, $topicparent = 0) {
 			 
 			// Update the forum definition record to know the number of topics and number of posts
 			DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=$lastrecid, topic_count=$topicCount, post_count=$postCount WHERE forum_id=$forumid");		
+		} else {
+			// Forum has no posts
+			DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec=0, topic_count=0, post_count=0 WHERE forum_id=$forumid");		
 		}
 	}
 	

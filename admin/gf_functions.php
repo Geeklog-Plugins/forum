@@ -80,46 +80,20 @@ function gf_resyncforum($id) {
 	$recCount = 0;
 
     COM_errorLog("Re-Syncing Forum id:$id");
+	
+	// Update forum record for: last_post_rec, topic_count, post_count
+	// Even for forums with 0 posts as something could have happened 
+	gf_updateLastPost($id);
+	
     // Update all the Topics lastupdated timestamp to that of the last posted comment
     $topicsQuery = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE forum=$id AND pid=0");
     $topicCount = DB_numRows($topicsQuery);
     if ($topicCount > 0) {
-		
-		// Update forum record for: last_post_rec, topic_count, post_count
-		gf_updateLastPost($id);
-		
-		/*
-        $lastTopicQuery = DB_query("SELECT MAX(id) AS maxid FROM {$_TABLES['forum_topic']} WHERE forum=$id");
-        $lasttopic = DB_fetchArray($lastTopicQuery);
-        DB_query("UPDATE {$_TABLES['forum_forums']} SET last_post_rec = {$lasttopic['maxid']} WHERE forum_id=$id");
-        $postCount = DB_Count($_TABLES['forum_topic'],'forum',$id);
-        // Update the forum definition record to know the number of topics and number of posts
-        DB_query("UPDATE {$_TABLES['forum_forums']} SET topic_count=$topicCount, post_count=$postCount WHERE forum_id=$id");
-		*/
         while($trecord = DB_fetchArray($topicsQuery)) {
             $recCount++;
 			
 			// Update topic record for: lastupdated, last_reply_rec, numreplies
 			gf_updateLastPost(0, $trecord['id']);
-			
-			/*
-            // Retrieve the oldest post records for this topic and update the lastupdated time in the parent topic record
-            $lsql = DB_query("SELECT MAX(id) AS maxid FROM {$_TABLES['forum_topic']} WHERE pid={$trecord['id']}");
-            $lastrec = DB_fetchArray($lsql);
-            if ($lastrec['maxid'] != NULL) {
-                $postCount = DB_count($_TABLES['forum_topic'],'forum',$id);
-                $latest = DB_getItem($_TABLES['forum_topic'], 'date', "id={$lastrec['maxid']}");
-                DB_query("UPDATE {$_TABLES['forum_topic']} SET lastupdated = '$latest' WHERE id='{$trecord['id']}'");
-                // Update the parent topic record to know the id of the Last Reply
-                DB_query("UPDATE {$_TABLES['forum_topic']} SET last_reply_rec = {$lastrec['maxid']} WHERE id='{$trecord['id']}'");
-            } else {
-                $latest = DB_getItem($_TABLES['forum_topic'], 'date', "id={$trecord['id']}");
-                DB_query("UPDATE {$_TABLES['forum_topic']} SET lastupdated = '$latest' WHERE id='{$trecord['id']}'");
-            }
-            // Recalculate and Update the number of replies
-            $numreplies = DB_Count($_TABLES['forum_topic'], "pid", $trecord['id']);
-            DB_query("UPDATE {$_TABLES['forum_topic']} SET replies = '$numreplies' WHERE id='{$trecord['id']}'");
-			*/
         }
         COM_errorLog("$recCount Topic Records Updated");
     } else {
