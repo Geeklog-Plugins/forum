@@ -52,7 +52,7 @@ $editpid     = isset($_POST['editpid'])            ? COM_applyFilter($_POST['edi
 $editpost    = isset($_POST['editpost'])           ? COM_applyFilter($_POST['editpost'])                : '';
 $forum       = isset($_REQUEST['forum'])           ? COM_applyFilter($_REQUEST['forum'],true)           : '';
 $id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : ''; // Reply Topic Id
-$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : '';
+$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : ''; // newtopic, postreply, or edit
 $mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
 $mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
 $notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
@@ -141,10 +141,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
     $editAllowed = false;
     $moderator_anon_post = false;
     $editmoderator = false;
+	$uidPost = DB_getItem($_TABLES['forum_topic'],'uid',"id='$id'");
     if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
         $editmoderator = true;
         $editAllowed = true;
-        if (DB_getItem($_TABLES['forum_topic'],'uid',"id='$id'") == 1) {
+        if ($uidPost == 1) {
             $moderator_anon_post = true;
         }
     } else {
@@ -222,12 +223,10 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             }
 
             //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
-            $notifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id='$topicparent' AND uid='$uid'");
-            if ($notify == 1 AND $notifyRecID < 1) {
-                DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$topicparent','{$_USER['uid']}',now() )");
-            } elseif ($notify == '' AND $notifyRecID > 1) {
-                DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$notifyRecID");
-            }
+			// Make sure user only changes notifications for his own posts when editing
+			if ($uid == $uidPost) {
+				gf_setnotification($notify, $forum, $topicparent, $uid);
+			}
 
             // if user has un-checked the Silent option then they want to have user alerted of the edit and update the topic timestamp
             if ($silentedit != 1) {
@@ -240,7 +239,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 
             PLG_itemSaved($editid, 'forum');
             COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-            // Remove new block and centerblock cached items
+            
+			// Remove new block and centerblock cached items
             $cacheInstance = 'forum__newpostsblock_';
             CACHE_remove_instance($cacheInstance);
             $cacheInstance = 'forum__centerblock_';
@@ -348,7 +348,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-                    // Remove new block and centerblock cached items
+                    
+					// Remove new block and centerblock cached items
                     $cacheInstance = 'forum__newpostsblock_';
                     CACHE_remove_instance($cacheInstance);
                     $cacheInstance = 'forum__centerblock_';
@@ -359,16 +360,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     // Check for any users subscribed notifications - would only be for users subscribed to the forum
                     gf_chknotifications($forum,$lastid,$uid,"forum");
-                    // NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
-                    $currentNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
-                    if ($notify == 1 AND $currentNotifyRecID < 1) {
-                        DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$lastid','{$_USER['uid']}',now() )");
-                    } elseif ($notify == '' AND $currentNotifyRecID > 1) { // Subscribed to forum - but does not want to be notified about this topic
-                        $nlastid = -$lastid;  // Negative Value
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$lastid'");
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$nlastid'");
-                        DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nlastid','$uid',now() )");
-                    }
+                    
+					// NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
+					gf_setnotification($notify, $forum, $lastid, $uid);
 
                     COM_updateSpeedlimit ('forum');
 
@@ -378,12 +372,13 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     }
                     COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
                 }
-
             } else {
                 $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
             }
         }
 // END OF A NEW TOPIC...
+
+// ADD REPLY
      } elseif ($method == 'postreply') {
         if ( function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha') ) {
             if ( function_exists('plugin_itemPreSave_captcha') ) {
@@ -461,7 +456,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
                     PLG_itemSaved($lastid, 'forum');
                     COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-                    // Remove new block and centerblock cached items
+                    
+					// Remove new block and centerblock cached items
                     $cacheInstance = 'forum__newpostsblock_';
                     CACHE_remove_instance($cacheInstance);
                     $cacheInstance = 'forum__centerblock_';
@@ -471,31 +467,12 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                     DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 
                     //NOTIFY - Checkbox variable in form set to "on" when checked and they don't already have subscribed to forum or topic
-                    $nid = -$id;  // Negative Topic ID Value
-                
-                    $currentForumNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
-                    $currentTopicNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$id AND uid='$uid'");
-                    $currentTopicUnNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$nid AND uid='$uid'");
-					// Only insert topic notification if not already subscribed to forum or parent topic
-                    if ($notify == 1 AND $currentForumNotifyRecID < 1 AND $currentTopicNotifyRecID < 1) {
-                        $sql = "INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) ";
-                        $sql .= "VALUES ('$forum','$id','$_USER[uid]',now() )";
-                        DB_query($sql);
-                    } elseif ($notify == 1 AND $currentTopicUnNotifyRecID > 1) { // Had un-subcribed to topic and now wants to subscribe
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$currentTopicUnNotifyRecID");
-                    } elseif ($notify == '' AND $currentTopicNotifyRecID > 1) { // Subscribed to topic - but does not want to be notified anymore
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$id'");
-                    } elseif ($notify == '' AND $currentForumNotifyRecID > 1) { // Subscribed to forum - but does not want to be notified about this topic
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$id'");
-                        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$nid'");
-                        DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nid','$uid',now() )");
-                    }
+					gf_setnotification($notify, $forum, $id, $uid);
+					
                     COM_updateSpeedlimit ('forum');
 					$url = html_entity_decode(forum_buildForumPostURL($lastid));
 					COM_redirect($url);
-					
                 }
-
             } else {
                 $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
             }
@@ -1015,24 +992,28 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
         }
     }
+	
     $locked_prompt = '';
     $sticky_prompt = '';
     $notify_prompt = '';
     if ($editmoderator) {
-        if ($notify == 1 || (isset($_POST['notify']) && $_POST['notify'] == 1)) {
-            $notify_val = 'checked="checked"';
-        } else {
-            $notify_val = '';
-        }
-        // Notify Option
-        $submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg38']);
-        $submissionform_main->set_var ('option_name', 'notify');
-        $submissionform_main->set_var ('option_checked', $notify_val);
-        $submissionform_main->set_var ('option_extra', '');
-        $submissionform_main->parse ('option', 'submissionform_option', true);
-        $options_exist = true;
+		// Only show notifications for new or edit of own posts
+		if (($method == 'edit' AND $uid == $edittopic['uid']) OR ($method == 'postreply') OR ($method == 'newtopic')) {
+			if ($notify == 1 || (isset($_POST['notify']) && $_POST['notify'] == 1)) {
+				$notify_val = 'checked="checked"';
+			} else {
+				$notify_val = '';
+			}
+			// Notify Option
+			$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg38']);
+			$submissionform_main->set_var ('option_name', 'notify');
+			$submissionform_main->set_var ('option_checked', $notify_val);
+			$submissionform_main->set_var ('option_extra', '');
+			$submissionform_main->parse ('option', 'submissionform_option', true);
+			$options_exist = true;
+		}
 
-        // check that this is the parent topic - only able to make it skicky or locked
+        // check that this is the parent topic - only able to make it sticky or locked
         if ($editpid == 0) {
             if (!isset($locked_val) AND !isset($sticky_val) AND $method == 'edit') {
 				$locked_val = '';
@@ -1070,7 +1051,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             } else {
                 $notify_val = '';
             }
-            //$notify_prompt = '<label for="notify">' . $LANG_GF02['msg38']. '</label><br' . XHTML . '><input type="checkbox" name="notify" id="notify" value="on" ' . $notify_val. XHTML . '>';
             // Notify Option
 			$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg38']);
 			$submissionform_main->set_var ('option_name', 'notify');
@@ -1210,6 +1190,36 @@ COM_output($display);
 
 
 /*
+* Function is called to add and exempt topic notifications as needed
+*/
+function gf_setnotification($notify, $forum, $id, $uid) 
+{
+	global $_TABLES;
+	
+	if ($uid > 1) {
+		$nid = -$id;  // Negative Topic ID Value for exemption
+
+		$currentForumNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=0 AND uid='$uid'");
+		$currentTopicNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$id AND uid='$uid'");
+		$currentTopicUnNotifyRecID = DB_getItem($_TABLES['forum_watch'],'id', "forum_id='$forum' AND topic_id=$nid AND uid='$uid'");
+		// Only insert topic notification if not already subscribed to forum or parent topic
+		if ($notify == 1 AND $currentForumNotifyRecID < 1 AND $currentTopicNotifyRecID < 1) {
+			$sql = "INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) ";
+			$sql .= "VALUES ('$forum','$id','$uid',now() )";
+			DB_query($sql);
+		} elseif ($notify == 1 AND $currentTopicUnNotifyRecID > 1) { // Had un-subcribed to topic and now wants to subscribe
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id=$currentTopicUnNotifyRecID");
+		} elseif ($notify == '' AND $currentTopicNotifyRecID > 1) { // Subscribed to topic - but does not want to be notified anymore
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$id'");
+		} elseif ($notify == '' AND $currentForumNotifyRecID > 1) { // Subscribed to forum - but does not want to be notified about this topic
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$id'");
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='$uid' AND forum_id='$forum' and topic_id = '$nid'");
+			DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$nid','$uid',now() )");
+		}
+	}
+}
+
+/*
 * Function is called to check for notifications that may be setup by forum users
 * A record in the forum_watch table is created for each users's subscribed notifications
 * Users can subscribe to a complete forum or individual topics.
@@ -1217,7 +1227,8 @@ COM_output($display);
 *
 * This function needs to be called when there is a new topic or a reply
 */
-function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
+function gf_chknotifications($forumid, $topicid, $userid, $type='topic') 
+{
     global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM, $LANG08;
 
     $pid = DB_getItem($_TABLES['forum_topic'],'pid',"id='$topicid'");
@@ -1278,7 +1289,7 @@ function gf_chknotifications($forumid,$topicid,$userid,$type='topic') {
             
 			// if the topic_id is 0 for this record - user has subscribed to complete forum. Check if they have opted out of this forum topic.
             if (DB_count($_TABLES['forum_watch'],array('uid','forum_id','topic_id'),array($N['uid'],$forumid,-$topicid)) == 0) {
-                
+               
 				// Check if user does not want to receive multiple notifications for same topic and already has been notified
                 $userNotifyOnceOption = DB_getItem($_TABLES['forum_userprefs'],'notify_once',"uid='{$N['uid']}'");
                 
