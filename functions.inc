@@ -1308,7 +1308,9 @@ function forum_deleteForumPost($id)
 			// Now lets delete those replies
 			DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE pid = $id");
 
-			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id = $id");
+			// Remove any topic notifications and exemptions
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE topic_id = $id");
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE topic_id = -$id");
 		}
 		
 		// Delete Likes for current message being deleted
