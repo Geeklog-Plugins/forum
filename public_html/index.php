@@ -308,7 +308,8 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
         for ($i = 1; $i <= $nrows; $i++) {
             $P = DB_fetchArray($result);
 
-			$link = "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum={$P['forum']}&amp;showtopic={$P['id']}\">";
+			//$link = "<a href=\"{$_CONF['site_url']}/forum/viewtopic.php?forum={$P['forum']}&amp;showtopic={$P['id']}\">";
+			$link = '<a href="' . forum_buildForumPostURL($P['id']) . '">';
 			$report->set_var('post_start_ahref', $link);
 			$report->set_var('post_subject', $P['subject']);
 			$report->set_var('csscode', $csscode);
