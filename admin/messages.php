@@ -197,7 +197,14 @@ $report->set_var('gltoken', SEC_createToken());
 if ($nrows > 0) {
     $numpages = ceil($nrows / $show);
     $offset = ($page - 1) * $show;
-    $base_url = $_CONF['site_admin_url'] . '/plugins/forum/messages.php?forum='.$forum;
+	
+	$base_url = $_CONF['site_admin_url'] . '/plugins/forum/messages.php?forum='.$forum;
+	if ($member > 0) {
+		$base_url .= "&amp;member=$member";
+	}
+	if ($parentonly == 1) {
+		$base_url .= "&amp;parentonly=$parentonly";
+	}	
     $report->set_var('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
 
     $query = DB_query("SELECT * FROM {$_TABLES['forum_topic']} $whereSQL ORDER BY id DESC LIMIT $offset, $show");
