@@ -117,11 +117,13 @@ function gf_cleanforum($id = 0) {
 		$forumSQL = "AND forum = $id";
 		$forumModSQL = "AND mod_forum = $id";
 		$forumWatchSQL = "AND forum_id = $id";
+		$forumWatchDupSQL = "AND fw1.forum_id = $id";
 	} else {
 		COM_errorLog("Cleaning all Forums");
 		$forumSQL = "";
 		$forumModSQL = "";
 		$forumWatchSQL = "";
+		$forumWatchDupSQL = "";
 	}
 
 	// last_reply_rec should only be used by parent topics
@@ -192,8 +194,28 @@ function gf_cleanforum($id = 0) {
 	// If forum doesn't exist anymore then delete
 	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE forum_id NOT IN (SELECT forum_id from {$_TABLES['forum_forums']}) $forumWatchSQL");
 	$delRowCount = $delRowCount + DB_affectedRows($result);
-	// If topic (and it is parent) doesn't exist anymore then delete (also check negative topic_ids)
-	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE ABS(topic_id) NOT IN (SELECT id from {$_TABLES['forum_topic']}) $forumWatchSQL");
+	// If topic (and it is a parent) doesn't exist anymore then delete (also check negative topic_ids)
+	$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE topic_id != 0 AND ABS(topic_id) NOT IN (SELECT id from {$_TABLES['forum_topic']} WHERE pid = 0) $forumWatchSQL");
+	$delRowCount = $delRowCount + DB_affectedRows($result);
+	// Delete Topic Exemptions that don't have a corresponding Forum Notification
+	$sql = "SELECT fw1.id fwid FROM {$_TABLES['forum_watch']} fw1 WHERE fw1.topic_id < 0 AND ABS(fw1.topic_id) NOT IN (SELECT ft.id from {$_TABLES['forum_topic']} ft, {$_TABLES['forum_watch']} fw2 WHERE ft.forum = fw2.forum_id AND fw2.topic_id = 0 AND fw1.uid = fw2.uid) $forumWatchDupSQL";
+    $result = DB_query($sql);
+    $numRows = DB_numRows($result);
+    if ($numRows > 0) {
+		$delIdList = '';
+        while($A = DB_fetchArray($result)) {
+			// Now update old pid with new min forum post id
+			if (!empty($delIdList)) {
+				$delIdList .= ", ";
+			}
+			$delIdList .= $A['fwid'];
+		}
+		
+		$result = DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE id IN ($delIdList)");
+		$delRowCount = $delRowCount + DB_affectedRows($result);
+	}	
+	// Remove any duplicate notifications (topic or forum) (a bug allowed this to happen in certain situations at one point)
+	$result = DB_query("DELETE fw1 FROM {$_TABLES['forum_watch']} fw1, {$_TABLES['forum_watch']} fw2 WHERE fw1.id > fw2.id AND fw1.forum_id = fw2.forum_id AND fw1.topic_id = fw2.topic_id AND fw1.uid = fw2.uid $forumWatchDupSQL");
 	$delRowCount = $delRowCount + DB_affectedRows($result);
 
 	COM_errorLog("Number of Orphan Topic Records (no parent topic found) Fixed: $orphanTopicRowCount - Number of Records Cleaned from Forum Tables: $delRowCount");
