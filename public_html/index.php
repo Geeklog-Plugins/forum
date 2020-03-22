@@ -87,7 +87,10 @@ if (!COM_isAnonUser() && $op == 'markallread') {
 		$url = $_CONF['site_url'] . "/forum/index.php?forum=$forum";
 		$message = $LANG_GF02['msg302a'];
 	} else {
-		if (empty($category)) {
+		if ($category == 0) {
+			// filter issue
+			COM_handle404('/forum/index.php');			
+		} elseif (empty($category)) {
 			$csql = DB_query("SELECT id FROM {$_TABLES['forum_categories']} ORDER BY id");
 			while (list ($categoryID) = DB_fetchArray($csql)) {
 				$categories[] = $categoryID;
@@ -102,12 +105,15 @@ if (!COM_isAnonUser() && $op == 'markallread') {
 		}
 	}
 
+	$markedFlag = false;
     foreach ($categories as $category) {
         $fsql = DB_query("SELECT forum_id,grp_id FROM {$_TABLES['forum_forums']} WHERE forum_cat=$category $forumSQL");
 
         while ($frecord = DB_fetchArray($fsql)) {
             $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='{$frecord['grp_id']}'");
             if (SEC_inGroup($groupname)) {
+				// Means have access
+				$markedFlag = true;
                 DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE uid={$_USER['uid']} AND forum={$frecord['forum_id']}");
                 $tsql = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE forum={$frecord['forum_id']} AND pid=0");
                 while($trecord = DB_fetchArray($tsql)){
@@ -120,9 +126,13 @@ if (!COM_isAnonUser() && $op == 'markallread') {
         }
     }
 
-	COM_setSystemMessage($message, $LANG_GF02['msg197']);
-	
-    COM_redirect($url);
+	if ($markedFlag) {
+		COM_setSystemMessage($message, $LANG_GF02['msg197']);
+		COM_redirect($url);
+	} else {
+		// Someone trying to mark all as read who doesn't have access (category issue not forum as that is checked already)
+		COM_handle404('/forum/index.php');
+	}
 }
 
 // Debug Code to show variables
