@@ -55,7 +55,6 @@ $display .= gf_showVariables();
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $confirmbanip     = isset($_POST['confirmbanip'])     ? COM_applyFilter($_POST['confirmbanip'])          : '';
 $confirm_move     = isset($_POST['confirm_move'])     ? COM_applyFilter($_POST['confirm_move'])          : '';
-//$forum            = isset($_REQUEST['forum'])         ? COM_applyFilter($_REQUEST['forum'],true)         : '';
 $hostip           = isset($_POST['hostip'])           ? COM_applyFilter($_POST['hostip'])                : '';
 $modconfirmdelete = isset($_POST['modconfirmdelete']) ? COM_applyFilter($_POST['modconfirmdelete'])      : '';
 $modfunction      = isset($_REQUEST['modfunction'])   ? COM_applyFilter($_REQUEST['modfunction'])        : '';
@@ -71,7 +70,7 @@ $top              = isset($_REQUEST['top'])           ? COM_applyFilter($_REQUES
 // Find Forum for forum post
 $forum = DB_getItem($_TABLES['forum_topic'], 'forum', "id = $msgid");
 
-ForumHeader($forum, $showtopic, $display);
+ForumHeader('', $forum, $showtopic, $display);
 
 if (empty($forum)) {
     $display .= alertMessage($LANG_GF02['msg72']);

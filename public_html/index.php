@@ -49,8 +49,7 @@ $page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],t
 $sort      = isset($_REQUEST['sort'])      ? COM_applyFilter($_REQUEST['sort'],true)   : '';
 $order     = isset($_REQUEST['order'])     ? COM_applyFilter($_REQUEST['order'],true)  : '';
 $forum     = isset($_REQUEST['forum'])     ? COM_applyFilter($_REQUEST['forum'],true)  : '';
-$cat_id    = isset($_REQUEST['cat_id'])    ? COM_applyFilter($_REQUEST['cat_id'],true) : ''; // Used by marking posts read by category
-$category  = isset($_REQUEST['category'])  ? COM_applyFilter($_REQUEST['category'],true) : ''; // Used for display category forum index
+$category  = isset($_REQUEST['category'])  ? COM_applyFilter($_REQUEST['category'],true) : ''; // Used for display category forum index and to mark all posts as read
 $populartype = isset($_REQUEST['populartype']) ? COM_applyFilter($_REQUEST['populartype']) : '';
 
 // Check is anonymous users can access and if not, regular user can access
@@ -79,18 +78,33 @@ $todaysdate = date($_CONF['shortdate']);
 // Check to see if request to mark all topics read was requested
 if (!COM_isAnonUser() && $op == 'markallread') {
     $now = time();
+	
     $categories = array();
-    if ($cat_id == 0) {
-        $csql = DB_query("SELECT id FROM {$_TABLES['forum_categories']} ORDER BY id");
-        while (list ($categoryID) = DB_fetchArray($csql)) {
-            $categories[] = $categoryID;
-        }
-    } else {
-        $categories[] = $cat_id;
-    }
+	$forumSQL = "";
+	if (!empty($forum)) {
+		$categories[] = DB_getItem($_TABLES['forum_forums'],'forum_cat',"forum_id = $forum");
+		$forumSQL = " AND forum_id = $forum";
+		$url = $_CONF['site_url'] . "/forum/index.php?forum=$forum";
+		$message = $LANG_GF02['msg302a'];
+	} else {
+		if (empty($category)) {
+			$csql = DB_query("SELECT id FROM {$_TABLES['forum_categories']} ORDER BY id");
+			while (list ($categoryID) = DB_fetchArray($csql)) {
+				$categories[] = $categoryID;
+			}
+			
+			$url = $_CONF['site_url'] .'/forum/index.php';
+			$message = $LANG_GF02['msg301a'];
+		} else {
+			$categories[] = $category;
+			$url = $_CONF['site_url'] . "/forum/index.php?category=$category";
+			$message = $LANG_GF02['msg303a'];
+		}
+	}
 
     foreach ($categories as $category) {
-        $fsql = DB_query("SELECT forum_id,grp_id FROM {$_TABLES['forum_forums']} WHERE forum_cat=$category");
+        $fsql = DB_query("SELECT forum_id,grp_id FROM {$_TABLES['forum_forums']} WHERE forum_cat=$category $forumSQL");
+
         while ($frecord = DB_fetchArray($fsql)) {
             $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='{$frecord['grp_id']}'");
             if (SEC_inGroup($groupname)) {
@@ -106,7 +120,9 @@ if (!COM_isAnonUser() && $op == 'markallread') {
         }
     }
 
-    COM_redirect($_CONF['site_url'] .'/forum/index.php');
+	COM_setSystemMessage($message, $LANG_GF02['msg197']);
+	
+    COM_redirect($url);
 }
 
 // Debug Code to show variables
@@ -190,7 +206,7 @@ if ($op == 'newposts' AND !COM_isAnonUser()) {
 		$report->parse ("img_desc$sort", 'sort_desc_on');
 	}    
 	
-	$base_url .= "&amp;order=$order&amp;sort=$sort&amp;populartype=$populartype"; 
+	$base_url = "&amp;order=$order&amp;sort=$sort&amp;populartype=$populartype"; 
 
     $report->set_var ('imgset', $CONF_FORUM['imgset']);
     $report->set_var ('layout_url', $CONF_FORUM['layout_url']);
@@ -680,7 +696,7 @@ if ($op == 'subscribe') {
 // MAIN CODE BEGINS to view forums or topics within a forum
 
 isset($showtopic) or $showtopic = ''; // FIXME
-ForumHeader($forum, $showtopic, $display);
+ForumHeader($category, $forum, $showtopic, $display);
 
 // Check if the number of records was specified to show - part of page navigation.
 $show = $CONF_FORUM['show_topics_perpage'];
@@ -704,7 +720,7 @@ if ($page > $numpages) {
 }
 
 //Display Categories
-if ($forum == 0) {
+if (empty($forum)) {
     //$mytimer = new timerobject();
     //$mytimer->startTimer();
     //$exectime = $mytimer->stopTimer();
@@ -905,7 +921,7 @@ if ($forum == 0) {
             $_STRUCT_DATA->set_breadcrumb_item('forum-breadcrumb', $forum_bc_id, 2, $url, $A['cat_name']);            
             
             if (!COM_isAnonUser()) {
-                $link = $_CONF['site_url'] . '/forum/index.php?op=markallread&amp;cat_id=' . $A['id'];
+                $link = $_CONF['site_url'] . '/forum/index.php?op=markallread&amp;category=' . $A['id'];
                 $forumlisting->set_var ('markreadlink', $link);
                 $forumlisting->set_var ('LANG_markread', $LANG_GF02['msg84']);
                 $forumlisting->parse ('markread_link', 'markread_link');

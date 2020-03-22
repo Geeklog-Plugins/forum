@@ -242,7 +242,7 @@ if ($onlytopic) {
     }
     
     // Now display the forum header
-    ForumHeader($forum, $showtopic, $display);
+    ForumHeader('',  $forum, $showtopic, $display);
 }
 
 // Check if the number of records was specified to show

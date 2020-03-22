@@ -357,8 +357,12 @@ $LANG_GF02['forumsearchfor']   = 'Resultats des recherches dans le Forum pour "%
 $LANG_GF02['msg202']   =  'Pas de nouvelles contributions';
 $LANG_GF02['msg203']   = 'Aucune publications trouvees.';
 $LANG_GF02['msg300']   = 'This Forum Post by an anonymous user has been blocked. To enable see your <a href="/forum/userprefs.php">Forum User Preferences</a>.';
-$LANG_GF02['msg301']   = 'Marquer toutes les categories comme lues ?';
-$LANG_GF02['msg302']   = 'Tout marquer comme lu ?';
+$LANG_GF02['msg301']   = 'Really mark all topics in all forums and categories read?';
+$LANG_GF02['msg301a']   = 'All topics in all forums and categories have now been marked as read.';
+$LANG_GF02['msg302']   = 'Really mark all topics read in this forum?';
+$LANG_GF02['msg302a']   = 'All topics in this forum have now been marked as read.';
+$LANG_GF02['msg303']   = 'Really mark all topics in all forums in this category read?';
+$LANG_GF02['msg303a']   = 'All topics in all forums from this category have now been marked as read.';
 $LANG_GF02['PostReply']   = 'Poster une nouvelle reponse';
 $LANG_GF02['PostTopic']   = 'Poster un nouveau sujet';
 $LANG_GF02['EditTopic']   = 'Editer le sujet';

@@ -226,21 +226,32 @@ function do_bbcode_code($action, $attributes, $content, $params, $node_object) {
     return $codeblock;
 }
 
-
-function forumNavbarMenu($current='') {
+// Category and Forum must already be filtered and permissions checked
+function forumNavbarMenu($current = '', $category = '', $forum = '') {
     global $_CONF, $CONF_FORUM, $_USER, $LANG_GF01, $LANG_GF02;
+
+	$urlVariable = '';
+	if (!empty($forum)) {
+		$urlVariable = "&amp;forum=$forum";
+		$delMessage = $LANG_GF02['msg302'];
+	} elseif (!empty($category)) {
+		$urlVariable = "&amp;category=$category";
+		$delMessage = $LANG_GF02['msg303'];
+	} else {
+		$delMessage = $LANG_GF02['msg301'];
+	}
 
     require_once $_CONF['path_system'] . 'classes/navbar.class.php';
     $navmenu = new navbar; 
     $navmenu->add_menuitem($LANG_GF01['INDEXPAGE'],"{$_CONF['site_url']}/forum/index.php");
     $navmenu->set_onclick($LANG_GF01['INDEXPAGE'], 'location.href="' . "{$_CONF['site_url']}/forum/index.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
     if (!COM_isAnonUser()) {  
-        $navmenu->add_menuitem($LANG_GF02['msg197'],"{$_CONF['site_url']}/forum/index.php?op=markallread");
+        $navmenu->add_menuitem($LANG_GF02['msg197'],"{$_CONF['site_url']}/forum/index.php?op=markallread$urlVariable");
         // Added as a fix for the navbar class (since uikit tabs do not support urls)
         //$navmenu->set_onclick($LANG_GF02['msg197'], 'return confirm("' . $LANG_GF02['msg301'] . '");');
         $navmenu->set_onclick($LANG_GF02['msg197'], '
-          if (confirm("' . $LANG_GF02['msg301'] . '")) {
-            window.location.href="' . "{$_CONF['site_url']}/forum/index.php?op=markallread" . '";
+          if (confirm("' . $delMessage . '")) {
+            window.location.href="' . "{$_CONF['site_url']}/forum/index.php?op=markallread$urlVariable" . '";
           }
           return false;        
         ');
@@ -261,7 +272,8 @@ function forumNavbarMenu($current='') {
     return $navmenu->generate();
 }
 
-function ForumHeader($forum, $showtopic, &$display) {
+// Category and Forum must be filtered and permissions already checked. Can be empty
+function ForumHeader($category, $forum, $showtopic, &$display) {
     global $_TABLES, $_CONF, $CONF_FORUM, $LANG_GF01, $LANG_GF02;
     
     $navbar = COM_newTemplate(CTL_plugin_templatePath('forum'));
@@ -269,10 +281,10 @@ function ForumHeader($forum, $showtopic, &$display) {
     $navbar->set_var ('search_forum', f_forumsearch());
     $navbar->set_var ('select_forum', f_forumjump());
     if ($CONF_FORUM['usermenu'] == 'navbar') {
-        if ($forum == 0) {
-            $navbar->set_var('navmenu', forumNavbarMenu($LANG_GF01['INDEXPAGE']));
+        if (empty($forum)) {
+            $navbar->set_var('navmenu', forumNavbarMenu($LANG_GF01['INDEXPAGE'], $category, $forum));
         } else {
-            $navbar->set_var('navmenu', forumNavbarMenu());
+            $navbar->set_var('navmenu', forumNavbarMenu('', $category, $forum));
         }
     } else {
         $navbar->set_var('navmenu','');
@@ -1087,7 +1099,7 @@ function forum_chkUsercanAccess($secure = false, $forum = '', $showtopic = '') {
 	// Login required to use this feature of the forum
     } elseif ($secure AND (empty($_USER['uid']) || $_USER['uid'] < 2)) {
 		$message = sprintf($LANG_GF01['loginreqfeature'], '<a href="' .$_CONF['site_url']. '/users.php?mode=new">', '<a href="' .$_CONF['site_url']. '/users.php">');
-		ForumHeader($forum, $showtopic, $display);
+		ForumHeader('', $forum, $showtopic, $display);
 		$display .= alertMessage($message, $LANG_GF01['ACCESSERROR']);
 		$display = gf_createHTMLDocument($display);
 		COM_output($display);
@@ -1109,7 +1121,7 @@ function forum_chkUsercanAccess($secure = false, $forum = '', $showtopic = '') {
         }        
         $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='$grp_id'");
         if (!SEC_inGroup($groupname)) {
-			ForumHeader($forum, $showtopic, $display);
+			ForumHeader('', $forum, $showtopic, $display);
         	$display .= alertMessage($LANG_GF02['msg77'], $LANG_GF01['ACCESSERROR']);
             $display = gf_createHTMLDocument($display);
             COM_output($display);            

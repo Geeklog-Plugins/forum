@@ -100,7 +100,7 @@ $ip = getenv("REMOTE_ADDR");
 $sqlresult = DB_query ("SELECT * FROM {$_TABLES['forum_banned_ip']} WHERE host_ip like '$ip'");
 $numRows = DB_numRows($sqlresult);
 if ($numRows > 0) {
-	ForumHeader($forum, $showtopic, $display);
+	ForumHeader('', $forum, $showtopic, $display);
     $display .= alertMessage(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']);
     $display = COM_createHTMLDocument($display);
     COM_output($display);
@@ -110,7 +110,7 @@ if ($numRows > 0) {
 // Debug Code to show variables
 $display .= gf_showVariables();
 
-ForumHeader($forum, $showtopic, $display);
+ForumHeader('', $forum, $showtopic, $display);
 
 if (empty($_USER['uid']) OR $_USER['uid'] == 1 ) {
     $uid = 1;
