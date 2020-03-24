@@ -43,32 +43,6 @@ $forum      = isset($_REQUEST['forum'])      ? COM_applyFilter($_REQUEST['forum'
 $member     = isset($_REQUEST['member'])     ? COM_applyFilter($_REQUEST['member'],true)     : '';
 $parentonly = isset($_REQUEST['parentonly']) ? COM_applyFilter($_REQUEST['parentonly'],true) : '';
 
-function selectHTML_forum($selected='') {
-    global $_CONF,$_TABLES;
-    $selectHTML = '';
-    $asql = DB_query("SELECT * FROM {$_TABLES['forum_categories']} ORDER BY cat_order ASC");
-    while($A = DB_fetchArray($asql)) {
-        $firstforum=true;
-        $bsql = DB_query("SELECT * FROM {$_TABLES['forum_forums']} WHERE forum_cat='{$A['id']}' ORDER BY forum_order ASC");
-        while($B = DB_fetchArray($bsql)) {
-            $groupname = DB_getItem($_TABLES['groups'],'grp_name',"grp_id='{$B['grp_id']}'");
-            if (SEC_inGroup($groupname)) {
-                if ($firstforum) {
-                    $selectHTML .= '<option value="-1">-------------------</option>';
-                    $selectHTML .= '<option value="-1">' .$A['cat_name']. '</option>';
-                 }
-                $firstforum = false;
-                if ($B['forum_id'] == $selected) {
-                    $selectHTML .= LB .'<option value="' .$B['forum_id']. '" selected="selected">&nbsp;&#187;&nbsp;&nbsp;' .$B['forum_name']. '</option>';
-                } else {
-                    $selectHTML .= LB .'<option value="' .$B['forum_id']. '">&nbsp;&#187;&nbsp;&nbsp;' .$B['forum_name']. '</option>';
-                }
-            }
-        }
-    }
-    return $selectHTML;
-}
-
 function selectHTML_members($selected='') {
     global $_CONF,$_TABLES,$LANG_GF02;
     $selectHTML = '';
@@ -174,8 +148,9 @@ $report->set_var('LANG_all', $LANG_GF01['ALL']);
 
 $report->parse ('trash_link','trash_link');
 
-$report->set_var('select_forum',selectHTML_forum($forum));
-$report->set_var('select_member',selectHTML_members($member));
+$report->set_var('select_forum', f_forumjump('', $forum, true));
+
+$report->set_var('select_member',f_userjump(1, $member));
 
 $navbar->set_selected($LANG_GF06['6']);
 $report->set_var('navbar', $navbar->generate());

@@ -297,6 +297,9 @@ $LANG_GF02['msg137']   = 'Surveillance pour le sujet active';
 $LANG_GF02['msg138a']  = 'Listed below are all the forum topics you have subscribed to. This means for these subscriptions you will receive an email notification when someone replies to one of your subscribed topics.';
 $LANG_GF02['msg138b']  = 'Listed below are all the forums you have subscribed to. This means for these subscriptions you will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).';
 $LANG_GF02['msg138c']  = 'Listed below are all the topics that belong to the forum(s) you have subscribed to (see Forum Notifications), but you have unsubscribed from and chosen not to receive any more topic reply email notifications for.';
+$LANG_GF02['msg139a']  = 'Listed below are all the forum topics the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when someone replies to one of their subscribed topics. If "All Users" are selected then the User column contains the name of the account the notification is for.';
+$LANG_GF02['msg139b']  = 'Listed below are all the forums the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).  If "All Users" are selected then the User column contains the name of the account the notification is for.';
+$LANG_GF02['msg139c']  = 'Listed below are all the topics that belong to the forum(s) the user has subscribed to (see Forum Notifications), but they have unsubscribed from and chosen not to receive any more topic reply email notifications for. If "All Users" are selected then the User column contains the name of the account the notification is for.';
 $LANG_GF02['msg142']   = 'Surveillance enregistree.';
 $LANG_GF02['msg143']   = 'Notification sauvegardee mais aucune adresse email est associee avec votre compte ou elle est non valide. Merci d\'en ajouter une a <a href="/usersettings.php">votre compte</a> ou vous ne recevrez pas de notifications.';
 $LANG_GF02['msg144']   = 'Retourner au sujet';
@@ -432,7 +435,8 @@ $LANG_GF06 = array (
     4   => 'Moderateur',
     5   => 'Conversion',
     6   => 'Messages',
-    7   => 'Gestion IP'
+	7 => 'Subscriptions',
+    8   => 'Gestion IP'
 );
 
 
@@ -611,6 +615,10 @@ $LANG_GF96 = array (
     'ipunbanned'         => 'Adresse IP n\'est plus bannie.',
     'ipnotvalid'         => 'L\'adresse IP n\'est pas valide. Elle n\'a pas ete ajoutee.',
     'noip'               => 'Vous n\'avez pas fourni une adresse IP !'
+);
+
+$LANG_GF97 = array (
+    'gfsubscriptions' 	 => 'Forum Subscriptions'
 );
 
 // Smilies

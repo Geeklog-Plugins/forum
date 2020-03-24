@@ -842,7 +842,39 @@ function f_forumsearch() {
     return $forum_search->finish($forum_search->get_var('output'));
 }
 
-function f_forumjump($action='',$selected=0) {
+
+// Used by some admin pages as well
+function f_userjump($type, $selected = '') {
+    global $_CONF,$_TABLES,$LANG_GF02;
+	
+    $selectHTML = '';
+	if ($type == 2) {
+		// Users that have posted Forum and/or Topic Subscriptions
+		$sql  = "SELECT u.uid, u.username FROM {$_TABLES['users']} u, {$_TABLES['forum_watch']} fw ";
+		$sql .= "WHERE u.uid = fw.uid GROUP BY u.uid ORDER BY u.username";
+	} else { // $type = 1
+		// Users that have posted in the forum
+		$sql  = "SELECT u.uid, u.username FROM {$_TABLES['users']} u, {$_TABLES['forum_topic']} ft ";
+		$sql .= "WHERE u.uid = ft.uid GROUP BY u.uid ORDER BY u.username";
+	}
+    $memberlistsql = DB_query($sql);
+    if ($selected == -1) {
+        $selectHTML .= LB .'<option value="-1" selected="selected">' .$LANG_GF02['msg177']. '</option>';
+    } else {
+        $selectHTML .= LB .'<option value="-1">' .$LANG_GF02['msg177']. '</option>';
+    }
+    while($A = DB_fetchArray($memberlistsql)) {
+        if ($A['uid'] == $selected) {
+            $selectHTML .= LB .'<option value="' .$A['uid']. '" selected="selected">' .$A['username']. '</option>';
+        } else {
+            $selectHTML .= LB .'<option value="' .$A['uid']. '">' .$A['username']. '</option>';
+        }
+    }
+    return $selectHTML;
+
+}
+
+function f_forumjump($action = '', $selected = 0, $OptionsOnly = false) {
     global $CONF_FORUM, $_CONF,$_TABLES,$LANG_GF01,$LANG_GF02;
 
     $selecthtml = '';
@@ -866,6 +898,11 @@ function f_forumjump($action='',$selected=0) {
         	$selecthtml .= $catthtml . $formhtml . '</optgroup>' . LB;
 		}
     }
+	
+	if ($OptionsOnly) {
+		return $selecthtml;
+	}
+	
     $forum_jump = COM_newTemplate(CTL_plugin_templatePath('forum'));
     $forum_jump->set_file (array ('forum_jump'=>'forum_jump.thtml'));
     $forum_jump->set_var ('LANG_msg103', $LANG_GF02['msg103']);

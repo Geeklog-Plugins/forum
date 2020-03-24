@@ -256,11 +256,8 @@ if (forum_modPermission($forum,$_USER['uid'])) {
             $page->set_var('fortopicid', $msgid);
             $page->set_var('forum', $forum);
             $page->set_var('topictitle', $topictitle);
-            
-            while($showforums = DB_fetchArray($query)){
-                $promptform  .= '<option value="' . $showforums['forum_id'] . '">' . $showforums['forum_name'] . '</option>';
-            }
-            $page->set_var('forumoptions', $promptform);
+			
+			$page->set_var('forumoptions', f_forumjump('', '', true));
 
             /* Check and see request to move complete topic or split the topic */
             if (DB_getItem($_TABLES['forum_topic'],"pid","id='$msgid'") == 0) {

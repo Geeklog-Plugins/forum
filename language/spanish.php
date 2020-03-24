@@ -308,6 +308,9 @@ $LANG_GF02 = array(
 	'msg138a' => 'Listed below are all the forum topics you have subscribed to. This means for these subscriptions you will receive an email notification when someone replies to one of your subscribed topics.',
 	'msg138b' => 'Listed below are all the forums you have subscribed to. This means for these subscriptions you will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).',
 	'msg138c' => 'Listed below are all the topics that belong to the forum(s) you have subscribed to (see Forum Notifications), but you have unsubscribed from and chosen not to receive any more topic reply email notifications for.',
+	'msg139a' => 'Listed below are all the forum topics the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when someone replies to one of their subscribed topics. If "All Users" are selected then the User column contains the name of the account the notification is for.',
+	'msg139b' => 'Listed below are all the forums the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).  If "All Users" are selected then the User column contains the name of the account the notification is for.',
+	'msg139c' => 'Listed below are all the topics that belong to the forum(s) the user has subscribed to (see Forum Notifications), but they have unsubscribed from and chosen not to receive any more topic reply email notifications for. If "All Users" are selected then the User column contains the name of the account the notification is for.',
     'msg142' => 'Notificación guardada.',
     'msg144' => 'Volver al tópico',
     'msg146' => 'Notificación Borrada',
@@ -432,7 +435,8 @@ $LANG_GF06 = array(
     4 => 'Moderador',
     5 => 'Convertir',
     6 => 'Mensajes',
-    7 => 'Gestión IP'
+	7 => 'Subscriptions',
+    8 => 'Gestión IP'
 );
 
 $LANG_GF07 = array(
@@ -571,6 +575,9 @@ $LANG_GF96 = array(
     'noip' => 'You did not provide an IP address!'
 );
 
+$LANG_GF97 = array (
+    'gfsubscriptions' => 'Forum Subscriptions'
+);
 
 $LANG_GF_SMILIES = array(
     'biggrin' => 'Big Grin',

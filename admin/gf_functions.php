@@ -36,7 +36,17 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'gf_functions.php') !== false) {
     die('This file can not be used on its own.');
 }
 
-require_once '../../../lib-common.php';
+
+$foundFile = false;
+$included_files = get_included_files();
+foreach ($included_files as $filename) {
+    if (basename($filename) == 'lib-common.php') {
+		$foundFile = true;
+	}
+}
+if (!$foundFile) {
+	require_once '../../../lib-common.php';
+}
 
 if (!in_array('forum', $_PLUGINS)) {
     COM_redirect($_CONF['site_url'] . '/index.php');
@@ -45,7 +55,7 @@ if (!in_array('forum', $_PLUGINS)) {
 /**
 * Security check to ensure user even belongs on this page
 */
-require_once '../../auth.inc.php';
+require_once $_CONF['path_admin'] . 'auth.inc.php';
 
 if (!SEC_hasRights('forum.edit')) {
     $display = COM_showMessageText($MESSAGE[29], $MESSAGE[30]);
@@ -69,8 +79,10 @@ $navbar->add_menuitem($LANG_GF06['5'], $_CONF['site_admin_url'] .'/plugins/forum
 $navbar->set_onclick($LANG_GF06['5'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/migrate.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 $navbar->add_menuitem($LANG_GF06['6'], $_CONF['site_admin_url'] .'/plugins/forum/messages.php');
 $navbar->set_onclick($LANG_GF06['6'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/messages.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
-$navbar->add_menuitem($LANG_GF06['7'], $_CONF['site_admin_url'] .'/plugins/forum/ips.php');
-$navbar->set_onclick($LANG_GF06['7'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/ips.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
+$navbar->add_menuitem($LANG_GF06['7'],"{$_CONF['site_url']}/forum/notify.php?mode=admin");
+$navbar->set_onclick($LANG_GF06['7'], 'location.href="' . "{$_CONF['site_url']}/forum/notify.php?mode=admin" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
+$navbar->add_menuitem($LANG_GF06['8'], $_CONF['site_admin_url'] .'/plugins/forum/ips.php');
+$navbar->set_onclick($LANG_GF06['8'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/ips.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 $navbar->add_menuitem($LANG_GF06['2'], $_CONF['site_admin_url'] .'/plugins/forum/settings.php');
 $navbar->set_onclick($LANG_GF06['2'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/settings.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 

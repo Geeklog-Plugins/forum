@@ -49,6 +49,29 @@ $notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'], 
 $op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         	: '';
 $page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      	: '';
 $topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) 	: '';
+$mode       = isset($_REQUEST['mode'])   ? COM_applyFilter($_REQUEST['mode']) 			: '';
+
+	
+// If Admin then allow to look at any user subscriptions
+if ($mode == 'admin') { 
+	include_once $_CONF['path_admin'] . 'plugins/forum/gf_functions.php';
+	$isAdminUser = true;
+	$selecteduid = isset($_REQUEST['uid']) 	 ? COM_applyFilter($_REQUEST['uid'], true)      : '';
+	if (empty($selecteduid) || $selecteduid < 2) {
+		$selecteduid = ''; // All Users
+	} else {
+		// Make sure user exists and still has notifications (as the last one could have been just deleted)
+		$sql  = "SELECT u.uid, u.username FROM {$_TABLES['users']} u, {$_TABLES['forum_watch']} fw ";
+		$sql .= "WHERE u.uid = fw.uid AND u.uid = $selecteduid GROUP BY u.uid ORDER BY u.username";
+		$memberlistQuery = DB_query($sql);
+		if (DB_numRows($memberlistQuery) == 0 ) { 
+			$selecteduid = ''; // All Users
+		}
+	}
+} else {
+	$isAdminUser = false;
+	$selecteduid = $_USER['uid']; // Current Users
+}
 
 // Means forum select was set to all again
 if ($forum == -1) {
@@ -76,10 +99,13 @@ if (($_USER['email'] == '')  OR !COM_isEmail($_USER['email'])) {
 // NOTIFY CODE -> SAVE
 if (isset($_REQUEST['submit'])) {
     if (($_REQUEST['submit'] == 'save') && ($id != 0)) {
-        $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id='$id') AND (uid='{$_USER['uid']}') OR ";
-        $sql .= "((forum_id='$forum') AND (topic_id='0') AND (uid='{$_USER['uid']}')))";
+		// **********************************************
+		// FOR: Save notification on menu on viewtopic.php (for topic and forum notifications)
+		// **********************************************
+	    $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE (topic_id = $id AND uid = $selecteduid OR ";
+        $sql .= "(forum_id = $forum AND topic_id = 0 AND uid = $selecteduid))";
         $notifyquery = DB_query("$sql");
-        $pid = DB_getItem($_TABLES['forum_topic'],'pid',"id='$id'");
+        $pid = DB_getItem($_TABLES['forum_topic'],'pid',"id = $id");
         if ($pid == 0) {
             $pid = $id;
         }
@@ -87,12 +113,12 @@ if (isset($_REQUEST['submit'])) {
             $A = DB_fetchArray($notifyquery);
             if ($A['topic_id'] == 0) {     // User has subscribed to complete forum
                // Check and see if user has a non-subscribe record for this topic id
-                $query = DB_query("SELECT id FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND forum_id=$forum AND topic_id < 0 " );
+                $query = DB_query("SELECT id FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND forum_id = $forum AND topic_id < 0 " );
                 if (DB_numRows($query) > 0) {
                     list($watchrec) = DB_fetchArray($query);
-                    DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND id=$watchrec");
+                    DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND id = $watchrec");
                 }  else {
-                    DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$pid','{$_USER['uid']}',now() )");
+                    DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id, topic_id, uid, date_added) VALUES ($forum, $pid, $selecteduid, now())");
                 }
                 if (($_USER['email'] != '')  AND COM_isEmail($_USER['email'])) {
                     COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
@@ -104,9 +130,9 @@ if (isset($_REQUEST['submit'])) {
                 COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=3&amp;showtopic=$id");
             }
         } else {
-            DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$pid','{$_USER['uid']}',now() )");
+            DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id, topic_id, uid, date_added) VALUES ($forum, $pid, $selecteduid, now())");
             $nid = -$id;
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$nid'");          
+            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND forum_id = $forum AND topic_id = $nid");          
             if (($_USER['email'] != '')  AND COM_isEmail($_USER['email'])) {
                 COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=2&amp;showtopic=$id");
             } else {
@@ -116,34 +142,74 @@ if (isset($_REQUEST['submit'])) {
         }
         COM_output($display);
         exit();
-
     } elseif (($_REQUEST['submit'] == 'delete') AND ($id != 0))  {
-		// Get forum from id
-		$delForumID = DB_getItem($_TABLES['forum_watch'], 'forum_id', "uid = {$_USER['uid']} AND id = $id");
-		// Now delete any topic exceptions associated with the forum subscription being deleted (topics with negative values)
-		if (!empty($delForumID)) {
-			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = {$_USER['uid']} AND forum_id = $delForumID and topic_id < 0");
+		// **********************************************
+		// FOR: Remove Button on Subscription page
+		// **********************************************
+		if ($isAdminUser AND empty($selecteduid)) {
+			$delUserID = DB_getItem($_TABLES['forum_watch'], 'uid', "id = $id");
+		} else {
+			$delUserID = $selecteduid;
+		}		
+		
+		if (!empty($delUserID)) {
+			// Get forum from id
+			$delForumID = DB_getItem($_TABLES['forum_watch'], 'forum_id', "uid = $delUserID AND id = $id");
+			// Now delete any topic exceptions associated with the forum subscription being deleted (topics with negative values)
+			if (!empty($delForumID)) {
+				DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $delUserID AND forum_id = $delForumID and topic_id < 0");
+			}
+			// Now delete the forum notification
+			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $delUserID AND id = $id");
 		}
-		// Now delete the forum notification
-        DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND id='$id'");
 		
-		// Notification deleted message
+		// Set Notification deleted message and fall through to rest of page
 		COM_setSystemMessage($LANG_GF02['msg146']);
-		
-        COM_redirect($_CONF['site_url'] . "/forum/notify.php?filter=$notifytype&amp;forum=$forum");
     } elseif (($_REQUEST['submit'] == 'delete2') AND ($id != ''))  {
+		// **********************************************
+		// FOR: Remove notification on menu on viewtopic.php (for topic and forum notifications)
+		// **********************************************
         // Check and see if subscribed to complete forum and if so - unsubscribe to just this topic
-        if (DB_getItem($_TABLES['forum_watch'], 'topic_id', "uid = {$_USER['uid']} AND id = $id") == 0 ) {
+        if (DB_getItem($_TABLES['forum_watch'], 'topic_id', "uid = $selecteduid AND id = $id") == 0 ) {
             $ntopic = -$topic;  // Negative Value
 			// Need to include user id for security
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$topic'");
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' AND topic_id = '$ntopic'");
-            DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id,topic_id,uid,date_added) VALUES ('$forum','$ntopic','{$_USER['uid']}',now() )");
+            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND forum_id = $forum AND topic_id = $topic");
+            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND forum_id = $forum AND topic_id = $ntopic");
+            DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id, topic_id, uid, date_added) VALUES ($forum, $ntopic, $selecteduid, now())");
         } else {
-            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = {$_USER['uid']} AND id = $id");
+            DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $selecteduid AND id = $id");
         }
         COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=4&amp;showtopic=$topic");
     }
+} else {
+	// **********************************************
+	// FOR: Multiple Deletes on Subscription page
+	// **********************************************
+	if ($op == 'delchecked' && isset($_POST['chk_record_delete'])) {
+		foreach ($_POST['chk_record_delete'] as $id) {
+			$id = COM_applyFilter($id);
+			if ($isAdminUser AND empty($selecteduid)) {
+				$delUserID = DB_getItem($_TABLES['forum_watch'], 'uid', "id = $id");
+			} else {
+				$delUserID = $selecteduid;
+			}
+			
+			if (!empty($delUserID)) {
+				if ($notifytype == 2) { // Forum Notifications
+					// Get forum from id
+					$delForumID = DB_getItem($_TABLES['forum_watch'], 'forum_id', "uid = $delUserID AND id = $id");
+					// Now delete any topic exceptions associated with the forum subscription being deleted (topics with negative values)
+					if (!empty($delForumID)) {
+						DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $delUserID AND forum_id = $delForumID and topic_id < 0");
+					}
+				}
+				DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = $delUserID AND id = $id");
+			}
+		}
+		
+		// Set Notification deleted message and fall through to rest of page
+		COM_setSystemMessage($LANG_GF02['msg146']);	
+	}	
 }
 
 // NOTIFY MAIN
@@ -152,25 +218,6 @@ $show = $CONF_FORUM['show_messages_perpage'];
 // Check if this is the first page.
 if ($page == 0) {
      $page = 1;
-}
-
-/* Check to see if user has checked multiple records to delete */
-if ($op == 'delchecked' && isset($_POST['chk_record_delete'])) {
-    foreach ($_POST['chk_record_delete'] as $id) {
-        $id = COM_applyFilter($id);
-		if ($notifytype == 2) { // Forum Notifications
-			// Get forum from id
-			$delForumID = DB_getItem($_TABLES['forum_watch'], 'forum_id', "uid = {$_USER['uid']} AND id = $id");
-			// Now delete any topic exceptions associated with the forum subscription being deleted (topics with negative values)
-			if (!empty($delForumID)) {
-				DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid = {$_USER['uid']} AND forum_id = $delForumID and topic_id < 0");
-			}
-		}
-		DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid={$_USER['uid']} AND id='$id'");
-    }
-	
-	// Notification deleted message
-	COM_setSystemMessage($LANG_GF02['msg146']);	
 }
 
 $report = COM_newTemplate(CTL_plugin_templatePath('forum'));
@@ -189,14 +236,35 @@ $report->set_var ('layout_url', $CONF_FORUM['layout_url']);
 $report->set_var ('LANG_TITLE', $LANG_GF02['msg89']);
 $report->set_var ('lang_subscriptions', $LANG_GF01['SUBSCRIPTIONS']);
 
-$report->set_var('select_forum', f_forumjump($_CONF['site_url'].'/forum/notify.php', $forum));
+if ($isAdminUser) {
+	$report->set_var('isAdminUser', $isAdminUser);
+	$report->set_var('LANG_selectmember', $LANG_GF02['msg107']);
+	$report->set_var('user_options',f_userjump(2, $selecteduid));
+}
+if (!empty($selecteduid)) {
+	$report->set_var('uid', $selecteduid); 
+}
+
+
 $report->set_var('filter_options', COM_optionListFromLangVariables('LANG_GF08', $notifytype));
 if ($notifytype == 3) {
-	$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138c']);	
+	if ($isAdminUser) {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg139c']);	
+	} else {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138c']);	
+	}
 } elseif ($notifytype == 2) {
-	$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138b']);	
+	if ($isAdminUser) {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg139b']);	
+	} else {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138b']);	
+	}
 } else {
-	$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138a']);	
+	if ($isAdminUser) {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg139a']);	
+	} else {
+		$report->set_var('lang_notify_filter_desc', $LANG_GF02['msg138a']);	
+	}
 }
 $report->set_var('notifytype', $notifytype);
 $report->set_var('forum', $forum);   
@@ -208,27 +276,35 @@ $report->set_var ('LANG_Heading5', $LANG_GF01['STARTEDBY']);
 $report->set_var ('LANG_Heading6', $LANG_GF01['VIEWS']);
 $report->set_var ('LANG_Heading7', $LANG_GF01['REPLIES']);
 $report->set_var ('LANG_Heading8', $LANG_GF01['REMOVE']);
+$report->set_var ('LANG_Heading9', $LANG_GF01['USER']);
 
 $report->set_var ('LANG_deleteall', $LANG_GF01['DELETEALL']);
 $report->set_var ('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM']);
 $report->parse ('trash_link', 'trash_link');
 
-if ($CONF_FORUM['usermenu'] == 'navbar') {
+if ($isAdminUser) {
+	// $navbar created when gf_functions.php included
+	$navbar->set_selected($LANG_GF01['SUBSCRIPTIONS']);
+	$report->set_var('navmenu', $navbar->generate());
+} elseif ($CONF_FORUM['usermenu'] == 'navbar') {
     $report->set_var('navmenu', forumNavbarMenu($LANG_GF01['SUBSCRIPTIONS']));
 } else {
     $report->set_var('navmenu','');
 }
 
-$sql = "SELECT id,forum_id,topic_id,date_added FROM {$_TABLES['forum_watch']} WHERE (uid='{$_USER['uid']}')";
+$sql = "SELECT id, forum_id, topic_id, date_added, uid FROM {$_TABLES['forum_watch']} WHERE 1 = 1";
+if (!empty($selecteduid)) {
+	$sql .= " AND uid = $selecteduid";   
+}
 if ($forum > 0 ) {
-    $sql .= " AND forum_id='$forum'";   
+    $sql .= " AND forum_id = $forum";   
 }
 if ($notifytype == '2') {
-    $sql .= " AND topic_id = '0'";
+    $sql .= " AND topic_id = 0";
 } elseif ($notifytype == '3') {
-    $sql .= " AND topic_id < '0'";
+    $sql .= " AND topic_id < 0";
 } else {
-    $sql .= " AND topic_id > '0'";
+    $sql .= " AND topic_id > 0";
 }
 
 $sql .= " ORDER BY forum_id ASC, date_added DESC";
@@ -236,13 +312,40 @@ $notifications = DB_query($sql);
 $nrows = DB_numRows($notifications);
 $numpages = ceil($nrows / $show);
 $offset = ($page - 1) * $show;
-$base_url = $_CONF['site_url'] . "/forum/notify.php?filter={$notifytype}&amp;forum=$forum";
+
+
+$url_sep = '?';
+if (!empty($notifytype)) {
+	$notify_url = "{$url_sep}filter=$notifytype";
+	$url_sep = '&amp;';
+} else {
+	$notify_url = "";
+}
+if ($isAdminUser) {
+	$admin_url = "{$url_sep}mode=admin";
+	$url_sep = '&amp;';
+	if (!empty($selecteduid)) {
+		$admin_url .= "{$url_sep}uid=$selecteduid";
+	}
+} else {
+	$admin_url = "";
+}
+if ($forum > 0 ) {
+    $forum_url = "{$url_sep}forum=$forum";   
+	$url_sep = '&amp;';
+} else {
+	$forum_url = "";
+}
+
+$base_url = $_CONF['site_url'] . "/forum/notify.php$notify_url$forum_url$admin_url";
+$report->set_var ('phpself', $base_url);
+$report->set_var('select_forum', f_forumjump($base_url, $forum));
 
 $sql .= " LIMIT $offset, $show";
 $notifications = DB_query($sql);
 
 $i = 0;
-while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($notifications)) {
+while (list($notify_recid,$forum_id,$topic_id,$date_added, $uid) = DB_fetchArray($notifications)) {
     $forum_name = DB_getItem($_TABLES['forum_forums'],"forum_name","forum_id='$forum_id'");
 	$forum_link = '<a href="' .$_CONF['site_url']. '/forum/index.php?forum=' .$forum_id. '" title="' . $forum_name . '">' . $forum_name . '</a>';
     if ($topic_id == '0') {
@@ -255,7 +358,7 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
         } else {
             $neg_subscription = false;
         }
-        $result = DB_query("SELECT subject,name,replies,views,uid,id FROM {$_TABLES['forum_topic']} WHERE id = '$topic_id'");
+        $result = DB_query("SELECT subject, name, replies, views, uid, id FROM {$_TABLES['forum_topic']} WHERE id = $topic_id");
         $A = DB_fetchArray($result);
         if ($A['subject'] == '') {
 			// This only happens if forum topics get deleted and the watch does not (forum v2.9.3 and lower)
@@ -272,7 +375,13 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added) = DB_fetchArray($noti
 
     $report->set_var ('id', $notify_recid);
     $report->set_var ('csscode', $i%2+1);
-    //$report->set_var ('forum', $forum_name);
+    
+	if ($isAdminUser && empty($selecteduid)) {
+		$username = COM_getDisplayName($uid);
+		$userlink = COM_getProfileLink($uid, $username);			
+		$report->set_var('user_link', $userlink);	
+	}
+	
 	$report->set_var ('forum_link', $forum_link);
 	if (!empty($subject)) {
 		$report->set_var ('linksubject', htmlspecialchars($subject,ENT_QUOTES,$CONF_FORUM['charset']));
@@ -313,7 +422,11 @@ if ($nrows == 0) {
     $report->parse ('links', 'links');
 }
 
-$report->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+if ($isAdminUser) {
+	$report->set_var('block_start', COM_startBlock($LANG_GF97['gfsubscriptions']));
+} else {
+	$report->set_var('block_start', COM_startBlock($CONF_FORUM['forums_name']));
+}
 $report->set_var('block_end', COM_endBlock()); 
 
 $report->parse ('output', 'report');

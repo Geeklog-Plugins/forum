@@ -273,13 +273,13 @@ $LANG_GF02['msg84']    = 'Mark all topics read';
 $LANG_GF02['msg85']    = 'Page:';
 $LANG_GF02['msg86']    = '&nbsp;Last %s posts&nbsp;';
 $LANG_GF02['msg87']    = 'Warning: This topic has been locked by the moderator. No additional posts are permitted';
-$LANG_GF02['msg88']    = 'Site Members';
+$LANG_GF02['msg88']    = 'Site Users';
 $LANG_GF02['msg88b']   = 'Forum Activity Only';
 $LANG_GF02['msg89']    = 'My Enabled Notifications';
 $LANG_GF02['msg101']   = 'Forum Rules:';
 $LANG_GF02['msg103']   = 'Forum Jump:';
 $LANG_GF02['msg106']   = 'Select a Forum';
-$LANG_GF02['msg107']   = 'Select a Member';
+$LANG_GF02['msg107']   = 'Select a User';
 $LANG_GF02['msg108']   = 'Active Forum';
 $LANG_GF02['msg109']   = 'Locked Topic';
 $LANG_GF02['msg110']   = 'Transferring to message edit page..';
@@ -299,6 +299,9 @@ $LANG_GF02['msg137']   = 'Notification for topic enabled';
 $LANG_GF02['msg138a']  = 'Listed below are all the forum topics you have subscribed to. This means for these subscriptions you will receive an email notification when someone replies to one of your subscribed topics.';
 $LANG_GF02['msg138b']  = 'Listed below are all the forums you have subscribed to. This means for these subscriptions you will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).';
 $LANG_GF02['msg138c']  = 'Listed below are all the topics that belong to the forum(s) you have subscribed to (see Forum Notifications), but you have unsubscribed from and chosen not to receive any more topic reply email notifications for.';
+$LANG_GF02['msg139a']  = 'Listed below are all the forum topics the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when someone replies to one of their subscribed topics. If "All Users" are selected then the User column contains the name of the account the notification is for.';
+$LANG_GF02['msg139b']  = 'Listed below are all the forums the user you are viewing has subscribed to. This means for these subscriptions the user will receive an email notification when a new topic is created in one of these forums, or someone replies to a topic. Please note that deleting a forum subscription will also delete any Topic Exception Notifications associated with the forum (but not any individual topic notifications).  If "All Users" are selected then the User column contains the name of the account the notification is for.';
+$LANG_GF02['msg139c']  = 'Listed below are all the topics that belong to the forum(s) the user has subscribed to (see Forum Notifications), but they have unsubscribed from and chosen not to receive any more topic reply email notifications for. If "All Users" are selected then the User column contains the name of the account the notification is for.';
 $LANG_GF02['msg142']   = 'Notification saved.';
 $LANG_GF02['msg143']   = 'Notification saved but, no email is associated with your user account (or it is invalid). Please add one to your <a href="/usersettings.php">account</a> or you will not receive any notifications.';
 $LANG_GF02['msg144']   = 'Return to topic';
@@ -318,15 +321,15 @@ $LANG_GF02['msg164']   = 'Mark all Categories and Topics Read';
 $LANG_GF02['msg166']   = 'ERROR: Invalid topic or Topic not found';
 $LANG_GF02['msg167']   = 'Notification Option';
 $LANG_GF02['msg168']   = 'Setting of No will disable email notifications';
-$LANG_GF02['msg169']   = 'Return to Members listing';
+$LANG_GF02['msg169']   = 'Return to Users listing';
 $LANG_GF02['msg170']   = 'Latest Forum Posts';
 $LANG_GF02['msg171']   = 'Forum Access Error';
 $LANG_GF02['msg172']   = 'Topic does not exist. It possibly has been deleted';
 $LANG_GF02['msg173']   = 'Transferring to Post Message page..';
-$LANG_GF02['msg174']   = 'Unable to BAN Member - Invalid or Empty IP Address';
+$LANG_GF02['msg174']   = 'Unable to BAN User - Invalid or Empty IP Address';
 $LANG_GF02['msg175']   = 'Return to Forum Listing';
-$LANG_GF02['msg176']   = 'Select a member';
-$LANG_GF02['msg177']   = 'All Members';
+$LANG_GF02['msg176']   = 'Select a user';
+$LANG_GF02['msg177']   = 'All Users';
 $LANG_GF02['msg178']   = 'Parent Posts Only';
 $LANG_GF02['msg179']   = 'Content generated in: %s seconds';
 $LANG_GF02['msg180']   = 'Forum Posting Alert';
@@ -347,7 +350,7 @@ $LANG_GF02['msg196']   = 'View the main forum index';
 $LANG_GF02['msg197']   = 'Mark All Read';
 $LANG_GF02['msg198']   = 'Update your forum settings';
 $LANG_GF02['msg199']   = 'View or remove forum notifications';
-$LANG_GF02['msg200']   = 'Members Report';
+$LANG_GF02['msg200']   = 'Users Report';
 $LANG_GF02['msg201']   = 'Popular Topics';
 $LANG_GF02['popularforumtopics']   = 'Popular Forum Topics';
 $LANG_GF02['poptopisby']   = 'Popular Topics by %s';
@@ -434,7 +437,8 @@ $LANG_GF06 = array (
     4   => 'Moderator',
     5   => 'Migrate',
     6   => 'Posts',
-    7   => 'Banned IPs'
+	7   => 'Subscriptions',
+    8   => 'Banned IPs'
 );
 
 
@@ -444,7 +448,7 @@ $LANG_GF07 = array (
     2   => 'Preferences',
     3   => 'Popular Topics',
     4   => 'Subscriptions',
-    5   => 'Members'
+    5   => 'Users'
 );
 
 
@@ -507,8 +511,8 @@ $LANG_GF92 = array (
     'popularldscp'       => 'Number of posts or views before calling a topic popular',
     'searchpp'         	 => 'Search Results Per Pages',
     'searchppdscp'       => 'Number of search results to display on the search page',
-    'memberspp'          => 'Members Per Page',
-    'membersppdscp'      => 'Number of Members to show on the members report page',
+    'memberspp'          => 'Users Per Page',
+    'membersppdscp'      => 'Number of Users to show on the Users report page',
     'viewap'         	 => 'View Anonymous Posts',
     'viewapdscp'         => 'Setting of No will filter out anonymous posts',
     'alwaysn'            => 'Always Notify',
@@ -564,6 +568,7 @@ $LANG_GF93 = array (
     'moderatorwarning'   => 'Setup Forum Categories and Add at least 1 forum before attempting to add Moderators',
     'nomoderatorfound'   => "No Moderators found.",
     'modadded'   		 => "Moderator(s) have been added.",
+	'modnotadded'  		 => "No Moderators added. You need to pick one or more Forums, Functions, and pick either one or more Users, or a Group.",
     'moddeleted'   		 => "Moderator(s) have been deleted.",
     'modedited'   		 => "Moderator(s) have been edited.",
     'private'            => 'Private Forum',
@@ -613,6 +618,11 @@ $LANG_GF96 = array (
     'ipunbanned'         => 'IP Address Un-Banned.',
     'ipnotvalid'         => 'IP Address %s is not valid. Therefore it has not been added.',
     'noip'               => 'You did not provide an IP address!'
+);
+
+// Subscriptions
+$LANG_GF97 = array (
+    'gfsubscriptions'    => 'Forum Subscriptions'
 );
 
 // Smilies
@@ -685,7 +695,7 @@ $LANG_confignames['forum'] = array(
     'show_moods'            => 'Enable Moods?',
     'allow_smilies'         => 'Enable Smilies?',
     'use_smilies_plugin'    => 'Use Smilies Plugin?',
-    'avatar_width'          => 'Width of Member Avatar',
+    'avatar_width'          => 'Width of User Avatar',
     // ----------------------------------
     'show_centerblock'      => 'Enable Centerblock?',
     'centerblock_homepage'  => 'Enable Homepage Only?',
