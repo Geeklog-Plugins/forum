@@ -337,7 +337,7 @@ if ($forum > 0 ) {
 	$forum_url = "";
 }
 
-$base_url = $_CONF['site_url'] . "/forum/notify.php$notify_url$forum_url$admin_url";
+$base_url = $_CONF['site_url'] . "/forum/notify.php$notify_url$admin_url$forum_url";
 $report->set_var ('phpself', $base_url);
 $report->set_var('select_forum', f_forumjump($base_url, $forum));
 
@@ -410,7 +410,7 @@ if ($nrows == 0) {
     $report->set_var ('message',$LANG_GF02['msg44']);
     $report->parse ('no_records_message', 'no_records_message');
 } else {
-    $report->set_var ('pagenavigation', COM_printPageNavigation($base_url,$page, $numpages));
+    $report->set_var ('pagenavigation', COM_printPageNavigation($base_url, $page, $numpages));
     if ($forum > 0) {
         $report->set_var ('LANG_return', $LANG_GF02['msg144']);
         $report->set_var ('returnlink', "{$_CONF['site_url']}/forum/index.php?forum=$forum");
