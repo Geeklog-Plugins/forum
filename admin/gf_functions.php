@@ -49,7 +49,7 @@ if (!$foundFile) {
 }
 
 if (!in_array('forum', $_PLUGINS)) {
-    COM_redirect($_CONF['site_url'] . '/index.php');
+	COM_handle404();
 }
 
 /**
@@ -79,8 +79,8 @@ $navbar->add_menuitem($LANG_GF06['5'], $_CONF['site_admin_url'] .'/plugins/forum
 $navbar->set_onclick($LANG_GF06['5'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/migrate.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 $navbar->add_menuitem($LANG_GF06['6'], $_CONF['site_admin_url'] .'/plugins/forum/messages.php');
 $navbar->set_onclick($LANG_GF06['6'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/messages.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
-$navbar->add_menuitem($LANG_GF06['7'],"{$_CONF['site_url']}/forum/notify.php?mode=admin");
-$navbar->set_onclick($LANG_GF06['7'], 'location.href="' . "{$_CONF['site_url']}/forum/notify.php?mode=admin" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
+$navbar->add_menuitem($LANG_GF06['7'], $_CONF['site_admin_url'] .'/plugins/forum/notify.php');
+$navbar->set_onclick($LANG_GF06['7'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/notify.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 $navbar->add_menuitem($LANG_GF06['8'], $_CONF['site_admin_url'] .'/plugins/forum/ips.php');
 $navbar->set_onclick($LANG_GF06['8'], 'location.href="' . "{$_CONF['site_admin_url']}/plugins/forum/ips.php" . '";'); // Added as a fix for the navbar class (since uikit tabs do not support urls)
 $navbar->add_menuitem($LANG_GF06['2'], $_CONF['site_admin_url'] .'/plugins/forum/settings.php');

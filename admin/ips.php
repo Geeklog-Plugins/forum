@@ -60,7 +60,7 @@ if ($msg == 1) {
 
 $display .= COM_startBlock($LANG_GF96['gfipman']);
 
-$navbar->set_selected($LANG_GF06['7']);
+$navbar->set_selected($LANG_GF06['8']);
 $display .= $navbar->generate();
 
 if ($op == 'banip' && $ip != '' && $submit != $LANG_GF01['CANCEL']) {

@@ -33,11 +33,18 @@
 // | Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.           |
 // +---------------------------------------------------------------------------+
 
-require_once '../lib-common.php'; // Path to your lib-common.php
+// Note: To share functionality, this page also can be included by public_html/admin/plugins/forum/notify.php
+// If this happens 'plugins/forum/gf_functions.php' is included to check admin permissions. If successful 
+// a special global variable is set so we know we are in "ADMIN" mode
+if (isset($forumNotifyMode) && $forumNotifyMode == 'admin') {
+	$isAdminUser = true;
+} else {
+	$isAdminUser = false;
+	require_once '../lib-common.php'; // Path to your lib-common.php
 
-if (!in_array('forum', $_PLUGINS)) {
-    COM_handle404();
-    exit;
+	if (!in_array('forum', $_PLUGINS)) {
+		COM_handle404();
+	}
 }
 
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
@@ -49,13 +56,11 @@ $notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'], 
 $op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         	: '';
 $page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      	: '';
 $topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) 	: '';
-$mode       = isset($_REQUEST['mode'])   ? COM_applyFilter($_REQUEST['mode']) 			: '';
-
 	
 // If Admin then allow to look at any user subscriptions
-if ($mode == 'admin') { 
-	include_once $_CONF['path_admin'] . 'plugins/forum/gf_functions.php';
-	$isAdminUser = true;
+if ($isAdminUser) { 
+	$notify_url_start = $_CONF['site_admin_url'] . '/plugins';
+	
 	$selecteduid = isset($_REQUEST['uid']) 	 ? COM_applyFilter($_REQUEST['uid'], true)      : '';
 	if (empty($selecteduid) || $selecteduid < 2) {
 		$selecteduid = ''; // All Users
@@ -69,7 +74,8 @@ if ($mode == 'admin') {
 		}
 	}
 } else {
-	$isAdminUser = false;
+	$notify_url_start = $_CONF['site_url'];
+
 	$selecteduid = $_USER['uid']; // Current Users
 }
 
@@ -127,7 +133,7 @@ if (isset($_REQUEST['submit'])) {
                     COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=12&amp;showtopic=$id");
                 }
             } else {
-                COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=3&amp;showtopic=$id");
+                COM_redirect($_CONF['site_url']. "/forum/viewtopic.php?msg=3&amp;showtopic=$id");
             }
         } else {
             DB_query("INSERT INTO {$_TABLES['forum_watch']} (forum_id, topic_id, uid, date_added) VALUES ($forum, $pid, $selecteduid, now())");
@@ -313,7 +319,6 @@ $nrows = DB_numRows($notifications);
 $numpages = ceil($nrows / $show);
 $offset = ($page - 1) * $show;
 
-
 $url_sep = '?';
 if (!empty($notifytype)) {
 	$notify_url = "{$url_sep}filter=$notifytype";
@@ -321,12 +326,9 @@ if (!empty($notifytype)) {
 } else {
 	$notify_url = "";
 }
-if ($isAdminUser) {
-	$admin_url = "{$url_sep}mode=admin";
+if ($isAdminUser && !empty($selecteduid)) {
+	$admin_url = "{$url_sep}uid=$selecteduid";
 	$url_sep = '&amp;';
-	if (!empty($selecteduid)) {
-		$admin_url .= "{$url_sep}uid=$selecteduid";
-	}
 } else {
 	$admin_url = "";
 }
@@ -337,7 +339,7 @@ if ($forum > 0 ) {
 	$forum_url = "";
 }
 
-$base_url = $_CONF['site_url'] . "/forum/notify.php$notify_url$admin_url$forum_url";
+$base_url = $notify_url_start . "/forum/notify.php$notify_url$admin_url$forum_url";
 $report->set_var ('phpself', $base_url);
 $report->set_var('select_forum', f_forumjump($base_url, $forum));
 
@@ -347,7 +349,7 @@ $notifications = DB_query($sql);
 $i = 0;
 while (list($notify_recid,$forum_id,$topic_id,$date_added, $uid) = DB_fetchArray($notifications)) {
     $forum_name = DB_getItem($_TABLES['forum_forums'],"forum_name","forum_id='$forum_id'");
-	$forum_link = '<a href="' .$_CONF['site_url']. '/forum/index.php?forum=' .$forum_id. '" title="' . $forum_name . '">' . $forum_name . '</a>';
+	$forum_link = '<a href="' . $notify_url_start . '/forum/index.php?forum=' .$forum_id. '" title="' . $forum_name . '">' . $forum_name . '</a>';
     if ($topic_id == '0') {
         $subject = '';
 		$topic_link = '';
@@ -369,7 +371,7 @@ while (list($notify_recid,$forum_id,$topic_id,$date_added, $uid) = DB_fetchArray
             $subject = htmlspecialchars($A['subject'], ENT_QUOTES, $CONF_FORUM['charset']);
         }
 		if (!empty($subject)) {
-			$topic_link = '<a href="' . $_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $topic_id . '" title="' . $subject . '">' . $subject . '</a>';
+			$topic_link = '<a href="' . $notify_url_start . '/forum/viewtopic.php?showtopic=' . $topic_id . '" title="' . $subject . '">' . $subject . '</a>';
 		}
     }
 
@@ -413,10 +415,10 @@ if ($nrows == 0) {
     $report->set_var ('pagenavigation', COM_printPageNavigation($base_url, $page, $numpages));
     if ($forum > 0) {
         $report->set_var ('LANG_return', $LANG_GF02['msg144']);
-        $report->set_var ('returnlink', "{$_CONF['site_url']}/forum/index.php?forum=$forum");
+        $report->set_var ('returnlink', "{$notify_url_start}/forum/index.php?forum=$forum");
     } else {
         $report->set_var ('LANG_return', $LANG_GF02['msg175']);
-        $report->set_var ('returnlink', "{$_CONF['site_url']}/forum/index.php");
+        $report->set_var ('returnlink', "{$notify_url_start}/forum/index.php");
     }
     $report->parse ('return_link', 'return_link');
     $report->parse ('links', 'links');
