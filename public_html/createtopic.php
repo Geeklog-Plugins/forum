@@ -64,8 +64,8 @@ $submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['sub
 $postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 
 // Not sure why but we have several topic id variables that can be passed in (this should be fixed at some point)
-// Lets figure out which one is being used and do some security checks. One passed will be >=0, not pssed will be ''
-// If not then $topic will be empty
+// Lets figure out which one is being used and do some security checks. One passed will be >=0, not passed will be ''
+// If not then $topic will be empty. $topic just used right now for security checks
 if ($id > 0) {
 	$topic = $id;
 } elseif ($editid > 0) {
@@ -77,14 +77,15 @@ if ($id > 0) {
 // Check is anonymous users can access and if not, regular user can access
 forum_chkUsercanAccess(false, $forum, $topic);
 
-// Lets check quote id now for security if passed
-if (!empty($quoteid)) {
-	forum_chkUsercanAccess(false, '', $quoteid);
-}
-
-// If have topic id grab its forum id
+// If have topic id grab its forum id (and over write one if passed)
 if (!empty($topic)) {
 	$forum = DB_getItem($_TABLES['forum_topic'],'forum',"id = $topic");
+}
+
+// Lets check quote id now for security if passed
+// Note: this doesn't check if quoteid belongs to the parent topic though (not a big deal)
+if (!empty($quoteid)) {
+	forum_chkUsercanAccess(false, '', $quoteid);
 }
 
 // Check if user is anonymous and can post as forum_chkUsercanAccess does not do this
@@ -101,7 +102,8 @@ $sqlresult = DB_query ("SELECT * FROM {$_TABLES['forum_banned_ip']} WHERE host_i
 $numRows = DB_numRows($sqlresult);
 if ($numRows > 0) {
 	ForumHeader('', $forum, $showtopic, $display);
-    $display .= alertMessage(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']);
+    //$display .= alertMessage(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']);
+	$display .= COM_showMessageText(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']); // Banned Message
     $display = COM_createHTMLDocument($display);
     COM_output($display);
     exit();
@@ -132,6 +134,24 @@ if ($submit == $LANG_GF01['CANCEL']) {
     }
 }
 
+
+// Check Speed Limit for New Topics and New Replies
+if (empty($submit) && ($method == 'newtopic' || $method == 'postreply')) {
+	COM_clearSpeedlimit($CONF_FORUM['post_speedlimit'], 'forum');
+	$last = COM_checkSpeedlimit('forum');
+	if ($last > 0) {
+		$message = sprintf($LANG_GF01['SPEEDLIMIT'],$last,$CONF_FORUM['post_speedlimit']);
+		// $display .= alertMessage($message, $LANG_GF02['msg180']);
+		if ($method == 'newtopic') {
+			$link = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
+		} else {
+			$link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$id";
+		}
+		COM_setSystemMessage($message, $LANG_GF02['msg180']);
+		COM_redirect($link);
+	}
+}
+
 // ADD EDITED TOPIC
 $editmoderator = false;
 
@@ -156,16 +176,19 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             if ((time() - $t2) < $t1) {
                 $editAllowed = true;
             }
-        } else {
+        } elseif ($CONF_FORUM['allowed_editwindow'] == -1) {
             $editAllowed = true;
         }
     }
 
     if (($editpid < 1) && (trim($_POST['subject']) == '')) {
-		$display .= alertMessage($LANG_GF02['msg18'], '');
+		// $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+		$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
     } elseif (!$editAllowed) {
         $link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$id}";
-        $display .= alertMessage('',$LANG_GF02['msg189'], sprintf($LANG_GF02['msg187'],$link));
+        //$display .= alertMessage('',$LANG_GF02['msg189'], sprintf($LANG_GF02['msg187'], $link));
+		COM_setSystemMessage($LANG_GF02['msg189'], $LANG_GF02['msg180']); // Cannot edit post anymore
+		COM_redirect($link);
     } else {
         if ($moderator_anon_post) {
             $name = gf_preparefordb($aname,'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
@@ -249,13 +272,16 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             $link = $_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$topicparent&amp;page=$page#$editid";
             COM_redirect($link);
         } else {
-            $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+            $display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']);
         }
     }
+	
+	// If reaches here then something is not correct when editing a post
+	$submit = $LANG_GF01['PREVIEW'];
 
-    $display = gf_createHTMLDocument($display);
-    COM_output($display);
-    exit;
+    //$display = gf_createHTMLDocument($display);
+    //COM_output($display);
+    //exit;
 }
 
 // ADD TOPIC
@@ -286,7 +312,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                          . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
             }
         }
-        
+
         if ( $msg == '' ) {
             if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
                 strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
@@ -294,86 +320,79 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 TOPIC_hasMultiTopicAccess('topic') > 2) {
                 // Note: TOPIC_checkTopicSelectionControl not required since Geeklog topics not required
 
-                COM_clearSpeedlimit ($CONF_FORUM['post_speedlimit'], 'forum');
-                $last = COM_checkSpeedlimit ('forum');
-                if ($last > 0) {
-                    $message = sprintf($LANG_GF01['SPEEDLIMIT'],$last,$CONF_FORUM['post_speedlimit']);
-                    $display .= alertMessage($message, $LANG_GF02['msg180']);
+				if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
+					// Check for SPAM
+					$spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
+					$permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+					$result = PLG_checkForSpam(
+						$spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+						$name
+					);                
+					// Now check the result and redirect to index.php if spam action was taken
+					if ($result > 0) {
+						// then tell them to get lost ...
+						$display .= COM_showMessage( $result, 'spamx' );
+						$display = gf_createHTMLDocument($display);
+						COM_output($display);
+						exit;
+					}
+				}
+				$postmode = gf_chkpostmode($postmode,$mode_switch);
+				$subject = gf_preparefordb(strip_tags($_POST['subject']),'text');
 
-                } else {
-                    if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
-                        // Check for SPAM
-                        $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                        $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
-                        $result = PLG_checkForSpam(
-                            $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
-                            $name
-                        );                
-                        // Now check the result and redirect to index.php if spam action was taken
-                        if ($result > 0) {
-                            // then tell them to get lost ...
-                            $display .= COM_showMessage( $result, 'spamx' );
-                            $display = gf_createHTMLDocument($display);
-                            COM_output($display);
-                            exit;
-                        }
-                    }
-                    $postmode = gf_chkpostmode($postmode,$mode_switch);
-                    $subject = gf_preparefordb(strip_tags($_POST['subject']),'text');
+				if (mb_strlen($subject) > 100) {
+					$subject = COM_truncate($subject, 99, '...');
+				}
+				$comment = gf_preparefordb($_POST['comment'],$postmode);
+				$locked = 0;
+				$sticky = 0;
+				if (Input::post('modedit', 0) == 1) {
+					if (Input::post('locked_switch', 0) == 1)  $locked = 1;
+					if (Input::post('sticky_switch', 0) == 1)  $sticky = 1;
+				}
 
-                    if (mb_strlen($subject) > 100) {
-                        $subject = COM_truncate($subject, 99, '...');
-                    }
-                    $comment = gf_preparefordb($_POST['comment'],$postmode);
-                    $locked = 0;
-                    $sticky = 0;
-                    if (Input::post('modedit', 0) == 1) {
-                        if (Input::post('locked_switch', 0) == 1)  $locked = 1;
-                        if (Input::post('sticky_switch', 0) == 1)  $sticky = 1;
-                    }
+				$fields = "forum,name,date,lastupdated,subject,comment,postmode,ip,mood,uid,pid,sticky,locked";
+				$sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
+				$sql .= "VALUES ('$forum','$name','$date',$date,'$subject','$comment', ";
+				$sql .= "'$postmode','$REMOTE_ADDR','$mood','$uid','0','$sticky','$locked')";
+				DB_query($sql);
+				
+				// Find the id of the last inserted topic
+				list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+				
+				// If moderator on a root post
+				if ($editmoderator) {
+					TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_TOPIC);
+				}
 
-                    $fields = "forum,name,date,lastupdated,subject,comment,postmode,ip,mood,uid,pid,sticky,locked";
-                    $sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
-                    $sql .= "VALUES ('$forum','$name','$date',$date,'$subject','$comment', ";
-                    $sql .= "'$postmode','$REMOTE_ADDR','$mood','$uid','0','$sticky','$locked')";
-                    DB_query($sql);
-                    
-                    // Find the id of the last inserted topic
-                    list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
-                    
-                    // If moderator on a root post
-                    if ($editmoderator) {
-                        TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_TOPIC);
-                    }
+				PLG_itemSaved($lastid, 'forum');
+				COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+				
+				// Remove new block and centerblock cached items
+				$cacheInstance = 'forum__newpostsblock_';
+				CACHE_remove_instance($cacheInstance);
+				$cacheInstance = 'forum__centerblock_';
+				CACHE_remove_instance($cacheInstance);
 
-                    PLG_itemSaved($lastid, 'forum');
-                    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-                    
-					// Remove new block and centerblock cached items
-                    $cacheInstance = 'forum__newpostsblock_';
-                    CACHE_remove_instance($cacheInstance);
-                    $cacheInstance = 'forum__centerblock_';
-                    CACHE_remove_instance($cacheInstance);
- 
-                    // Update forums record
-                    DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, topic_count=topic_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
+				// Update forums record
+				DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, topic_count=topic_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 
-                    // Check for any users subscribed notifications - would only be for users subscribed to the forum
-                    gf_chknotifications($forum,$lastid,$uid,"forum");
-                    
-					// NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
-					gf_setnotification($notify, $forum, $lastid, $uid);
+				// Check for any users subscribed notifications - would only be for users subscribed to the forum
+				gf_chknotifications($forum,$lastid,$uid,"forum");
+				
+				// NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
+				gf_setnotification($notify, $forum, $lastid, $uid);
 
-                    COM_updateSpeedlimit ('forum');
+				COM_updateSpeedlimit ('forum');
 
-                    // Insert a new log record for all logged in users that posted so it does not appear as new
-                    if ($uid != '1') {
-                        DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$_USER['uid']}','$forum','$lastid','$date')");
-                    }
-                    COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
-                }
+				// Insert a new log record for all logged in users that posted so it does not appear as new
+				if ($uid != '1') {
+					DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$_USER['uid']}','$forum','$lastid','$date')");
+				}
+				COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
             } else {
-                $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+                //$display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+				$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
             }
         }
 // END OF A NEW TOPIC...
@@ -412,78 +431,74 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
                 strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {            
 
-                COM_clearSpeedlimit ($CONF_FORUM['post_speedlimit'], 'forum');
-                $last = COM_checkSpeedlimit ('forum');
-                if ($last > 0) {
-                    $message = sprintf($LANG_GF01['SPEEDLIMIT'],$last,$CONF_FORUM['post_speedlimit']);
-                    $display .= alertMessage($message, $LANG_GF02['msg180']);
+				if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
+					// Check for SPAM
+					$spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
+					$permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+					$result = PLG_checkForSpam(
+						$spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+						$name
+					);                
+					// Now check the result and redirect to index.php if spam action was taken
+					if ($result > 0) {
+						// then tell them to get lost ...
+						$display .= COM_showMessage( $result, 'spamx' );
+						$display = gf_createHTMLDocument($display);
+						COM_output($display);
+						exit;
+					}
+				}
+				DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
 
-                } else {
-                    if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
-                        // Check for SPAM
-                        $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                        $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
-                        $result = PLG_checkForSpam(
-                            $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
-                            $name
-                        );                
-                        // Now check the result and redirect to index.php if spam action was taken
-                        if ($result > 0) {
-                            // then tell them to get lost ...
-                            $display .= COM_showMessage( $result, 'spamx' );
-                            $display = gf_createHTMLDocument($display);
-                            COM_output($display);
-                            exit;
-                        }
-                    }
-                    DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
+				$postmode = gf_chkpostmode($postmode,$mode_switch);
+				$subject = gf_preparefordb($_POST['subject'],'text');
+				$comment = gf_preparefordb($_POST['comment'],$postmode);
 
-                    $postmode = gf_chkpostmode($postmode,$mode_switch);
-                    $subject = gf_preparefordb($_POST['subject'],'text');
-                    $comment = gf_preparefordb($_POST['comment'],$postmode);
+				$fields = "name,date,subject,comment,postmode,ip,mood,uid,pid,forum";
+				$sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
+				$sql .= "VALUES  ('$name','$date','$subject','$comment',";
+				$sql .= "'$postmode','$REMOTE_ADDR','$mood','$uid','$id','$forum')";
+				DB_query($sql);
 
-                    $fields = "name,date,subject,comment,postmode,ip,mood,uid,pid,forum";
-                    $sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
-                    $sql .= "VALUES  ('$name','$date','$subject','$comment',";
-                    $sql .= "'$postmode','$REMOTE_ADDR','$mood','$uid','$id','$forum')";
-                    DB_query($sql);
+				// Find the id of the last inserted topic
+				list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+				
+				// Check for any users subscribed notifications
+				gf_chknotifications($forum,$id,$uid);
 
-                    // Find the id of the last inserted topic
-                    list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
-					
-                    // Check for any users subscribed notifications
-                    gf_chknotifications($forum,$id,$uid);
+				PLG_itemSaved($lastid, 'forum');
+				COM_rdfUpToDateCheck('forum'); // forum rss feeds update
+				
+				// Remove new block and centerblock cached items
+				$cacheInstance = 'forum__newpostsblock_';
+				CACHE_remove_instance($cacheInstance);
+				$cacheInstance = 'forum__centerblock_';
+				CACHE_remove_instance($cacheInstance);
+				
+				DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies + 1, lastupdated = $date,last_reply_rec=$lastid WHERE id=$id");
+				DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 
-                    PLG_itemSaved($lastid, 'forum');
-                    COM_rdfUpToDateCheck('forum'); // forum rss feeds update
-                    
-					// Remove new block and centerblock cached items
-                    $cacheInstance = 'forum__newpostsblock_';
-                    CACHE_remove_instance($cacheInstance);
-                    $cacheInstance = 'forum__centerblock_';
-                    CACHE_remove_instance($cacheInstance);
-                    
-                    DB_query("UPDATE {$_TABLES['forum_topic']} SET replies=replies + 1, lastupdated = $date,last_reply_rec=$lastid WHERE id=$id");
-                    DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
-
-                    //NOTIFY - Checkbox variable in form set to "on" when checked and they don't already have subscribed to forum or topic
-					gf_setnotification($notify, $forum, $id, $uid);
-					
-                    COM_updateSpeedlimit ('forum');
-					$url = html_entity_decode(forum_buildForumPostURL($lastid));
-					COM_redirect($url);
-                }
+				//NOTIFY - Checkbox variable in form set to "on" when checked and they don't already have subscribed to forum or topic
+				gf_setnotification($notify, $forum, $id, $uid);
+				
+				COM_updateSpeedlimit ('forum');
+				$url = html_entity_decode(forum_buildForumPostURL($lastid));
+				COM_redirect($url);
             } else {
-                $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+                //$display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
+				$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
             }
         }
     }
+	
+	// If reaches here then something is not correct when adding new topic or reply
+	$submit = $LANG_GF01['PREVIEW'];
 
-    if ( $msg == '' ) {
+/*    if ( $msg == '' ) {
         $display = gf_createHTMLDocument($display);
         COM_output($display);
         exit;
-    }
+    } */
 }
 
 
@@ -491,6 +506,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 $comment = isset($_POST['comment']) ? COM_stripslashes($_POST['comment']) : '';
 $subject = isset($_POST['subject']) ? COM_stripslashes($_POST['subject']) : '';
 
+// New or Edit Reply or Edit Topic
 if ($id > 0) {
     $sql  = "SELECT a.forum,a.pid,a.comment,a.date,a.locked,a.subject,a.mood,a.sticky,a.uid,a.name,a.postmode,b.forum_cat,b.forum_name,b.is_readonly,c.cat_name,c.id ";
     $sql .= "FROM {$_TABLES['forum_topic']} a ";
@@ -498,13 +514,8 @@ if ($id > 0) {
     $sql .= "LEFT JOIN {$_TABLES['forum_categories']} c ON c.id=b.forum_cat ";
     $sql .= "WHERE a.id=$id";
     $edittopic = DB_fetchArray(DB_query($sql),false);
+// New Topic
 } else {
-    if (empty($forum)) {
-        $display .= alertMessage('', $LANG_GF02['msg171']);
-        $display = gf_createHTMLDocument($display);
-        COM_output($display);
-        exit;
-    }
     $sql  = "SELECT a.forum_name,a.is_readonly,b.cat_name,b.id ";
     $sql .= "FROM {$_TABLES['forum_forums']} a ";
     $sql .= "LEFT JOIN {$_TABLES['forum_categories']} b ON b.id=a.forum_cat ";
@@ -514,19 +525,22 @@ if ($id > 0) {
 
 if ($method == 'edit') {
     $editAllowed = false;
+	$editAllowedTimedCheck = false;
     if (forum_modPermission($edittopic['forum'],$_USER['uid'],'mod_edit')) {
         $editAllowed = true;
         $display .= '<input type="hidden" name="modedit" value="1"' . XHTML . '>';
     } else {
         // User is trying to edit their topic post - this is allowed
         if ($edittopic['date'] > 0 AND $edittopic['uid'] == $_USER['uid']) {
+			$editAllowedTimedCheck = true;
+			
             if ($CONF_FORUM['allowed_editwindow'] > 0) {   // Check if edit timeframe is still valid
                 $t2 = $CONF_FORUM['allowed_editwindow'];
                 $time = time();
                 if ((time() - $t2) < $edittopic['date']) {
                     $editAllowed = true;
                 }
-            } else {
+            } elseif ($CONF_FORUM['allowed_editwindow'] == -1) {
                 $editAllowed = true;
             }
         }
@@ -543,14 +557,21 @@ if ($method == 'edit') {
             $notify_val= 'checked="checked"';
         }
     } else {
-        $display .= alertMessage($LANG_GF02['msg72'],$LANG_GF02['msg191']);
+        //$display .= alertMessage($LANG_GF02['msg72'],$LANG_GF02['msg191']);
+		if ($editAllowedTimedCheck) {
+			$display .= COM_showMessageText($LANG_GF02['msg191'], $LANG_GF01['ACCESSERROR']); // Edit not permitted. Allowable edit time frame expired
+		} else { 
+			$display .= COM_showMessageText($LANG_GF02['msg72'], $LANG_GF01['ACCESSERROR']); // You do not have rights to perform this moderation function
+		}
+		$display = gf_createHTMLDocument($display);
+		COM_output($display);		
         exit;
     }
 }
 
 // Add JavaScript
 $_SCRIPTS->setJavaScriptFile('forum_creattopic', CTL_plugin_themeFindFile('forum', 'javascript', 'createtopic.js'));
-
+ 
 // PREVIEW TOPIC
 if ($submit == $LANG_GF01['PREVIEW']) {
     $previewitem = array();
@@ -607,10 +628,10 @@ if ($submit == $LANG_GF01['PREVIEW']) {
     isset($editmoderator) or $editmoderator = '';
     if ($editmoderator AND $editpid == 0) {
         if ($method == 'edit') {
-            if ($_POST['locked_switch'] == 1 ) {
+            if (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 ) {
                 $locked_val = 'checked="checked"';
             }
-            if ($_POST['sticky_switch'] == 1 ) {
+            if (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 ) {
                 $sticky_val = 'checked="checked"';
             }
         }
@@ -622,20 +643,11 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     if ($submit == $LANG_GF01['PREVIEW']) {
         $edittopic['subject'] = COM_stripslashes($_POST['subject']);
     }
-    // validate the forum is actually the forum the topic belongs in...
-    if ( $method == 'postreply' || $method=='edit') {
-        if ( ($forum != 0) && $forum != $edittopic['forum'] ) {
-        	$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
-            $display = gf_createHTMLDocument($display);
-            COM_output($display);
-            
-            exit;
-        }
-    }
     if ( $method == 'newtopic' && ($newtopic['is_readonly'] == 1 ) ) {
         /* Check if this user has moderation rights now to allow a post to a locked topic */
         if (!forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
-            $display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
+            //$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
+			$display .= COM_showMessageText($LANG_GF02['msg87'], $LANG_GF01['ERROR']); // This topic has been locked by the moderator. No additional posts are permitted
             $display = gf_createHTMLDocument($display);
             COM_output($display);
             
@@ -645,7 +657,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     if ($method == 'postreply' AND ( $edittopic['locked'] == 1 || $edittopic['is_readonly'] == 1 )) {
         /* Check if this user has moderation rights now to allow a post to a locked topic */
         if (!forum_modPermission($edittopic['forum'],$_USER['uid'],'mod_edit')) {
-            $display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
+            //$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
+			$display .= COM_showMessageText($LANG_GF02['msg87'], $LANG_GF01['ERROR']); // This topic has been locked by the moderator. No additional posts are permitted
             $display = gf_createHTMLDocument($display);
             COM_output($display);
             exit;
@@ -689,7 +702,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $topicnavbar->set_var ('hidden_editpid', '');
     $topicnavbar->set_var ('hidden_editid', '');
     $topicnavbar->set_var ('hidden_method', '');
-    $topicnavbar->set_var ('page', $page);
 
     $topicnavbar->set_var ('LANG_bhelp', $LANG_GF01['b_help']);
     $topicnavbar->set_var ('LANG_ihelp', $LANG_GF01['i_help']);
@@ -744,7 +756,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
         }
 
-        $editpid=$id;
+        $editpid = $id;
 
     } elseif ($method == 'edit') {
         $postmessage = $LANG_GF02['EditTopic'];

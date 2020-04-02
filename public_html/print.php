@@ -77,7 +77,7 @@ $display = '';
 // if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
 if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
     $display .= COM_startBlock();
-    $display .= alertMessage($LANG_GF02['msg01'],$LANG_GF02['msg171']);
+    $display .= COM_showMessageText($LANG_GF02['msg01'], $LANG_GF02['msg171']);
     $display .= COM_endBlock();
     $display = COM_createHTMLDocument($display);
     COM_output($display);
@@ -95,7 +95,7 @@ $forum = DB_getItem($_TABLES['forum_topic'],"forum","id=$id");
 $query = DB_query("SELECT grp_name FROM {$_TABLES['groups']} groups, {$_TABLES['forum_forums']} forum WHERE forum.forum_id='$forum' AND forum.grp_id=groups.grp_id");
 list ($groupname) = DB_fetchArray($query);
 if (!SEC_inGroup($groupname)) {
-    $display .= alertMessage($LANG_GF02['msg02'],$LANG_GF02['msg171']);
+	$display .= COM_showMessageText($LANG_GF02['msg02'], $LANG_GF02['msg171']);
     $display = COM_createHTMLDocument($display);
     COM_output($display);
     exit;

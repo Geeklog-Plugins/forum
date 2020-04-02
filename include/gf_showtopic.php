@@ -278,13 +278,14 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid']) && !$isUserBanned) {
         /* Check if user can still edit this post - within allowed edit timeframe */
         $editAllowed = false;
+
         if ($CONF_FORUM['allowed_editwindow'] > 0) {
             $t1 = $showtopic['date'];
             $t2 = $CONF_FORUM['allowed_editwindow'];
             if ((time() - $t2) < $t1) {
                 $editAllowed = true;
             }
-        } else {
+        } elseif ($CONF_FORUM['allowed_editwindow'] == -1) {
             $editAllowed = true;
         }
         if ($editAllowed) {
@@ -577,10 +578,9 @@ function forum_getmodFunctions($showtopic) {
         $retval .= '</select>&nbsp;&nbsp;';
         $retval .= '<input type="submit" name="submit" value="' .$LANG_GF01['GO'].'!"' . XHTML . '>';
         $retval .= '<input type="hidden" name="msgid" value="' .$showtopic['id']. '"' . XHTML . '>';
-        $retval .= '<input type="hidden" name="forum" value="' .$showtopic['forum']. '"' . XHTML . '>';
-        $retval .= '<input type="hidden" name="msgpid" value="' .$msgpid. '"' . XHTML . '>';
-        $retval .= '<input type="hidden" name="top" value="' .$top. '"' . XHTML . '>';
-        $retval .= '<input type="hidden" name="page" value="' .$page. '"' . XHTML . '>';
+        // $retval .= '<input type="hidden" name="forum" value="' .$showtopic['forum']. '"' . XHTML . '>';
+        // $retval .= '<input type="hidden" name="msgpid" value="' .$msgpid. '"' . XHTML . '>';
+        // $retval .= '<input type="hidden" name="top" value="' .$top. '"' . XHTML . '>';
     }
     return $retval;
 }

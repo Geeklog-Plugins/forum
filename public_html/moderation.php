@@ -43,9 +43,6 @@ if (!in_array('forum', $_PLUGINS)) {
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 
-// Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess(true);
-
 $display = '';
 $promptform = '';
 
@@ -58,28 +55,31 @@ $confirm_move     = isset($_POST['confirm_move'])     ? COM_applyFilter($_POST['
 $hostip           = isset($_POST['hostip'])           ? COM_applyFilter($_POST['hostip'])                : '';
 $modconfirmdelete = isset($_POST['modconfirmdelete']) ? COM_applyFilter($_POST['modconfirmdelete'])      : '';
 $modfunction      = isset($_REQUEST['modfunction'])   ? COM_applyFilter($_REQUEST['modfunction'])        : '';
-$movetoforumid    = isset($_REQUEST['movetoforum'])   ? COM_applyFilter($_REQUEST['movetoforum'], true)  : 0;
+$movetoforumid    = isset($_REQUEST['movetoforum'])   ? COM_applyFilter($_REQUEST['movetoforum'], true)  : '';
 $movetitle 		  = isset($_REQUEST['movetitle']) 	  ? COM_stripslashes($_REQUEST['movetitle']) 		 : '';
-$msgid            = isset($_REQUEST['msgid'])         ? COM_applyFilter($_REQUEST['msgid'],true)         : 0;
-$msgpid           = isset($_REQUEST['msgpid'])        ? COM_applyFilter($_REQUEST['msgpid'],true)        : 0;
-$page             = isset($_REQUEST['page'])          ? COM_applyFilter($_REQUEST['page'],true)          : '';
-$showtopic        = isset($_REQUEST['showtopic'])     ? COM_applyFilter($_REQUEST['showtopic'],true)     : '';
+$msgid            = isset($_REQUEST['msgid'])         ? COM_applyFilter($_REQUEST['msgid'],true)         : '';
 $submit           = isset($_REQUEST['submit'])        ? COM_applyFilter($_POST['submit'])                : '';
-$top              = isset($_REQUEST['top'])           ? COM_applyFilter($_REQUEST['top'])                : '';
 
-// Find Forum for forum post
-$forum = DB_getItem($_TABLES['forum_topic'], 'forum', "id = $msgid");
-
-ForumHeader('', $forum, $showtopic, $display);
-
-if (empty($forum)) {
-    $display .= alertMessage($LANG_GF02['msg72']);
-    $display = gf_createHTMLDocument($display);
-    COM_output($display);
-    exit();
+// Check is anonymous users can access and if not, regular user can access. Also if have access to topic
+if (empty($msgid)) {
+	$msgid = 0; // let's intentionally error out in forum_chkUsercanAccess
+}
+forum_chkUsercanAccess(true, '', $msgid);
+// Now check all ids if available
+if (!empty($movetoforumid)) { // Move to forum id
+	forum_chkUsercanAccess(true, $movetoforumid);
 }
 
-if (forum_modPermission($forum,$_USER['uid'])) {
+// Get Parent Topic and forum ids
+$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $msgid");
+list($forum, $msgpid) = DB_fetchArray($result);
+if ($msgpid == 0) {// Then this is a parent topic already
+	$msgpid = $msgid;
+}
+
+ForumHeader('', $forum, '', $display);
+
+if (forum_modPermission($forum, $_USER['uid'])) {
 
     //Moderator check OK, everything dealing with moderator permissions go here.
     if ($modconfirmdelete == 1 && $msgid != '') {
@@ -88,10 +88,10 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         } else {
 			forum_deleteForumPost($msgid);
 
-            if ($top == 'yes') {
+            if ($msgid == $msgpid) { // Parent topic being deleted then
                 COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=3&amp;forum=$forum");
             } else {
-				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '&amp;msg=5')));
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '&amp;msg=5', '', false)));
             }
         }
     }
@@ -102,10 +102,10 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         } else {
 			if (DB_getItem($_TABLES['forum_banned_ip'], 'host_ip', "host_ip = '$hostip'")) {
 				DB_query("DELETE FROM {$_TABLES['forum_banned_ip']} WHERE host_ip = '$hostip'");
-				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=13')));
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=13', '', false)));
 			} else {
 				DB_query("INSERT INTO {$_TABLES['forum_banned_ip']} (host_ip) VALUES ('$hostip')");
-				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=6')));
+				COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=6', '', false)));
 			}
         }
     }
@@ -205,9 +205,8 @@ if (forum_modPermission($forum,$_USER['uid'])) {
     }
 
     if ($modfunction == 'deletepost' AND forum_modPermission($forum,$_USER['uid'],'mod_delete') AND $msgid != 0) {
-
-        if ($top == 'yes') {
-            $alertmessage = $LANG_GF02['msg65'] . "<p>";
+        if ($msgid == $msgpid) { // Parent topic being deleted then
+            $alertmessage = $LANG_GF02['msg65'];
         } else {
             $alertmessage = '';
         }
@@ -218,15 +217,15 @@ if (forum_modPermission($forum,$_USER['uid'])) {
 		$page->set_file(array('page'=>'delete.thtml'));
 		
 		$page->set_var('fortopicid', $msgid);
-		$page->set_var('forum', $forum);
-		$page->set_var('msgpid', $msgpid);
-		$page->set_var('top', $top);
+		// $page->set_var('forum', $forum);
+		// $page->set_var('msgpid', $msgpid);
+		// $page->set_var('top', $top);
 		$page->parse('output', 'page');
 		$promptform = $page->finish($page->get_var('output'));         
         
         $display .= alertMessage($alertmessage, $LANG_GF02['msg182'], $promptform);
     } elseif ($modfunction == 'editpost' AND forum_modPermission($forum,$_USER['uid'],'mod_edit') AND $msgid != 0) {
-        COM_redirect("createtopic.php?method=edit&amp;id=$msgid&amp;page=$page");
+        COM_redirect("createtopic.php?method=edit&amp;id=$msgid");
     } elseif ($modfunction == 'lockedpost' AND forum_modPermission($forum,$_USER['uid'],'mod_edit') AND $msgid != 0) {
         COM_redirect("createtopic.php?method=postreply&amp;id=$msgid");
     } elseif ($modfunction == 'movetopic' AND forum_modPermission($forum,$_USER['uid'],'mod_move') AND $msgid != 0) {
@@ -245,7 +244,8 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         $query = DB_query($sql);
 
         if (DB_numRows($query) == 0) {
-            $display .= alertMessage($LANG_GF02['msg181'],$LANG_GF01['WARNING']);
+			COM_setSystemMessage($LANG_GF02['msg181'], $LANG_GF01['WARNING']);
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '', '' , false)));
         } else {
 			$page = COM_newTemplate(CTL_plugin_templatePath('forum', 'moderator'));
 			$page->set_file(array('page'=>'split_move.thtml'));
@@ -254,7 +254,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         	
             $topictitle = DB_getItem($_TABLES['forum_topic'],"subject","id='$msgid'");
             $page->set_var('fortopicid', $msgid);
-            $page->set_var('forum', $forum);
+            // $page->set_var('forum', $forum);
             $page->set_var('topictitle', $topictitle);
 			
 			$page->set_var('forumoptions', f_forumjump('', '', true));
@@ -284,25 +284,25 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         $iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='$msgid'");
         $forumpostipnum = DB_fetchArray($iptobansql);
         if ($forumpostipnum['ip'] == '') {
-            $display .= alertMessage($LANG_GF02['msg174']);
-            exit;
+			COM_setSystemMessage($LANG_GF02['msg174'], $LANG_GF01['WARNING']);
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '', '' , false)));			
         }
         
         $ip_address = $forumpostipnum['ip'];
         
         if (BAN_for_plugins_ban_found($ip_address)) {
 			BAN_for_plugins_ban_ip($ip_address, 'forum', false);
-			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=11')));
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=11', '', false)));
 		} else {
 			BAN_for_plugins_ban_ip($ip_address, 'forum');
-			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=10')));
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgid, '&amp;msg=10', '', false)));
 		}
     } elseif ($modfunction == 'banippost' AND forum_modPermission($forum,$_USER['uid'],'mod_ban') AND $msgid != 0) {
         $iptobansql = DB_query("SELECT ip FROM {$_TABLES['forum_topic']} WHERE id='$msgid'");
         $forumpostipnum = DB_fetchArray($iptobansql);
         if ($forumpostipnum['ip'] == '') {
-            $display .= alertMessage($LANG_GF02['msg174']);
-            exit;
+			COM_setSystemMessage($LANG_GF02['msg174'], $LANG_GF01['WARNING']);
+			COM_redirect(html_entity_decode(forum_buildForumPostURL($msgpid, '', '' , false)));			
         }
         
 		$ip_address = $forumpostipnum['ip'];
@@ -322,7 +322,7 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         $page->set_file(array('page'=>'ban.thtml'));
 
         $page->set_var('hostip', $forumpostipnum['ip']);
-        $page->set_var('forum', $forum);
+        // $page->set_var('forum', $forum);
         $page->set_var('fortopicid', $msgid);
  
         $page->parse('output', 'page');
@@ -331,11 +331,13 @@ if (forum_modPermission($forum,$_USER['uid'])) {
         $display .= alertMessage($alertmessage, $LANG_GF02['msg182'], $promptform);
 
     } else {
-        $display .= alertMessage($LANG_GF02['msg71'], $LANG_GF01['WARNING']);
+        $display .= COM_showMessageText($LANG_GF02['msg71'], $LANG_GF01['WARNING']); // No function selected
     }
 
 } else {
-    $display .= alertMessage($LANG_GF02['msg72'], $LANG_GF01['ACCESSERROR']);
+    // $display .= COM_showMessageText($LANG_GF02['msg72'], $LANG_GF01['ACCESSERROR']); // Warning, you do not have rights to perform this moderation function
+	// No mod privileges at all so 404 to hide details about moderation.php
+	COM_handle404("{$_CONF['site_url']}/forum/index.php");
 }
 
 $display = gf_createHTMLDocument($display);

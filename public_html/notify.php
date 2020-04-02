@@ -97,11 +97,6 @@ $display = '';
 // Debug Code to show variables
 $display .= gf_showVariables();
 
-// Display warning if no email found (usually happens with user oauth accounts)
-if (($_USER['email'] == '')  OR !COM_isEmail($_USER['email'])) {
-    $display .= alertMessage($LANG_GF02['msg145'], $LANG_GF01['WARNING'], false);
-}
-
 // NOTIFY CODE -> SAVE
 if (isset($_REQUEST['submit'])) {
     if (($_REQUEST['submit'] == 'save') && ($id != 0)) {
@@ -288,14 +283,21 @@ $report->set_var ('LANG_deleteall', $LANG_GF01['DELETEALL']);
 $report->set_var ('LANG_DELALLCONFIRM', $LANG_GF01['DELALLCONFIRM']);
 $report->parse ('trash_link', 'trash_link');
 
+// Display warning if no email found (usually happens with user oauth accounts)
+if (($_USER['email'] == '') OR !COM_isEmail($_USER['email'])) {
+	$emailMsg = COM_showMessageText($LANG_GF02['msg145'], $LANG_GF01['WARNING']);
+} else {
+	$emailMsg = '';
+}
+
 if ($isAdminUser) {
 	// $navbar created when gf_functions.php included
 	$navbar->set_selected($LANG_GF01['SUBSCRIPTIONS']);
 	$report->set_var('navmenu', $navbar->generate());
 } elseif ($CONF_FORUM['usermenu'] == 'navbar') {
-    $report->set_var('navmenu', forumNavbarMenu($LANG_GF01['SUBSCRIPTIONS']));
+    $report->set_var('navmenu', forumNavbarMenu($LANG_GF01['SUBSCRIPTIONS']) . $emailMsg);
 } else {
-    $report->set_var('navmenu','');
+    $report->set_var('navmenu', $emailMsg);
 }
 
 $sql = "SELECT id, forum_id, topic_id, date_added, uid FROM {$_TABLES['forum_watch']} WHERE 1 = 1";

@@ -697,7 +697,7 @@ if ($op == 'subscribe') {
         DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE uid='{$_USER['uid']}' AND forum_id='$forum' and topic_id > '0' " );
         COM_redirect($_CONF['site_url'] .'/forum/index.php?msg=1&amp;forum=' . $forum);
     } else {
-        $display .= alertMessage($LANG_GF02['msg136'], $LANG_GF01['ERROR']);
+		$display .= COM_showMessageText($LANG_GF02['msg136'], $LANG_GF01['ERROR']);
     }
     $display = gf_createHTMLDocument($display);
     COM_output($display);
@@ -959,7 +959,7 @@ if (empty($forum)) {
     }
 
     if ($numCategories == 0) {         // Do we have any categories defined yet
-    	$display .= alertMessage($LANG_GF01['MSG_NO_CAT'], $LANG_GF01['ERROR'], false);
+		$display .= COM_showMessageText($LANG_GF01['MSG_NO_CAT'], $LANG_GF01['ERROR']);
     }
 
     $forumlisting->parse ('output', 'forumlisting');

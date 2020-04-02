@@ -489,7 +489,7 @@ while ($topicRec = DB_fetchArray($result)) {
     //$intervalTime = $mytimer->stopTimer();
     //COM_errorLog("Topic Display Time: $intervalTime");
     if ($CONF_FORUM['show_anonymous_posts'] == 0 AND $topicRec['uid'] == 1) {
-		$display .= alertMessage($LANG_GF02['msg300'], '', '0'); 
+		$display .= COM_showMessageText($LANG_GF02['msg300'], $LANG_GF01['FORUM']);
     } else {
         $display .= showtopic($topicRec,$showTopicMode,$postcount,$onetwo,$page, $query);
         $onetwo = ($onetwo == 1) ? 2 : 1;

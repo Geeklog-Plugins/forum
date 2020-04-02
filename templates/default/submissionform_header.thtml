@@ -31,7 +31,6 @@ h_help = "{LANG_hhelp}";
 
 <form id="forumform" action="{phpself}" method="post" name="forumpost" style="margin:0px;">
 <div>
-    <input type="hidden" name="forum" value="{forum_id}"{xhtml}>
     <input type="hidden" name="id" value="{hidden_id}"{xhtml}>
     <input type="hidden" name="modedit" value="{hidden_modedit}"{xhtml}>
     <input type="hidden" name="method" value="{hidden_method}"{xhtml}>
@@ -39,7 +38,6 @@ h_help = "{LANG_hhelp}";
     <input type="hidden" name="editpid" value="{hidden_editpid}"{xhtml}>
     <input type="hidden" name="editid" value="{hidden_editid}"{xhtml}>
 	<input type="hidden" name="quoteid" value="{quoteid}"{xhtml}>
-    <input type="hidden" name="page" value="{page}"{xhtml}>
     <input type="hidden" name="{gltoken_name}" value="{gltoken}"{xhtml}>
     {gltoken_msg}
 

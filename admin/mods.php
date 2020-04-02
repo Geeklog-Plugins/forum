@@ -67,7 +67,7 @@ $navbar->set_selected($LANG_GF06['4']);
 $display .= $navbar->generate();
 
 if (DB_count($_TABLES['forum_forums']) == 0) {
-    $display .= alertMessage($LANG_GF93['moderatorwarning'], $LANG_GF93['moderatorwarningtitle']);
+    $display .= COM_showMessageText($LANG_GF93['moderatorwarning'], $LANG_GF93['moderatorwarningtitle']);
 } else {
     if ($submit != $LANG_GF01['CANCEL']) {
         $id        = isset($_POST['recid']) ? COM_applyFilter($_POST['recid'],true) : '';
