@@ -1395,6 +1395,8 @@ function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true)
 		if ($page > 1) {
 			$page_url = "&amp;page=$page";
 		}
+		
+		$hashtag = '';
 		if ($anchor) {
 			$hashtag = "#$id";
 		}
