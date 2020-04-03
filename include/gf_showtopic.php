@@ -274,35 +274,6 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
 
     //$intervalTime = $mytimer->stopTimer();
     //COM_errorLog("Show Topic Display Time2: $intervalTime");
-
-    if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid']) && !$isUserBanned) {
-        /* Check if user can still edit this post - within allowed edit timeframe */
-        $editAllowed = false;
-
-        if ($CONF_FORUM['allowed_editwindow'] > 0) {
-            $t1 = $showtopic['date'];
-            $t2 = $CONF_FORUM['allowed_editwindow'];
-            if ((time() - $t2) < $t1) {
-                $editAllowed = true;
-            }
-        } elseif ($CONF_FORUM['allowed_editwindow'] == -1) {
-            $editAllowed = true;
-        }
-        if ($editAllowed) {
-			//$editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;forum={$showtopic['forum']}&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
-            $editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
-            $editlinktext = $LANG_GF09['edit'];
-            $topictemplate->set_var ('editlink', $editlink);
-            $topictemplate->set_var ('editlinktext', $editlinktext);
-            $topictemplate->set_var ('LANG_edit', $LANG_GF01['EDITICON']);
-            $topictemplate->parse ('edittopic_link', 'edittopic_link');
-        }
-    }
-
-    if ($query != '') {
-		$showtopic['subject'] = COM_highlightQuery($showtopic['subject'], $query);
-		$showtopic['comment'] = COM_highlightQuery($showtopic['comment'], $query);
-    }
 	
 	if (!isset($showtopic['pid'])) {
 		$showtopic['pid'] = 0;
@@ -322,6 +293,37 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         $topictemplate->set_var ('read_msg','');
     }
 
+	$is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly','forum_id=' . $showtopic['forum']);
+    if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid']) && !$isUserBanned) {
+        /* Check if user can still edit this post - within allowed edit timeframe */
+        $editAllowed = false;
+
+		// Edit window must exist and topic cannot be locked
+        if ($CONF_FORUM['allowed_editwindow'] > 0 && !$is_lockedtopic && !$is_readonly) {
+            $t1 = $showtopic['date'];
+            $t2 = $CONF_FORUM['allowed_editwindow'];
+            if ((time() - $t2) < $t1) {
+                $editAllowed = true;
+            }
+        } elseif ($CONF_FORUM['allowed_editwindow'] == -1) {
+            $editAllowed = true;
+        }
+        if ($editAllowed) {
+			//$editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;forum={$showtopic['forum']}&amp;id={$showtopic['id']}&amp;editid={$showtopic['id']}&amp;page=$page";
+            $editlink = "{$_CONF['site_url']}/forum/createtopic.php?method=edit&amp;id={$showtopic['id']}";
+            $editlinktext = $LANG_GF09['edit'];
+            $topictemplate->set_var ('editlink', $editlink);
+            $topictemplate->set_var ('editlinktext', $editlinktext);
+            $topictemplate->set_var ('LANG_edit', $LANG_GF01['EDITICON']);
+            $topictemplate->parse ('edittopic_link', 'edittopic_link');
+        }
+    }
+
+    if ($query != '') {
+		$showtopic['subject'] = COM_highlightQuery($showtopic['subject'], $query);
+		$showtopic['comment'] = COM_highlightQuery($showtopic['comment'], $query);
+    }
+	
     if ($CONF_FORUM['allow_user_dateformat']) {
         $date = COM_getUserDateTimeFormat($showtopic['date']);
         $topictemplate->set_var ('posted_date', $date[0]);
@@ -332,7 +334,6 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
 
     if ($mode != 'preview') {
         if ($is_lockedtopic == 0) {
-            $is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly','forum_id=' . $showtopic['forum']);
             if ($is_readonly == 0 OR forum_modPermission($showtopic['forum'],$_USER['uid'],'mod_edit')) {
                 //$quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum={$showtopic['forum']}&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";
 				$quotelink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopicid&amp;quoteid={$showtopic['id']}";

@@ -46,41 +46,54 @@ require_once $CONF_FORUM['path_include'] . 'gf_showtopic.php';
 require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
-$aname       = isset($_POST['aname'])              ? strip_tags($_POST['aname'])                        : '';
-$editid      = isset($_POST['editid'])             ? COM_applyFilter($_POST['editid'],true)             : '';
-$editpid     = isset($_POST['editpid'])            ? COM_applyFilter($_POST['editpid'],true)            : '';
-$editpost    = isset($_POST['editpost'])           ? COM_applyFilter($_POST['editpost'])                : '';
-$forum       = isset($_REQUEST['forum'])           ? COM_applyFilter($_REQUEST['forum'],true)           : '';
-$id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : ''; // Reply Topic Id
-$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : ''; // newtopic, postreply, or edit
+$id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : 0; // Forum id, Reply Topic Parent Id or Edit Topic Id always required so set to 0 if not found (so it will error during permission check)
+$method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : ''; // Can equal newtopic, postreply, or edit
 $mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
 $mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
 $notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
-$page        = isset($_REQUEST['page'])            ? COM_applyFilter($_REQUEST['page'],true)            : '';
 $quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
-$showtopic   = isset($_REQUEST['showtopic'])       ? COM_applyFilter($_REQUEST['showtopic'],true)       : '';
-$silentedit  = isset($_POST['silentedit'])         ? COM_applyFilter($_POST['silentedit'],true)         : '';
 $submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
 $postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
+$aname       = isset($_POST['aname'])              ? trim(strip_tags($_POST['aname']))                  : '';
+$captcha 	 = isset($_POST['captcha']) 		   ? $_POST['captcha']									: ''; // this is needed to support the captcha plugin (not the recaptcha plugin) used when $method = 'postreply' or 'newtopic'
 
-// Not sure why but we have several topic id variables that can be passed in (this should be fixed at some point)
-// Lets figure out which one is being used and do some security checks. One passed will be >=0, not passed will be ''
-// If not then $topic will be empty. $topic just used right now for security checks
-if ($id > 0) {
-	$topic = $id;
-} elseif ($editid > 0) {
-	$topic = $editid;
+// Okay lets figure out what the id url variable is (either topic or forum id). This is based on $method
+if ($method == 'newtopic') {
+	// Then this is a new topic so id is used as forum id in editor
+	$forum = $id;
+	$id = '';
+	$pid = 0;
+	$isParent = true;	
+} elseif ($method == 'postreply' || $method == 'edit') {
+	// Get parent Topic and forum ids from id
+	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $id");
+	list($forum, $pid) = DB_fetchArray($result);
+	
+	if ($method == 'edit') {
+		if ($pid == 0) {// Then this is a parent topic already
+			$pid = $id;
+			$isParent = true;
+		} else {
+			$isParent = false;
+		}	
+	} else {
+		// New reply so id is parent
+		// Keep $id equal to parent id as that is how the code works below
+		$pid = $id;
+		$isParent = false;
+	}
 } else {
-	$topic = '';
+	COM_handle404("{$_CONF['site_url']}/forum/index.php");
 }
 
+// Check if user is anonymous and can post
+if ($CONF_FORUM['registered_to_post'] && COM_isAnonUser()) {
+	$secureCheck = true;
+} else {
+	$secureCheck = false;
+}
 // Check is anonymous users can access and if not, regular user can access
-forum_chkUsercanAccess(false, $forum, $topic);
-
-// If have topic id grab its forum id (and over write one if passed)
-if (!empty($topic)) {
-	$forum = DB_getItem($_TABLES['forum_topic'],'forum',"id = $topic");
-}
+forum_chkUsercanAccess($secureCheck, $forum, $id);
 
 // Lets check quote id now for security if passed
 // Note: this doesn't check if quoteid belongs to the parent topic though (not a big deal)
@@ -88,20 +101,15 @@ if (!empty($quoteid)) {
 	forum_chkUsercanAccess(false, '', $quoteid);
 }
 
-// Check if user is anonymous and can post as forum_chkUsercanAccess does not do this
-if ($CONF_FORUM['registered_to_post'] && COM_isAnonUser()) {
-	// Display access error message for a feature
-	forum_chkUsercanAccess(true);	
-}
-
 $display = '';
+$editorDisplay = true;
 
 // Check if IP of user has been banned
 $ip = getenv("REMOTE_ADDR");
 $sqlresult = DB_query ("SELECT * FROM {$_TABLES['forum_banned_ip']} WHERE host_ip like '$ip'");
 $numRows = DB_numRows($sqlresult);
 if ($numRows > 0) {
-	ForumHeader('', $forum, $showtopic, $display);
+	ForumHeader('', $forum, $id, $display);
     //$display .= alertMessage(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']);
 	$display .= COM_showMessageText(sprintf($LANG_GF02['msg14'], $_CONF['site_mail']), $LANG_GF00['access_denied']); // Banned Message
     $display = COM_createHTMLDocument($display);
@@ -112,7 +120,7 @@ if ($numRows > 0) {
 // Debug Code to show variables
 $display .= gf_showVariables();
 
-ForumHeader('', $forum, $showtopic, $display);
+ForumHeader('', $forum, $id, $display);
 
 if (empty($_USER['uid']) OR $_USER['uid'] == 1 ) {
     $uid = 1;
@@ -120,20 +128,28 @@ if (empty($_USER['uid']) OR $_USER['uid'] == 1 ) {
     $uid = $_USER['uid'];
 }
 
-// CHECK TO SEE IF CANCELED
-if ($submit == $LANG_GF01['CANCEL']) {
-    if (!empty($id)) {
-        // Cancel Reply
-        COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=9&amp;showtopic=$id");
-    } elseif (!empty($forum)) {
-        // Cancel New Topic
-        COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=9&amp;forum=$forum");
-    } else {
-        // Something wrong so just go back
-        COM_redirect($_CONF['site_url'] . "/forum/index.php?msg=9");
-    }
+// Is user an edit moderator?
+if (forum_modPermission($forum, $uid, 'mod_edit')) {
+	$editmoderator = true;
+} else {
+	$editmoderator = false;
 }
 
+// CHECK TO SEE IF CANCELED
+if ($submit == $LANG_GF01['CANCEL']) {
+	if ($method == 'newtopic') {
+		$url = $_CONF['site_url'] . "/forum/index.php?msg=9&amp;forum=$forum";
+	} elseif ($method == 'postreply') {
+		$url = html_entity_decode(forum_buildForumPostURL($pid, '&amp;msg=9', '', false));
+	} elseif ($method == 'edit') {
+		$url = html_entity_decode(forum_buildForumPostURL($id, '&amp;msg=9'));
+    } else {
+        // Something wrong so just go back
+        $url = $_CONF['site_url'] . "/forum/index.php?msg=9";
+    }
+	
+	COM_redirect($url);
+}
 
 // Check Speed Limit for New Topics and New Replies
 if (empty($submit) && ($method == 'newtopic' || $method == 'postreply')) {
@@ -145,31 +161,30 @@ if (empty($submit) && ($method == 'newtopic' || $method == 'postreply')) {
 		if ($method == 'newtopic') {
 			$link = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
 		} else {
-			$link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$id";
+			$link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic=$pid";
 		}
 		COM_setSystemMessage($message, $LANG_GF02['msg180']);
 		COM_redirect($link);
 	}
 }
 
-// ADD EDITED TOPIC
-$editmoderator = false;
-
-if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken()) {
+// Update EDITED TOPIC
+if (($submit == $LANG_GF01['SUBMIT']) && ($method == 'edit') && SEC_checkToken()) {
     $date = time();
 
     $editAllowed = false;
     $moderator_anon_post = false;
-    $editmoderator = false;
 	$uidPost = DB_getItem($_TABLES['forum_topic'],'uid',"id='$id'");
-    if (forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
-        $editmoderator = true;
+    if ($editmoderator) {
         $editAllowed = true;
         if ($uidPost == 1) {
             $moderator_anon_post = true;
         }
     } else {
-        if ($CONF_FORUM['allowed_editwindow'] > 0) {
+		// Edit window must exist and topic cannot be locked
+		$is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly', "forum_id = $forum");
+		$is_lockedtopic = DB_getItem($_TABLES['forum_topic'],'locked',"id = $pid");
+        if ($CONF_FORUM['allowed_editwindow'] > 0 && !$is_lockedtopic && !$is_readonly) {
             $t1 = DB_getItem($_TABLES['forum_topic'],'date',"id='$id'");
             $t2 = $CONF_FORUM['allowed_editwindow'];
             $time = time();
@@ -181,42 +196,28 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
         }
     }
 
-    if (($editpid < 1) && (trim($_POST['subject']) == '')) {
+    if (($isParent) && (trim($_POST['subject']) == '')) {
 		// $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
 		$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
     } elseif (!$editAllowed) {
-        $link = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$id}";
+		$url = html_entity_decode(forum_buildForumPostURL($id));
         //$display .= alertMessage('',$LANG_GF02['msg189'], sprintf($LANG_GF02['msg187'], $link));
 		COM_setSystemMessage($LANG_GF02['msg189'], $LANG_GF02['msg180']); // Cannot edit post anymore
-		COM_redirect($link);
+		COM_redirect($url);
     } else {
         if ($moderator_anon_post) {
-            $name = gf_preparefordb($aname,'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
+            $name = gf_preparefordb($aname, 'text'); // This happens if mod is editing an anonymous post since anonymous nick name can be changed
         } else {
-            $name = gf_preparefordb($_POST['name'],'text');
+			$name = gf_preparefordb(COM_getDisplayName($uidPost), 'text');
         }
         
         if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
             strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
             strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {
-                
-            if ($CONF_FORUM['use_spamx_filter'] == 1) {
-                // Check for SPAM
-                $spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-                $permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
-                $result = PLG_checkForSpam(
-                    $spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
-                    $name
-                );                
-                // Now check the result and redirect to index.php if spam action was taken
-                if ($result > 0) {
-                    // then tell them to get lost ...
-                    $display .= COM_showMessage( $result, 'spamx' );
-                    $display = gf_createHTMLDocument($display);
-                    COM_output($display);
-                    exit;
-                }
-            }
+            
+			// If spam found error message will display
+			gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
+            
             $postmode = gf_chkpostmode($postmode,$mode_switch);
             $subject  = gf_preparefordb(strip_tags($_POST['subject']),'text');
             $comment  = gf_preparefordb($_POST['comment'],$postmode);
@@ -224,7 +225,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             // If user has moderator edit rights only
             $locked = 0;
             $sticky = 0;
-            if ($_POST['modedit'] == 1) {
+            if ($editmoderator) {
                 if (isset($_POST['locked_switch']) AND $_POST['locked_switch'] == 1)  $locked = 1;
                 if (isset($_POST['sticky_switch']) AND $_POST['sticky_switch'] == 1)  $sticky = 1;
             }
@@ -232,35 +233,34 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             if ($moderator_anon_post) {
                 $sql .= "name='$name', ";
             }
-            $sql .= "mood='$mood', sticky='$sticky', locked='$locked' WHERE (id='$editid')";
+            $sql .= "mood='$mood', sticky='$sticky', locked='$locked' WHERE (id='$id')";
             DB_query($sql);
 
-            $topicparent = DB_getItem($_TABLES['forum_topic'],"pid","id='$editid'");
-            if ($topicparent == 0) {
-                $topicparent = $editid;
-                
-                // If moderator and a root post
-                if ($editmoderator) {
-                    TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $editid, TOPIC_TYPE_FORUM_TOPIC);
-                }                
-            }
+			// If moderator and a root post
+			if ($editmoderator && $isParent) {
+				TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+			}                
 
             //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
 			// Make sure user only changes notifications for his own posts when editing
 			if ($uid == $uidPost) {
-				gf_setnotification($notify, $forum, $topicparent, $uid);
+				gf_setnotification($notify, $forum, $pid, $uid);
 			}
 
             // if user has un-checked the Silent option then they want to have user alerted of the edit and update the topic timestamp
-            if ($silentedit != 1) {
-                DB_query("UPDATE {$_TABLES['forum_topic']} SET lastupdated = $date WHERE id=$topicparent");
+			if (isset($_POST['silentedit']) && $_POST['silentedit'] == 1 ) {
+            	// This needs to be outside silentedit check since forum notification for site needs to be sent at least
+				gf_chknotifications($forum, $id, $uid, 'topic', true);
+			} else {
+                DB_query("UPDATE {$_TABLES['forum_topic']} SET lastupdated = $date WHERE id=$pid");
                 //Remove any lastviewed records in the log so that the new updated topic indicator will appear
-                DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$topicparent' and time > 0");
-                // Check for any users subscribed notifications
-                gf_chknotifications($forum,$editid,$uid);
-            }
+                DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$pid' and time > 0");
+				
+				// Check for any users subscribed notifications
+				gf_chknotifications($forum, $id, $uid);
+			}
 
-            PLG_itemSaved($editid, 'forum');
+            PLG_itemSaved($id, 'forum');
             COM_rdfUpToDateCheck('forum'); // forum rss feeds update
             
 			// Remove new block and centerblock cached items
@@ -269,8 +269,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
             $cacheInstance = 'forum__centerblock_';
             CACHE_remove_instance($cacheInstance);
 
-            $link = $_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$topicparent&amp;page=$page#$editid";
-            COM_redirect($link);
+			$url = html_entity_decode(forum_buildForumPostURL($id, '&amp;msg=1'));
+            COM_redirect($url);
         } else {
             $display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']);
         }
@@ -286,57 +286,28 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($editpost == 'yes') && SEC_checkToken(
 
 // ADD TOPIC
 if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
-    $msg = '';
+    $captchaMsg = '';
     $date = time();
     $REMOTE_ADDR = $_SERVER['REMOTE_ADDR'];
-
+	
     if ($method == 'newtopic') {
-        if ($aname != '') {
+        if ($uid == 1) {
             $name = gf_preparefordb($aname,'text');
         } else {
-            $name = gf_preparefordb($_POST['name'],'text');
+			$name = gf_preparefordb(COM_getDisplayName($uid), 'text');
         }
-
-        if ( function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha') ) {
-            if ( function_exists('plugin_itemPreSave_captcha') ) {
-                $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
-            } else {
-                $msg = plugin_itemPreSave_recaptcha('forum');
-            }
-            if ( $msg != '' ) {
-                $submit = $LANG_GF01['PREVIEW'];
-                $subject = COM_stripslashes($_POST['subject']);
-                $display .= COM_startBlock ($LANG03[17], '',
-                              COM_getBlockTemplate ('_msg_block', 'header'))
-                         . $msg
-                         . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
-            }
-        }
-
-        if ( $msg == '' ) {
-            if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
+		
+		$captchaMsg = gf_passCaptchaCheck($captcha, $_POST['subject']);
+        if ($captchaMsg == '') {
+            if (strlen($name) >= $CONF_FORUM['min_username_length'] AND
                 strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
                 strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length'] AND
                 TOPIC_hasMultiTopicAccess('topic') > 2) {
-                // Note: TOPIC_checkTopicSelectionControl not required since Geeklog topics not required
+                // Note: TOPIC_checkTopicSelectionControl not required since Geeklog topics not required for parent forum topic
 
-				if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
-					// Check for SPAM
-					$spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-					$permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
-					$result = PLG_checkForSpam(
-						$spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
-						$name
-					);                
-					// Now check the result and redirect to index.php if spam action was taken
-					if ($result > 0) {
-						// then tell them to get lost ...
-						$display .= COM_showMessage( $result, 'spamx' );
-						$display = gf_createHTMLDocument($display);
-						COM_output($display);
-						exit;
-					}
-				}
+				// If spam found error message will display
+				gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
+				
 				$postmode = gf_chkpostmode($postmode,$mode_switch);
 				$subject = gf_preparefordb(strip_tags($_POST['subject']),'text');
 
@@ -346,7 +317,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 				$comment = gf_preparefordb($_POST['comment'],$postmode);
 				$locked = 0;
 				$sticky = 0;
-				if (Input::post('modedit', 0) == 1) {
+				if ($editmoderator) {
 					if (Input::post('locked_switch', 0) == 1)  $locked = 1;
 					if (Input::post('sticky_switch', 0) == 1)  $sticky = 1;
 				}
@@ -394,61 +365,29 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 //$display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
 				$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
             }
-        }
+        } else {
+			// Add captcha failure message to display
+			$display .= $captchaMsg;
+		}
 // END OF A NEW TOPIC...
 
 // ADD REPLY
      } elseif ($method == 'postreply') {
-        if ( function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha') ) {
-            if ( function_exists('plugin_itemPreSave_captcha') ) {
-                $msg = plugin_itemPreSave_captcha('forum',$_POST['captcha']);
-            } else {
-                $msg = plugin_itemPreSave_recaptcha('forum');
-            }
-            if ( $msg != '' ) {
-                $submit = $LANG_GF01['PREVIEW'];
-                $subject = COM_stripslashes($_POST['subject']);
-                $display .= COM_startBlock ($LANG03[17], '',
-                              COM_getBlockTemplate ('_msg_block', 'header'))
-                         . $msg
-                         . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
-            }
-        }
 
-        if ( $msg == '' ) {
-            //Add Reply
-            if ($aname != '') {
-                $name = gf_preparefordb($aname,'text');
-            } else {
-				if (isset($_POST['name'])) {
-					$name = gf_preparefordb($_POST['name'],'text');
-				} else {
-						$name = '';
-				}
-            }
+		$captchaMsg = gf_passCaptchaCheck($captcha, $_POST['subject']);
+        if ($captchaMsg == '') {
+			if ($uid == 1) {
+				$name = gf_preparefordb($aname,'text');
+			} else {
+				$name = gf_preparefordb(COM_getDisplayName($uid), 'text');
+			}
             
-            if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND 
+            if (strlen($name) >= $CONF_FORUM['min_username_length'] AND 
                 strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
                 strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {            
 
-				if ( $CONF_FORUM['use_spamx_filter'] == 1 ) {
-					// Check for SPAM
-					$spamcheck = '<h1>' . $_POST['subject'] . '</h1><p>' . $_POST['comment'] . '</p>';
-					$permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
-					$result = PLG_checkForSpam(
-						$spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
-						$name
-					);                
-					// Now check the result and redirect to index.php if spam action was taken
-					if ($result > 0) {
-						// then tell them to get lost ...
-						$display .= COM_showMessage( $result, 'spamx' );
-						$display = gf_createHTMLDocument($display);
-						COM_output($display);
-						exit;
-					}
-				}
-				DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
+				// If spam found error message will display
+				gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
 
 				$postmode = gf_chkpostmode($postmode,$mode_switch);
 				$subject = gf_preparefordb($_POST['subject'],'text');
@@ -462,6 +401,9 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
 				// Find the id of the last inserted topic
 				list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+				
+				// Make sure users know new reply for parent topic
+				DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
 				
 				// Check for any users subscribed notifications
 				gf_chknotifications($forum,$id,$uid);
@@ -488,13 +430,16 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
                 //$display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
 				$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
             }
-        }
+        } else {
+			// Add captcha failure message to display
+			$display .= $captchaMsg;
+		}
     }
 	
 	// If reaches here then something is not correct when adding new topic or reply
 	$submit = $LANG_GF01['PREVIEW'];
 
-/*    if ( $msg == '' ) {
+/*    if ( $captchaMsg == '' ) {
         $display = gf_createHTMLDocument($display);
         COM_output($display);
         exit;
@@ -526,15 +471,17 @@ if ($id > 0) {
 if ($method == 'edit') {
     $editAllowed = false;
 	$editAllowedTimedCheck = false;
-    if (forum_modPermission($edittopic['forum'],$_USER['uid'],'mod_edit')) {
+    if ($editmoderator) {
         $editAllowed = true;
-        $display .= '<input type="hidden" name="modedit" value="1"' . XHTML . '>';
     } else {
         // User is trying to edit their topic post - this is allowed
         if ($edittopic['date'] > 0 AND $edittopic['uid'] == $_USER['uid']) {
 			$editAllowedTimedCheck = true;
 			
-            if ($CONF_FORUM['allowed_editwindow'] > 0) {   // Check if edit timeframe is still valid
+			// Edit window must exist and topic cannot be locked
+			$is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly', "forum_id = $forum");
+			$is_lockedtopic = DB_getItem($_TABLES['forum_topic'],'locked',"id = $pid");
+			if ($CONF_FORUM['allowed_editwindow'] > 0 && !$is_lockedtopic && !$is_readonly) {			
                 $t2 = $CONF_FORUM['allowed_editwindow'];
                 $time = time();
                 if ((time() - $t2) < $edittopic['date']) {
@@ -561,7 +508,12 @@ if ($method == 'edit') {
 		if ($editAllowedTimedCheck) {
 			$display .= COM_showMessageText($LANG_GF02['msg191'], $LANG_GF01['ACCESSERROR']); // Edit not permitted. Allowable edit time frame expired
 		} else { 
-			$display .= COM_showMessageText($LANG_GF02['msg72'], $LANG_GF01['ACCESSERROR']); // You do not have rights to perform this moderation function
+			if (forum_modPermission($uid)) {
+				$display .= COM_showMessageText($LANG_GF02['msg72'], $LANG_GF01['ACCESSERROR']); // You do not have rights to perform this moderation function
+			} else {
+				// No mod privileges at all so 404 to hide details about moderation.php
+				COM_handle404("{$_CONF['site_url']}/forum/index.php");				
+			}
 		}
 		$display = gf_createHTMLDocument($display);
 		COM_output($display);		
@@ -624,47 +576,44 @@ if ($submit == $LANG_GF01['PREVIEW']) {
     $preview_footer->parse ('output', 'preview_footer');
     $display .= $preview_footer->finish($preview_footer->get_var('output'));
 
-    // If Moderator and editing the parent topic - see if form has skicky or locked checkbox on
-    isset($editmoderator) or $editmoderator = '';
-    if ($editmoderator AND $editpid == 0) {
-        if ($method == 'edit') {
-            if (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 ) {
-                $locked_val = 'checked="checked"';
-            }
-            if (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 ) {
-                $sticky_val = 'checked="checked"';
-            }
-        }
+    // If Moderator and editing the parent topic - see if form has sticky or locked checkbox on
+    if ($editmoderator AND $isParent) { // so topic either new topic or edit of parent topic
+		$locked_val = '';
+		$sticky_val = '';				
+		if (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 ) {
+			$locked_val = 'checked="checked"';
+		}
+		if (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 ) {
+			$sticky_val = 'checked="checked"';
+		}
     }
+	
+	if ($method == 'edit') {
+		$silentedit = false;
+		if (isset($_POST['silentedit']) && $_POST['silentedit'] == 1 ) {
+			$silentedit = true;
+		}
+	}
 }
 
-// NEW TOPIC OR REPLY
-if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($submit == $LANG_GF01['PREVIEW'])) {
+// DISPLAY Topic Editor for all methods
+if ($editorDisplay) {
+	/* Check if this user has moderation rights now to allow a post to a locked topic */
+    if (!$editmoderator && (
+		($method == 'newtopic' && ($newtopic['is_readonly'] == 1 )) || 
+		($method == 'postreply' && ( $edittopic['locked'] == 1 || $edittopic['is_readonly'] == 1 )))) {
+			
+		$display .= COM_showMessageText($LANG_GF02['msg87'], $LANG_GF01['ERROR']); // This topic has been locked by the moderator. No additional posts are permitted
+		$display = gf_createHTMLDocument($display);
+		COM_output($display);
+		
+		exit;
+    }
+
     if ($submit == $LANG_GF01['PREVIEW']) {
         $edittopic['subject'] = COM_stripslashes($_POST['subject']);
     }
-    if ( $method == 'newtopic' && ($newtopic['is_readonly'] == 1 ) ) {
-        /* Check if this user has moderation rights now to allow a post to a locked topic */
-        if (!forum_modPermission($forum,$_USER['uid'],'mod_edit')) {
-            //$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
-			$display .= COM_showMessageText($LANG_GF02['msg87'], $LANG_GF01['ERROR']); // This topic has been locked by the moderator. No additional posts are permitted
-            $display = gf_createHTMLDocument($display);
-            COM_output($display);
-            
-            exit;
-        }
-    }
-    if ($method == 'postreply' AND ( $edittopic['locked'] == 1 || $edittopic['is_readonly'] == 1 )) {
-        /* Check if this user has moderation rights now to allow a post to a locked topic */
-        if (!forum_modPermission($edittopic['forum'],$_USER['uid'],'mod_edit')) {
-            //$display .= alertMessage($LANG_GF02['msg87'], $LANG_GF01['ERROR']);
-			$display .= COM_showMessageText($LANG_GF02['msg87'], $LANG_GF01['ERROR']); // This topic has been locked by the moderator. No additional posts are permitted
-            $display = gf_createHTMLDocument($display);
-            COM_output($display);
-            exit;
-        }
-    }
-
+	
     if ($method == 'postreply' OR ($method == 'edit' AND $subject == '')) {
         $subject = $edittopic['subject'];
     } else {
@@ -690,18 +639,12 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         $topicnavbar->set_var ('cat_name',$edittopic['cat_name']);
         $topicnavbar->set_var ('forum_name', $edittopic['forum_name']);
     }
-    // run the subject through the HTML filter to ensure no XSS
-    // issues.
+    // run the subject through the HTML filter to ensure no XSS issues.
     $subject = gf_checkHTML($subject);
     $topicnavbar->set_var ('topic_id', $id);
     $topicnavbar->set_var ('subject', $subject);
     $topicnavbar->set_var ('LANG_HOME', $LANG_GF01['HOMEPAGE']);
     $topicnavbar->set_var('forum_home',$LANG_GF01['INDEXPAGE']);
-    $topicnavbar->set_var ('hidden_id', $id);
-    $topicnavbar->set_var ('hidden_editpost','');
-    $topicnavbar->set_var ('hidden_editpid', '');
-    $topicnavbar->set_var ('hidden_editid', '');
-    $topicnavbar->set_var ('hidden_method', '');
 
     $topicnavbar->set_var ('LANG_bhelp', $LANG_GF01['b_help']);
     $topicnavbar->set_var ('LANG_ihelp', $LANG_GF01['i_help']);
@@ -717,21 +660,14 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $topicnavbar->set_var ('LANG_fhelp', $LANG_GF01['f_help']);
     $topicnavbar->set_var ('LANG_hhelp', $LANG_GF01['h_help']);
 
-    if ((!COM_isAnonUser() AND forum_modPermission($forum, $_USER['uid'], 'mod_edit')) OR SEC_inGroup( 'Root' )) {
-        $editmoderator = true;
-        $topicnavbar->set_var ('hidden_modedit', '1');
-    } else {
-        $topicnavbar->set_var ('hidden_modedit', '0');
-        $editmoderator = false;
-    }
-
     if ($method == 'newtopic') {
         $postmessage = $LANG_GF02['PostTopic'];
         $topicnavbar->set_var ('hidden_method', 'newtopic');
-        $editpid = 0;
+		$topicnavbar->set_var ('hidden_id', $forum);
     } elseif ($method == 'postreply') {
         $postmessage = $LANG_GF02['PostReply'];
         $topicnavbar->set_var ('hidden_method', 'postreply');
+		$topicnavbar->set_var ('hidden_id', $pid);
         if ($submit != $LANG_GF01['PREVIEW']) {
             $subject = $LANG_GF01['RE'] . $subject;
         }
@@ -755,13 +691,10 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
                 $comment = sprintf($CONF_FORUM['quoteformat'],COM_getDisplayName($quotearray['uid']),$quotearray['comment']);
             }
         }
-
-        $editpid = $id;
-
     } elseif ($method == 'edit') {
         $postmessage = $LANG_GF02['EditTopic'];
         $topicnavbar->set_var ('hidden_method', 'edit');
-        $topicnavbar->set_var ('hidden_editpost','yes');
+		$topicnavbar->set_var ('hidden_id', $id);
         if ($editmoderator) {
             $username = COM_getDisplayName($edittopic['uid']);
         } elseif ($uid > 1) {
@@ -779,10 +712,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         if (strstr($edittopic['comment'],'<pre class="forumCode">') === false) {
             $comment = htmlspecialchars($comment,ENT_QUOTES, $CONF_FORUM['charset']);
         }
-        $editpid = $edittopic['pid'];
-        $topicnavbar->set_var ('hidden_editpid', $editpid);
-        $topicnavbar->set_var ('hidden_editid', $id);
-
     }
 
     if ($uid >= 2) {
@@ -830,7 +759,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             }
         } else {
             if ($editmoderator AND $edittopic['uid'] == 1) {
-                //$aname = COM_stripslashes($edittopic['name']);
                 if ($method == 'edit' AND $aname == '') {
                     $aname = COM_stripslashes($edittopic['name']);
                 } else {
@@ -840,7 +768,6 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
         }
 
         $submissionform_main->set_var ('username', $username);
-        $submissionform_main->set_var ('xusername', $username);
         $submissionform_main->set_var ('aname', $aname);
         $submissionform_main->parse ('user_name', 'submissionform_membertop');
     }
@@ -912,7 +839,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     } elseif ($method == 'postreply') {
         $required = $LANG_GF01['OPTIONAL'];
     } elseif ($method == 'edit') {
-        if ($editpid == 0) {
+        if ($isParent) {
             $required = $LANG_GF01['REQUIRED'];
         } else {
             $required = $LANG_GF01['OPTIONAL'];
@@ -974,8 +901,8 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 
     // if this is the first time showing the new submission form - then check if notify option should be on
 	if ($submit != $LANG_GF01['PREVIEW']) {
-        if ($editpid > 0) {
-            $notifyTopicid = $editpid;
+        if (!$isParent) {
+            $notifyTopicid = $pid;
         } else {
             $notifyTopicid = $id;
         }
@@ -1026,18 +953,18 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 		}
 
         // check that this is the parent topic - only able to make it sticky or locked
-        if ($editpid == 0) {
-            if (!isset($locked_val) AND !isset($sticky_val) AND $method == 'edit') {
+        if ($isParent) { // so topic either new topic or edit of parent topic
+            if (!isset($locked_val) AND !isset($sticky_val)) {
 				$locked_val = '';
 				$sticky_val = '';
             	
-                if ((!isset($_POST['locked_switch']) AND $edittopic['locked'] == 1) OR (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 )) {
+                if ((!isset($_POST['locked_switch']) AND (isset($edittopic['locked']) AND $edittopic['locked'] == 1)) OR (isset($_POST['locked_switch']) && $_POST['locked_switch'] == 1 )) {
                     $locked_val = 'checked="checked"';
 				}
-                if ((!isset($_POST['sticky_switch']) AND $edittopic['sticky'] == 1) OR (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 )) {
+                if ((!isset($_POST['sticky_switch']) AND (isset($edittopic['sticky']) AND $edittopic['sticky'] == 1)) OR (isset($_POST['sticky_switch']) && $_POST['sticky_switch'] == 1 )) {
                     $sticky_val = 'checked="checked"';
                 }
-			} else { 
+			} elseif (!isset($locked_val) AND !isset($sticky_val)) {
 				$locked_val = '';
 				$sticky_val = '';				
 			}
@@ -1078,7 +1005,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     } else {
          $postmode_msg = $LANG_GF01['HTMLMODE'];
     }
-    if ($CONF_FORUM['allow_html'] || SEC_inGroup( 'Root' )) {
+    if ($CONF_FORUM['allow_html'] || forum_modPermission($forum, $uid, 'mod_edit')) {
         
 		// Mode Option
 		$submissionform_main->set_var ('LANG_OPTION', $postmode_msg);
@@ -1097,14 +1024,17 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
             $comment = str_replace( '<pre>', '[code]', $comment );
             $comment = str_replace( '</pre>', '[/code]', $comment );
         }
-        if ($silentedit == 1 OR ( !isset($_POST['modedit']) AND $CONF_FORUM['silent_edit_default'])) {
-             $edit_val = 'checked="checked"';
-        }
+	
+        if ((isset($silentedit) && $silentedit) OR (!isset($silentedit) AND $CONF_FORUM['silent_edit_default'])) {
+            $silent_val = 'checked="checked"';
+        } else {
+			$silent_val = '';
+		}
 
 		// Edit Option
 		$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg190']);
 		$submissionform_main->set_var ('option_name', 'silentedit');
-		$submissionform_main->set_var ('option_checked', $edit_val);
+		$submissionform_main->set_var ('option_checked', $silent_val);
 		$submissionform_main->set_var ('option_extra', '');
 		$submissionform_main->parse ('option', 'submissionform_option', true); 
 		$options_exist = true;
@@ -1170,7 +1100,7 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
     $topicfooter->set_var ('site_url', $_CONF['site_url']);
 	
     // Topic Review
-    if (($method != 'newtopic' && $editpost != 'yes') && ($method == 'postreply' || $submit == $LANG_GF01['PREVIEW'])) {
+    if (($method != 'newtopic' && $method != 'edit') && ($method == 'postreply' || $submit == $LANG_GF01['PREVIEW'])) {
         if ($CONF_FORUM['show_topicreview']) {
 			if ($quoteid > 0) {
 				$gotoId = $quoteid;
@@ -1194,11 +1124,64 @@ if (($method == 'newtopic' || $method == 'postreply' || $method == 'edit') || ($
 	
 	$topicfooter->parse ('output', 'topicfooter');
     $display .= $topicfooter->finish ($topicfooter->get_var('output'));
-
 }
 
 $display = gf_createHTMLDocument($display, '', true);
 COM_output($display);
+
+/*
+* Function is called to captcha on save. If error in captcha a formatted message will be returned
+*/
+function gf_passCaptchaCheck($captcha, $subject) 
+{
+	global $LANG_GF01, $LANG03;
+	
+	$display = '';
+	
+	if (function_exists('plugin_itemPreSave_captcha') || function_exists('plugin_itemPreSave_recaptcha')) {
+		if (function_exists('plugin_itemPreSave_captcha')) {
+			$msg = plugin_itemPreSave_captcha('forum', $captcha);
+		} else {
+			$msg = plugin_itemPreSave_recaptcha('forum');
+		}
+		if ($msg != '') {
+			$submit = $LANG_GF01['PREVIEW'];
+			$subject = COM_stripslashes($subject);
+			$display .= COM_startBlock ($LANG03[17], '',
+						  COM_getBlockTemplate ('_msg_block', 'header'))
+					 . $msg
+					 . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
+		}
+	}
+	
+	return $display;
+}
+
+/*
+* Function is called to check spam. If found will display error message to user and does not exit function
+*/
+function gf_postSpamCheck(&$display, $subject, $comment, $name) 
+{
+	global $_CONF, $CONF_FORUM;
+	
+	if ($CONF_FORUM['use_spamx_filter'] == 1) {
+		// Check for SPAM
+		$spamcheck = '<h1>' . $subject . '</h1><p>' . $comment . '</p>';
+		$permanentlink = null; // Really difficult to determine, need to make sure viewed anonymously and what page on. There is no permantlink for the forum post as it could appear on different pages depending on settings
+		$result = PLG_checkForSpam(
+			$spamcheck, $_CONF['spamx'], $permanentlink, Geeklog\Akismet::COMMENT_TYPE_FORUM_POST,
+			$name
+		);                
+		// Now check the result and redirect to index.php if spam action was taken
+		if ($result > 0) {
+			// then tell them to get lost ...
+			$display .= COM_showMessage($result, 'spamx');
+			$display = gf_createHTMLDocument($display);
+			COM_output($display);
+			exit;
+		}
+	}
+}
 
 
 /*
@@ -1239,7 +1222,7 @@ function gf_setnotification($notify, $forum, $id, $uid)
 *
 * This function needs to be called when there is a new topic or a reply
 */
-function gf_chknotifications($forumid, $topicid, $userid, $type='topic') 
+function gf_chknotifications($forumid, $topicid, $userid, $type='topic', $siteNotificationOnly = false) 
 {
     global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM, $LANG08;
 
@@ -1285,109 +1268,111 @@ function gf_chknotifications($forumid, $topicid, $userid, $type='topic')
 		COM_mail($_CONF['site_mail'], $subjectline, $message);
 	}
 
-    $sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id = $pid) OR ((forum_id = $forumid) AND (topic_id = 0) )) GROUP BY uid";
-    $sqlresult = DB_query($sql);
-    $nrows = DB_numRows($sqlresult);
+	if (!$siteNotificationOnly) {
+		$sql = "SELECT * FROM {$_TABLES['forum_watch']} WHERE ((topic_id = $pid) OR ((forum_id = $forumid) AND (topic_id = 0) )) GROUP BY uid";
+		$sqlresult = DB_query($sql);
+		$nrows = DB_numRows($sqlresult);
 
-    $site_language = unserialize(DB_getItem($_TABLES['conf_values'], 'value', "group_name='Core' AND name='language'")); // Retrieve original language of site
-    $mail_language = $_CONF['language'];
-    $last_mail_language = $mail_language;
-    $plugin_path = $_CONF['path'] . 'plugins/forum/';
+		$site_language = unserialize(DB_getItem($_TABLES['conf_values'], 'value', "group_name='Core' AND name='language'")); // Retrieve original language of site
+		$mail_language = $_CONF['language'];
+		$last_mail_language = $mail_language;
+		$plugin_path = $_CONF['path'] . 'plugins/forum/';
 
-    for ($i =1; $i <= $nrows; $i++) {
-        $N = DB_fetchArray($sqlresult);
-        // Don't need to send a notification to the user that posted this message and users with NOTIFY disabled
-        if ($N['uid'] > 1 AND $N['uid'] != $userid AND $CONF_FORUM['allow_notification'] == '1' ) {
-            
-			// if the topic_id is 0 for this record - user has subscribed to complete forum. Check if they have opted out of this forum topic.
-            if (DB_count($_TABLES['forum_watch'],array('uid','forum_id','topic_id'),array($N['uid'],$forumid,-$topicid)) == 0) {
-               
-				// Check if user does not want to receive multiple notifications for same topic and already has been notified
-                $userNotifyOnceOption = DB_getItem($_TABLES['forum_userprefs'],'notify_once',"uid='{$N['uid']}'");
-                
-				// Retrieve the log record for this user if it exists then check if user has viewed this topic yet
-                // The logtime value may be 0 which indicates the user has not yet viewed the topic
-                $lsql = DB_query("SELECT time FROM {$_TABLES['forum_log']} WHERE uid='{$N['uid']}' AND forum='$forumid' AND topic='$topicid'");
+		for ($i =1; $i <= $nrows; $i++) {
+			$N = DB_fetchArray($sqlresult);
+			// Don't need to send a notification to the user that posted this message and users with NOTIFY disabled
+			if ($N['uid'] > 1 AND $N['uid'] != $userid AND $CONF_FORUM['allow_notification'] == '1' ) {
+				
+				// if the topic_id is 0 for this record - user has subscribed to complete forum. Check if they have opted out of this forum topic.
+				if (DB_count($_TABLES['forum_watch'],array('uid','forum_id','topic_id'),array($N['uid'],$forumid,-$topicid)) == 0) {
+				   
+					// Check if user does not want to receive multiple notifications for same topic and already has been notified
+					$userNotifyOnceOption = DB_getItem($_TABLES['forum_userprefs'],'notify_once',"uid='{$N['uid']}'");
+					
+					// Retrieve the log record for this user if it exists then check if user has viewed this topic yet
+					// The logtime value may be 0 which indicates the user has not yet viewed the topic
+					$lsql = DB_query("SELECT time FROM {$_TABLES['forum_log']} WHERE uid='{$N['uid']}' AND forum='$forumid' AND topic='$topicid'");
 
-                if (DB_numRows($lsql) == 1) {
-                    $nologRecord = false;
-                    list ($logtime) = DB_fetchArray($lsql);
-                } else {
-                    $nologRecord = true;
-                    $logtime = 0;
-                }
+					if (DB_numRows($lsql) == 1) {
+						$nologRecord = false;
+						list ($logtime) = DB_fetchArray($lsql);
+					} else {
+						$nologRecord = true;
+						$logtime = 0;
+					}
 
-                if  ($userNotifyOnceOption == 0 OR ($userNotifyOnceOption == 1 AND ($nologRecord OR $logtime != 0)) ) {
-                    $topicrec = DB_query("SELECT subject,name,forum FROM {$_TABLES['forum_topic']} WHERE id='$pid'");
-                    $A = DB_fetchArray($topicrec);
-                    $userrec = DB_query("SELECT username,email,language,status FROM {$_TABLES['users']} WHERE uid='{$N['uid']}'");
-                    $B = DB_fetchArray($userrec);
-                    if ($B['status'] == USER_ACCOUNT_ACTIVE) {
-                        // Need to send email in user own language if set, else site default
-                        // Should not use current user language if does not match
-                        if (empty($B['language'])) {
-                            $mail_language = $site_language;
-                        } else {
-                            $mail_language = $B['language'];
-                        }
-                        
-                        if ($mail_language != $last_mail_language) {
-                            $langfile = $plugin_path . 'language/' . $mail_language . '.php';
-                            if (file_exists($langfile)) {
-                                require $langfile;
-                                $last_mail_language = $mail_language;
-                            } else {
-                                // Use site default language as backup
-                                $langfile = $plugin_path . 'language/' . $site_language . '.php';
-                                if (file_exists($langfile)) {
-                                    require $langfile;
-                                    $last_mail_language = $site_language;
-                                } else {
-                                    require $plugin_path . 'language/english.php';
-                                    $last_mail_language = 'english';
-                                }
-                            }
-                        }
-
-                        $message = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
-						// ***************************************************************
-						// This code logic is very similar to the site notification above. If change here make sure it is reflected above						
-                        if ($type == 'forum') {
-							// New Topic (first post in topic)
-                            $forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-                            $message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
-							$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
-                        } else {
-							// Reply or Edit Post
-							// 2 scenarios here. Either it is an edit of a post or a reply.
-							if ($pid_flag) {
-								// Reply then
-								// Lets find the current last post in $topic
-								$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
-								list($lastrecid) = DB_fetchArray($sql);
-								$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
+					if  ($userNotifyOnceOption == 0 OR ($userNotifyOnceOption == 1 AND ($nologRecord OR $logtime != 0)) ) {
+						$topicrec = DB_query("SELECT subject,name,forum FROM {$_TABLES['forum_topic']} WHERE id='$pid'");
+						$A = DB_fetchArray($topicrec);
+						$userrec = DB_query("SELECT username,email,language,status FROM {$_TABLES['users']} WHERE uid='{$N['uid']}'");
+						$B = DB_fetchArray($userrec);
+						if ($B['status'] == USER_ACCOUNT_ACTIVE) {
+							// Need to send email in user own language if set, else site default
+							// Should not use current user language if does not match
+							if (empty($B['language'])) {
+								$mail_language = $site_language;
 							} else {
-								// Edit of existing post then
-								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
+								$mail_language = $B['language'];
 							}
-							$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
-                        }
-						// ***************************************************************
-                        $message .= "{$LANG_GF02['msg25']}{$_CONF['site_name']} {$LANG_GF01['ADMIN']}\n";
-                        // Check and see if Site admin has enabled email notifications
-                        if ($CONF_FORUM['allow_notification']) {
-                            if ($nologRecord and $userNotifyOnceOption == 1 ) {
-                                DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
-                            }
-                            if (($B['email'] != '')  AND COM_isEmail($B['email'])) {
-                                COM_mail($B['email'], $subjectline, $message);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+							
+							if ($mail_language != $last_mail_language) {
+								$langfile = $plugin_path . 'language/' . $mail_language . '.php';
+								if (file_exists($langfile)) {
+									require $langfile;
+									$last_mail_language = $mail_language;
+								} else {
+									// Use site default language as backup
+									$langfile = $plugin_path . 'language/' . $site_language . '.php';
+									if (file_exists($langfile)) {
+										require $langfile;
+										$last_mail_language = $site_language;
+									} else {
+										require $plugin_path . 'language/english.php';
+										$last_mail_language = 'english';
+									}
+								}
+							}
+
+							$message = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
+							// ***************************************************************
+							// This code logic is very similar to the site notification above. If change here make sure it is reflected above						
+							if ($type == 'forum') {
+								// New Topic (first post in topic)
+								$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
+								$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
+								$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
+							} else {
+								// Reply or Edit Post
+								// 2 scenarios here. Either it is an edit of a post or a reply.
+								if ($pid_flag) {
+									// Reply then
+									// Lets find the current last post in $topic
+									$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
+									list($lastrecid) = DB_fetchArray($sql);
+									$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
+								} else {
+									// Edit of existing post then
+									$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
+								}
+								$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
+							}
+							// ***************************************************************
+							$message .= "{$LANG_GF02['msg25']}{$_CONF['site_name']} {$LANG_GF01['ADMIN']}\n";
+							// Check and see if Site admin has enabled email notifications
+							if ($CONF_FORUM['allow_notification']) {
+								if ($nologRecord and $userNotifyOnceOption == 1 ) {
+									DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
+								}
+								if (($B['email'] != '')  AND COM_isEmail($B['email'])) {
+									COM_mail($B['email'], $subjectline, $message);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 ?>

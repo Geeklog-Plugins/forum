@@ -1119,6 +1119,7 @@ function forum_chkUsercanAccess($secure = false, $forum = '', $showtopic = '') {
 
 	// Check for forum and topic access if passed
     if (($forum !== '') || ($showtopic !== '')) { // Must not be blanks and number must be 0 or higher
+		$grp_id = '';
         if ($showtopic !== '') {
             $forum_id = DB_getItem($_TABLES['forum_topic'],'forum',"id='$showtopic'");
 			// Make sure if forum passed, that it matches actual forum of topic if also passed
@@ -1126,11 +1127,11 @@ function forum_chkUsercanAccess($secure = false, $forum = '', $showtopic = '') {
 				COM_handle404("{$_CONF['site_url']}/forum/index.php");
 			}
             $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum_id'");
-        } elseif ($forum != '') {
+        } elseif ($forum !== '') {
             $grp_id = DB_getItem($_TABLES['forum_forums'],'grp_id',"forum_id='$forum'");
         }
         // Double check forum and/or topic exists
-        if ($grp_id == "") {
+        if ($grp_id == '') {
             COM_handle404("{$_CONF['site_url']}/forum/index.php");
             exit;
         }        

@@ -1138,7 +1138,7 @@ if ($forum > 0) {
         $topiclisting->set_var ('LANG_newtopic', $LANG_GF01['NEWTOPIC']);
         $topiclisting->set_var('newtopiclinktext', $LANG_GF09['newtopic']);
         $topiclisting->set_var('newtopiclinkimg', gf_getImage('post_newtopic'));
-        $topiclisting->set_var ('newtopiclink',"{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;forum=$forum");
+        $topiclisting->set_var ('newtopiclink',"{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;id=$forum");
         $topiclisting->parse ('newtopic_link','newtopic_link');
     } else {
         $topiclisting->set_var ('LANG_newtopic', '');

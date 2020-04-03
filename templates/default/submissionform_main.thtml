@@ -41,7 +41,7 @@
 <!-- BEGIN submissionform_membertop -->
 			<tr>
 				<td class="pluginCellSubTitle" style="width:110px; white-space:nowrap;">&nbsp;{LANG_NAME}</td>
-				<td class="pluginCellText pluginCellFill"><input type="hidden" name="name" size="35" value="{xusername}"{xhtml}>{username}{!if aname}: <input id="form-forum-username" placeholder="" type="text" name="aname" value="{aname}"  maxlength="50" class="uk-form-width-medium"{xhtml}>{!endif}</td>
+				<td class="pluginCellText pluginCellFill">{username}{!if aname}: <input id="form-forum-username" placeholder="" type="text" name="aname" value="{aname}"  maxlength="50" class="uk-form-width-medium"{xhtml}>{!endif}</td>
 			</tr>
 <!-- END submissionform_membertop -->
 

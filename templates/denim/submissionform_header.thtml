@@ -34,11 +34,7 @@ h_help = "{LANG_hhelp}";
 
 <form id="forumform" class="uk-form uk-form-horizontal" action="{phpself}" method="post" name="forumpost">
 	<input type="hidden" name="id" value="{hidden_id}"{xhtml}>
-	<input type="hidden" name="modedit" value="{hidden_modedit}"{xhtml}>
 	<input type="hidden" name="method" value="{hidden_method}"{xhtml}>
-	<input type="hidden" name="editpost" value="{hidden_editpost}"{xhtml}>
-	<input type="hidden" name="editpid" value="{hidden_editpid}"{xhtml}>
-	<input type="hidden" name="editid" value="{hidden_editid}"{xhtml}>
 	<input type="hidden" name="quoteid" value="{quoteid}"{xhtml}>
 	<input type="hidden" name="{gltoken_name}" value="{gltoken}"{xhtml}>
     {gltoken_msg}

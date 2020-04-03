@@ -1053,11 +1053,16 @@ function plugin_autouninstall_forum()
  */
 function plugin_user_changed_forum($uid)
 {
-    global $_TABLES;
+    global $_TABLES, $CONF_FORUM;
 
 	if ($uid > 1) { // For only regular users
+		// moderators use just username
 		DB_query("UPDATE {$_TABLES['forum_moderators']} SET mod_username = (SELECT username FROM {$_TABLES['users']} WHERE uid = mod_uid) WHERE mod_uid = $uid");
 		
+		// with topics, display name is used
+		require_once $CONF_FORUM['path_include'] . 'gf_format.php';
+		$username = gf_preparefordb(COM_getDisplayName($uid), 'text');
+		DB_query("UPDATE {$_TABLES['forum_topic']} ft SET ft.name = '$username'");
 	}
 }
 
@@ -2002,7 +2007,7 @@ function plugin_getconfigtooltip_forum($id)
 // | Commmon Forum Functions                                                   |
 // +---------------------------------------------------------------------------+
 
-function forum_modPermission($forum,$uid='',$permission='') {
+function forum_modPermission($forum = '', $uid = '', $permission = '') {
     global $_USER,$_TABLES;
 
     if ($uid == '') {
@@ -2016,16 +2021,28 @@ function forum_modPermission($forum,$uid='',$permission='') {
     if ($uid <=1) {
         return FALSE;  // Invalid ID or anonymous user
     }
+	
+	if (SEC_inGroup('Root')) {
+		return TRUE;
+	}
 
     if (SEC_hasRights('forum.edit', '', $uid)) {
         // If user is part of forum Admin user group then he should automatically be assumed a moderator
         return TRUE;
     } else {
-        /* Retrieve all moderator records for this forum */
-        $modrecords = DB_query("SELECT * FROM {$_TABLES['forum_moderators']} WHERE mod_forum='$forum'");
+		/* Retrieve all moderator records for this forum */        
+		if (empty($forum)) {
+			// See if user is a moderator of anything...
+			$forumSQL = '';
+		} else {
+			/* Retrieve all moderator records for this forum */        
+			$forumSQL = " WHERE mod_forum='$forum'";
+		}
+		$sql = "SELECT * FROM {$_TABLES['forum_moderators']}{$forumSQL}";
+        $modrecords = DB_query($sql);
         while ($A = DB_fetchArray($modrecords)) {
             if ($A['mod_groupid'] > 0) {
-                if (SEC_inGroup($A['mod_groupid'],$uid)) {
+                if (SEC_inGroup($A['mod_groupid'], $uid)) {
                     if ($permission != '') {
                         if ($A[$permission] == '1') {
                             return TRUE;

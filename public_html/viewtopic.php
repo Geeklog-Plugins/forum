@@ -317,10 +317,17 @@ if (!$onlytopic) {
     }
 
     if ($viewtopic['is_readonly'] == 0 OR forum_modPermission($viewtopic['forum'],$_USER['uid'],'mod_edit')) {
-        $newtopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;forum=$forum";
+        $newtopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;id=$forum";
         $newtopiclinktext = $LANG_GF09['newtopic'];
         $newtopiclinkimg = gf_getImage('post_newtopic');
-        if ($viewtopic['locked'] != 1) {
+		
+		$topicnavbar->set_var ('newtopiclink', $newtopiclink);
+		$topicnavbar->set_var ('newtopiclinkimg', $newtopiclinkimg);
+		$topicnavbar->set_var ('newtopiclinktext', $newtopiclinktext);
+		$topicnavbar->set_var ('LANG_newtopic', $LANG_GF01['NEWTOPIC']);
+		$topicnavbar->parse ('newtopic_link', 'newtopic_link');		
+        
+		if ($viewtopic['locked'] != 1) {
 			//$replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
             $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopic_id";
             $topicnavbar->set_var ('replytopiclink', $replytopiclink);
@@ -329,10 +336,6 @@ if (!$onlytopic) {
             $topicnavbar->set_var ('LANG_reply', $LANG_GF01['POSTREPLY']);
             $topicnavbar->parse ('replytopic_link', 'replytopic_link');
         }
-    } else {
-        $newtopiclink = '';
-        $newtopiclinkimg = '';
-        $newtopiclinktext = '';
     }
 
 
@@ -421,12 +424,6 @@ if (!$onlytopic) {
 
     $topicnavbar->set_var ('topic_id', $replytopic_id);
 
-    $topicnavbar->set_var ('newtopiclink', $newtopiclink);
-    $topicnavbar->set_var ('newtopiclinkimg', $newtopiclinkimg);
-    $topicnavbar->set_var ('newtopiclinktext', $newtopiclinktext);
-    $topicnavbar->set_var ('LANG_newtopic', $LANG_GF01['NEWTOPIC']);
-    $topicnavbar->parse ('newtopic_link', 'newtopic_link');
-
     $topicnavbar->set_var ('LANG_next', $LANG_GF01['NEXT']);
     $topicnavbar->set_var ('LANG_TOP', $LANG_GF01['TOP']);
     $topicnavbar->set_var ('subject', $viewtopic['subject']);
@@ -508,7 +505,7 @@ if (!$onlytopic) {
     }    
     
     if ($viewtopic['is_readonly'] == 0 OR forum_modPermission($viewtopic['forum'],$_USER['uid'],'mod_edit')) {
-        $newtopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;forum=$forum";
+        $newtopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=newtopic&amp;id=$forum";
         $newtopiclinktext = $LANG_GF09['newtopic'];
         $topic_footer->set_var ('layout_url', $CONF_FORUM['layout_url']);
         $topicDisplayTime = $mytimer->stopTimer();
@@ -520,7 +517,6 @@ if (!$onlytopic) {
         $topic_footer->parse ('newtopic_link', 'newtopic_link');
 
         if ($viewtopic['locked'] != 1) {
-			//$replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;forum=$forum&amp;id=$replytopic_id";
             $replytopiclink = "{$_CONF['site_url']}/forum/createtopic.php?method=postreply&amp;id=$replytopic_id";
             $topic_footer->set_var ('replytopiclink', $replytopiclink);
             $topic_footer->set_var ('replytopiclinkimg', gf_getImage('post_reply'));
