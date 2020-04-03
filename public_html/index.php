@@ -1236,27 +1236,28 @@ if ($forum > 0) {
             $firstdate = strftime($CONF_FORUM['default_Datetime_format'],$record['date']);
         }
 
+		
         if (!COM_isAnonUser()) {
             // Determine if there are new topics since last visit for this user.
             // If topic has been updated or is new - then the user will not have record for this parent topic in the log table
             if (DB_getItem($_TABLES['forum_log'], 'COUNT(*)', "uid='{$_USER['uid']}' AND topic='{$record['id']}' AND time > 0") == 0) {
                 if ($record['sticky'] == 1) {
                     $folderimg = "stickynew_icon";
-                } elseif ($record['locked'] == 1) {
+                } elseif ($record['locked'] == 1 || $categoryRecord['is_readonly']) {
                     $folderimg = "lockednew_icon";
                 } else {
                     $folderimg = "normalnew_icon";
                 }
             } elseif ($record['sticky'] == 1) {
                 $folderimg = "sticky_icon";
-            } elseif ($record['locked'] == 1) {
+            } elseif ($record['locked'] == 1 || $categoryRecord['is_readonly']) {
                 $folderimg = "locked_icon";
             } else {
                 $folderimg = "normal_icon";
             }
         } elseif ($record['sticky'] == 1) {
             $folderimg = "sticky_icon";
-        } elseif ($record['locked'] == 1) {
+        } elseif ($record['locked'] == 1 || $categoryRecord['is_readonly']) {
             $folderimg = "locked_icon";
         } else {
            $folderimg = "normal_icon";

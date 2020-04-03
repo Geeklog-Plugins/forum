@@ -275,6 +275,8 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     //$intervalTime = $mytimer->stopTimer();
     //COM_errorLog("Show Topic Display Time2: $intervalTime");
 	
+	$is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly','forum_id=' . $showtopic['forum']);
+		
 	if (!isset($showtopic['pid'])) {
 		$showtopic['pid'] = 0;
 	}
@@ -284,7 +286,8 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         $is_lockedtopic = $showtopic['locked'];
         $views = $showtopic['views'];
         $topictemplate->set_var ('read_msg', sprintf($LANG_GF02['msg49'], COM_numberFormat($views)) );
-        if ($is_lockedtopic) {
+		
+        if ($is_lockedtopic || $is_readonly) {
             $topictemplate->parse('topiclocked_icon', 'topiclocked_icon'); 
         }
     } else {
@@ -293,7 +296,6 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         $topictemplate->set_var ('read_msg','');
     }
 
-	$is_readonly = DB_getItem($_TABLES['forum_forums'],'is_readonly','forum_id=' . $showtopic['forum']);
     if ($mode != 'preview' && $uservalid && !COM_isAnonUser() && ($_USER['uid'] == $showtopic['uid']) && !$isUserBanned) {
         /* Check if user can still edit this post - within allowed edit timeframe */
         $editAllowed = false;
