@@ -349,6 +349,7 @@ $LANG_GF02 = array(
     'msg188' => 'Click to go directly to last post',
     'msg189' => 'Error: You can not edit this post anymore',
     'msg190' => 'Silent Edit',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => 'Edit not permitted. Allowable edit timeframe expired or you need moderator rights',
     'msg192' => 'Completed ... Migrated %s topics and %s comments.',
     'msg193' => 'STORY&nbsp;&nbsp;TO&nbsp;&nbsp;FORUM&nbsp;&nbsp;MIGRATION&nbsp;&nbsp;UTILITY',

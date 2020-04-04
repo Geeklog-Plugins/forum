@@ -353,6 +353,7 @@ $LANG_GF02 = array(
     'msg188' => 'Cliquer pour aller directement au dernier message',
     'msg189' => 'Désolé vous ne pouvez plus éditer ce message',
     'msg190' => 'Edition silencieuse',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => 'L\'édition n\'est plus possible. La durée pendant laquelle vous pouviez modifier votre message a expirée.',
     'msg192' => 'Terminé... %s sujet(s) et %s commentaire(s) ont été créés.',
     'msg193' => 'Utilitaire de migration d\'article vers le forum',

@@ -339,6 +339,7 @@ $LANG_GF02['msg187']   = 'Retourner au sujet - Cliquez <a href="%s">ici</a>';
 $LANG_GF02['msg188']   = 'Cliquer pour aller directement au dernier message';
 $LANG_GF02['msg189']   = 'Desole vous ne pouvez plus editer ce message';
 $LANG_GF02['msg190']   = 'Edition silencieuse';
+$LANG_GF02['msg190b']  = 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.';
 $LANG_GF02['msg191']   = 'L\'edition n\'est plus possible. La duree pendant laquelle vous pouviez modifier votre message a expiree.';
 $LANG_GF02['msg192']   = 'Termine... %s sujet(s) et %s commentaire(s) ont ete crees.';
 $LANG_GF02['msg193']   = 'Utilitaire de migration d\'article vers le forum';

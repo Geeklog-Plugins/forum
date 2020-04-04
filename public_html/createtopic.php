@@ -1032,7 +1032,7 @@ if ($editorDisplay) {
 		}
 
 		// Edit Option
-		$submissionform_main->set_var ('LANG_OPTION', $LANG_GF02['msg190']);
+		$submissionform_main->set_var ('LANG_OPTION', COM_getTooltip($LANG_GF02['msg190'], $LANG_GF02['msg190b']));
 		$submissionform_main->set_var ('option_name', 'silentedit');
 		$submissionform_main->set_var ('option_checked', $silent_val);
 		$submissionform_main->set_var ('option_extra', '');

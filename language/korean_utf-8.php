@@ -349,6 +349,7 @@ $LANG_GF02 = array(
     'msg188' => '클릭하면 최신 덧글로 점프',
     'msg189' => '에러: 이제 이 덧글은 편집할 수 없습니다',
     'msg190' => '조용히 편집',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => '편집 불가능. 편집가능한 기간이 지났거나 모더레이터 권한이 없습니다.',
     'msg192' => '완료 되었습니다...  %s개의 토픽과  %s개의 코멘트를 인포트 하였습니다.',
     'msg193' => '기사를 게시판에 인포트 가능한 유용성 STORY&nbsp;&nbsp;TO&nbsp;&nbsp;FORUM&nbsp;&nbsp;MIGRATION&nbsp;&nbsp;',

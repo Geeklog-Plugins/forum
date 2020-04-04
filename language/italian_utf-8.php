@@ -352,6 +352,7 @@ $LANG_GF02 = array(
     'msg188' => 'Clicca per andare direttamente all\'ulmito messaggio',
     'msg189' => 'Errore: Non puoi piú modificare questo messaggio',
     'msg190' => 'Modifica Nascosta',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => 'Modifica non permessa. Il tempo di modifica consentito é scaduto o hai bisogno di permessi da moderatore',
     'msg192' => 'Completato ... Migrato %s argomenti e %s commenti.',
     'msg193' => 'ATRICOLO&nbsp;&nbsp;A&nbsp;&nbsp;FORUM&nbsp;&nbsp;MIGRAZIONE&nbsp;&nbsp;EXTRA',

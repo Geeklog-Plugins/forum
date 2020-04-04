@@ -349,6 +349,7 @@ $LANG_GF02 = array(
     'msg188' => 'Pulsa para ir directamente al último mensaje',
     'msg189' => 'Error: Ya no puedes corregir este mensaje',
     'msg190' => 'Corrección silenciosa',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => 'Corrección no permitida. El margen de tiempo permitido ha expirado o bien necesitas derechos de moderador.',
     'msg192' => 'Completado ... Migrados %s tópicos y %s comentarioss.',
     'msg193' => 'HISTORIA&nbsp;&nbsp;A&nbsp;&nbsp;FORO&nbsp;&nbsp;MIGRACIÓN&nbsp;&nbsp;UTILIDAD',

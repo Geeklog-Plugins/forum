@@ -349,6 +349,7 @@ $LANG_GF02 = array(
     'msg188' => 'Klikk for å gå direkte til siste innlegg',
     'msg189' => 'Feil: Du kan ikke endre dette innlegget lenger',
     'msg190' => 'Stille endring',
+	'msg190b' => 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.',
     'msg191' => 'Endring ikke tillatt. Tillatt tid for endring er utløpt eller du trenger moderatorrettigheter',
     'msg192' => 'Ferdig ... Migrert %s emner og %s innlegg.',
     'msg193' => 'STORY&nbsp;&nbsp;TO&nbsp;&nbsp;FORUM&nbsp;&nbsp;MIGRATION&nbsp;&nbsp;UTILITY',
