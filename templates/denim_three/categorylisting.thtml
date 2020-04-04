@@ -66,7 +66,7 @@
 			<div class="glforum-category-name">
 			    <div class="glforum-folderimg">{folderimg}</div>
                 <div class="glforum-category-name">
-                    <a href="index.php?forum={forum_id}">{forum_name}</a>
+                    <a href="index.php?forum={forum_id}">{forum_name}</a>{!if forumlocked_icon}&nbsp;{forumlocked_icon}{!endif}
                     {!if forum_desc}<div class="glforum-category-desc">{forum_desc}</div>{!endif}
                 </div>
 			</div>

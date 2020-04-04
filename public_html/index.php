@@ -769,8 +769,8 @@ if (empty($forum)) {
     		'forum_links'   	   => 'forum_links.thtml'));
     
     $forumlisting->set_block('category_record', 'forum_record');
-    
-    $blocks = array('new_icon', 'quiet_icon', 'active_icon', 'normal_icon', 'normalnew_icon', 'sticky_icon', 'stickynew_icon', 'locked_icon', 'lockednew_icon');
+
+    $blocks = array('new_icon', 'quiet_icon', 'active_icon', 'normal_icon', 'normalnew_icon', 'sticky_icon', 'stickynew_icon', 'locked_icon', 'lockednew_icon', 'topiclocked_icon');
     foreach ($blocks as $block) {
         $forumlisting->set_block('forum_icons', $block);
     }
@@ -907,6 +907,12 @@ if (empty($forum)) {
             } else {
                 $topicparent = $B['pid'];
             }
+			
+			if ($B['is_readonly']) {
+				$forumlisting->parse('forumlocked_icon', 'topiclocked_icon'); 
+			} else {
+				$forumlisting->set_var ('forumlocked_icon', '');
+			}
 
             //$forumlisting->set_var ('folderimg', $folderimg);
             $forumlisting->parse ('folderimg', $folderimg);

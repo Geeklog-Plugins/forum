@@ -27,7 +27,7 @@
 <!-- BEGIN forum_record -->
 <tr class="pluginRollOut pluginLinks" onmouseover="className='pluginRollOver pluginLinks';" onmouseout="className='pluginRollOut pluginLinks';">
 	<td style="vertical-align:top;">{folderimg}</td>
-	<td class="alignleft pluginCellText" style="vertical-align:top; width:60%" onmouseover="this.style.cursor='pointer';" onclick="window.location.href='index.php?forum={forum_id}'; this.style.cursor='pointer';"><a class="pluginLinks" style="text-decoration:none;" href="index.php?forum={forum_id}">{forum_name}</a><div style="text-align:left">{forum_desc}</div>{!if moderator}{moderator}{!endif}</td>
+	<td class="alignleft pluginCellText" style="vertical-align:top; width:60%" onmouseover="this.style.cursor='pointer';" onclick="window.location.href='index.php?forum={forum_id}'; this.style.cursor='pointer';"><a class="pluginLinks" style="text-decoration:none;" href="index.php?forum={forum_id}">{forum_name}</a>{!if forumlocked_icon}&nbsp;{forumlocked_icon}{!endif}<div style="text-align:left">{forum_desc}</div>{!if moderator}{moderator}{!endif}</td>
 	<td class="aligncenter pluginCellText" style="vertical-align:middle; width:5%">{topics}</td>
 	<td class="aligncenter pluginCellText" style="vertical-align:middle; width:5%">{posts}</td>
 	<td class="alignleft pluginCellText" style="vertical-align:top; width:5%; white-space:nowrap;"{!if lastpostURL} onmouseover="this.style.cursor='pointer';" onclick="window.location.href='{lastpostURL}'; this.style.cursor='pointer';"{!endif}>{lastpostmsgDate}{!if lastpostURL}<br{xhtml}>{lastpostmsgTopic}<br{xhtml}>{lastpostmsgBy}{!endif}</td>
