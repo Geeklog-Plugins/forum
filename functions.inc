@@ -2018,11 +2018,11 @@ function forum_modPermission($forum = '', $uid = '', $permission = '') {
         }
     }
 
-    if ($uid <=1) {
+    if ($uid <= 1) {
         return FALSE;  // Invalid ID or anonymous user
     }
-	
-	if (SEC_inGroup('Root')) {
+
+	if (SEC_inGroup('Root', $uid)) {
 		return TRUE;
 	}
 
