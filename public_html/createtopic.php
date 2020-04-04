@@ -48,13 +48,15 @@ require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $id          = isset($_REQUEST['id'])              ? COM_applyFilter($_REQUEST['id'],true)              : 0; // Forum id, Reply Topic Parent Id or Edit Topic Id always required so set to 0 if not found (so it will error during permission check)
 $method      = isset($_REQUEST['method'])          ? COM_applyFilter($_REQUEST['method'])               : ''; // Can equal newtopic, postreply, or edit
-$mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
 $mood        = isset($_POST['mood'])               ? COM_applyFilter($_POST['mood'])                    : '';
 $notify      = isset($_POST['notify'])             ? COM_applyFilter($_POST['notify'])                  : '';
 $quoteid     = isset($_REQUEST['quoteid'])         ? COM_applyFilter($_REQUEST['quoteid'],true)         : '';
 $submit      = isset($_POST['submitmode'])         ? COM_applyFilter($_POST['submitmode'])              : '';
-$postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
 $aname       = isset($_POST['aname'])              ? trim(strip_tags($_POST['aname']))                  : '';
+$subject 	 = isset($_POST['subject']) 		   ? trim($_POST['subject'])							: ''; 
+$comment 	 = isset($_POST['comment']) 		   ? trim($_POST['comment'])							: ''; 
+$postmode    = isset($_POST['postmode'])           ? COM_applyFilter($_POST['postmode'])                : '';
+$mode_switch = isset($_REQUEST['postmode_switch']) ? COM_applyFilter($_REQUEST['postmode_switch'],true) : '';
 $captcha 	 = isset($_POST['captcha']) 		   ? $_POST['captcha']									: ''; // this is needed to support the captcha plugin (not the recaptcha plugin) used when $method = 'postreply' or 'newtopic'
 
 // Okay lets figure out what the id url variable is (either topic or forum id). This is based on $method
@@ -196,7 +198,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($method == 'edit') && SEC_checkToken()
         }
     }
 
-    if (($isParent) && (trim($_POST['subject']) == '')) {
+    if (($isParent) && ($subject == '')) {
 		// $display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
 		$display .= COM_showMessageText($LANG_GF02['msg18'], $LANG_GF02['msg180']); // All fields are required
     } elseif (!$editAllowed) {
@@ -211,16 +213,16 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($method == 'edit') && SEC_checkToken()
 			$name = gf_preparefordb(COM_getDisplayName($uidPost), 'text');
         }
         
-        if (strlen(trim($name)) >= $CONF_FORUM['min_username_length'] AND
-            strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
-            strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {
+        if (strlen($name) >= $CONF_FORUM['min_username_length'] AND
+            strlen($subject) >= $CONF_FORUM['min_subject_length'] AND
+            strlen($comment) >= $CONF_FORUM['min_comment_length']) {
             
 			// If spam found error message will display
-			gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
+			gf_postSpamCheck($display, $subject, $comment, $name); 
             
-            $postmode = gf_chkpostmode($postmode,$mode_switch);
-            $subject  = gf_preparefordb(strip_tags($_POST['subject']),'text');
-            $comment  = gf_preparefordb($_POST['comment'],$postmode);
+            $postmode = gf_chkpostmode($postmode, $mode_switch);
+            $subject  = gf_preparefordb(strip_tags($subject), 'text');
+            $comment  = gf_preparefordb($comment, $postmode);
 
             // If user has moderator edit rights only
             $locked = 0;
@@ -297,24 +299,24 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 			$name = gf_preparefordb(COM_getDisplayName($uid), 'text');
         }
 		
-		$captchaMsg = gf_passCaptchaCheck($captcha, $_POST['subject']);
+		$captchaMsg = gf_passCaptchaCheck($captcha, $subject);
         if ($captchaMsg == '') {
             if (strlen($name) >= $CONF_FORUM['min_username_length'] AND
-                strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
-                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length'] AND
+                strlen($subject) >= $CONF_FORUM['min_subject_length'] AND
+                strlen($comment) >= $CONF_FORUM['min_comment_length'] AND
                 TOPIC_hasMultiTopicAccess('topic') > 2) {
                 // Note: TOPIC_checkTopicSelectionControl not required since Geeklog topics not required for parent forum topic
 
 				// If spam found error message will display
-				gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
+				gf_postSpamCheck($display, $subject, $comment, $name); 
 				
-				$postmode = gf_chkpostmode($postmode,$mode_switch);
-				$subject = gf_preparefordb(strip_tags($_POST['subject']),'text');
+				$postmode = gf_chkpostmode($postmode, $mode_switch);
+				$subject = gf_preparefordb(strip_tags($subject), 'text');
 
 				if (mb_strlen($subject) > 100) {
 					$subject = COM_truncate($subject, 99, '...');
 				}
-				$comment = gf_preparefordb($_POST['comment'],$postmode);
+				$comment = gf_preparefordb($comment, $postmode);
 				$locked = 0;
 				$sticky = 0;
 				if ($editmoderator) {
@@ -374,7 +376,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 // ADD REPLY
      } elseif ($method == 'postreply') {
 
-		$captchaMsg = gf_passCaptchaCheck($captcha, $_POST['subject']);
+		$captchaMsg = gf_passCaptchaCheck($captcha, $subject);
         if ($captchaMsg == '') {
 			if ($uid == 1) {
 				$name = gf_preparefordb($aname,'text');
@@ -383,15 +385,15 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 			}
             
             if (strlen($name) >= $CONF_FORUM['min_username_length'] AND 
-                strlen(trim($_POST['subject'])) >= $CONF_FORUM['min_subject_length'] AND
-                strlen(trim($_POST['comment'])) >= $CONF_FORUM['min_comment_length']) {            
+                strlen($subject) >= $CONF_FORUM['min_subject_length'] AND
+                strlen($comment) >= $CONF_FORUM['min_comment_length']) {            
 
 				// If spam found error message will display
-				gf_postSpamCheck($display, $_POST['subject'], $_POST['comment'], $name); 
+				gf_postSpamCheck($display, $subject, $comment, $name); 
 
-				$postmode = gf_chkpostmode($postmode,$mode_switch);
-				$subject = gf_preparefordb($_POST['subject'],'text');
-				$comment = gf_preparefordb($_POST['comment'],$postmode);
+				$postmode = gf_chkpostmode($postmode, $mode_switch);
+				$subject = gf_preparefordb($subject, 'text');
+				$comment = gf_preparefordb($comment, $postmode);
 
 				$fields = "name,date,subject,comment,postmode,ip,mood,uid,pid,forum";
 				$sql  = "INSERT INTO {$_TABLES['forum_topic']} ($fields) ";
@@ -448,8 +450,8 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 
 
 // EDIT MESSAGE
-$comment = isset($_POST['comment']) ? COM_stripslashes($_POST['comment']) : '';
-$subject = isset($_POST['subject']) ? COM_stripslashes($_POST['subject']) : '';
+$comment = COM_stripslashes($comment);
+$subject = COM_stripslashes($subject);
 
 // New or Edit Reply or Edit Topic
 if ($id > 0) {
@@ -611,7 +613,7 @@ if ($editorDisplay) {
     }
 
     if ($submit == $LANG_GF01['PREVIEW']) {
-        $edittopic['subject'] = COM_stripslashes($_POST['subject']);
+        $edittopic['subject'] = COM_stripslashes($subject);
     }
 	
     if ($method == 'postreply' OR ($method == 'edit' AND $subject == '')) {

@@ -165,9 +165,9 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         if (SEC_inGroup('Root', $showtopic['uid'])) {
             $user_level = showrank(7, $LANG_GF01['admin']);
             $user_levelname=$LANG_GF01['admin'];
-        } else if (forum_modPermission($showtopic['forum'],$showtopic['uid'])) {
+        } elseif (forum_modPermission($showtopic['forum'], $showtopic['uid'])) {
             $user_level = showrank(6, $LANG_GF01['moderator']);
-            $user_levelname=$LANG_GF01['moderator'];
+            $user_levelname = $LANG_GF01['moderator'];
         } else {
             if ($posts < $CONF_FORUM['level2']) {
                 $user_level = showrank(1, $CONF_FORUM['level1name']);
