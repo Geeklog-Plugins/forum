@@ -158,7 +158,7 @@ if (empty($submit) && ($method == 'newtopic' || $method == 'postreply')) {
 	COM_clearSpeedlimit($CONF_FORUM['post_speedlimit'], 'forum');
 	$last = COM_checkSpeedlimit('forum');
 	if ($last > 0) {
-		$message = sprintf($LANG_GF01['SPEEDLIMIT'],$last,$CONF_FORUM['post_speedlimit']);
+		$message = sprintf($LANG_GF01['SPEEDLIMIT'], $last, $CONF_FORUM['post_speedlimit']);
 		// $display .= alertMessage($message, $LANG_GF02['msg180']);
 		if ($method == 'newtopic') {
 			$link = "{$_CONF['site_url']}/forum/index.php?forum=$forum";
@@ -299,7 +299,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 			$name = gf_preparefordb(COM_getDisplayName($uid), 'text');
         }
 		
-		$captchaMsg = gf_passCaptchaCheck($captcha, $subject);
+		$captchaMsg = gf_passCaptchaCheck($captcha);
         if ($captchaMsg == '') {
             if (strlen($name) >= $CONF_FORUM['min_username_length'] AND
                 strlen($subject) >= $CONF_FORUM['min_subject_length'] AND
@@ -376,7 +376,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 // ADD REPLY
      } elseif ($method == 'postreply') {
 
-		$captchaMsg = gf_passCaptchaCheck($captcha, $subject);
+		$captchaMsg = gf_passCaptchaCheck($captcha);
         if ($captchaMsg == '') {
 			if ($uid == 1) {
 				$name = gf_preparefordb($aname,'text');
@@ -1134,7 +1134,7 @@ COM_output($display);
 /*
 * Function is called to captcha on save. If error in captcha a formatted message will be returned
 */
-function gf_passCaptchaCheck($captcha, $subject) 
+function gf_passCaptchaCheck($captcha) 
 {
 	global $LANG_GF01, $LANG03;
 	
@@ -1147,12 +1147,7 @@ function gf_passCaptchaCheck($captcha, $subject)
 			$msg = plugin_itemPreSave_recaptcha('forum');
 		}
 		if ($msg != '') {
-			$submit = $LANG_GF01['PREVIEW'];
-			$subject = COM_stripslashes($subject);
-			$display .= COM_startBlock ($LANG03[17], '',
-						  COM_getBlockTemplate ('_msg_block', 'header'))
-					 . $msg
-					 . COM_endBlock(COM_getBlockTemplate ('_msg_block', 'footer'));
+			$display .= COM_showMessageText($msg, $LANG03[17]);
 		}
 	}
 	
