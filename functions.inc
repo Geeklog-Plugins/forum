@@ -1062,7 +1062,7 @@ function plugin_user_changed_forum($uid)
 		// with topics, display name is used
 		require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 		$username = gf_preparefordb(COM_getDisplayName($uid), 'text');
-		DB_query("UPDATE {$_TABLES['forum_topic']} ft SET ft.name = '$username'");
+		DB_query("UPDATE {$_TABLES['forum_topic']} ft SET ft.name = '$username' WHERE uid = $uid");
 	}
 }
 
