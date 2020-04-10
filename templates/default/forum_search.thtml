@@ -6,7 +6,12 @@
                         <form action="{site_url}/forum/index.php" method="post" name="searchbox" onsubmit="return (this.query.value != '');" style="margin:0px;padding:2px;">
                             <table border="0" cellspacing="2" cellpadding="0">
                                 <tr>
-                                    <td><input type="hidden" name="op" value="search"{xhtml}><input type="hidden" name="forum" value="{forum}"{xhtml}></td>
+                                    <td>
+										<input type="hidden" name="op" value="search"{xhtml}>
+										{!if forum}
+										<input type="hidden" name="forum" value="{forum}"{xhtml}>
+										{!endif}										
+									</td>
                                     <td><input type="text" name="query" value="" style="width:165px"{xhtml}></td>
                                     <td><input type="submit" name="btnsubmit" value="{search}"{xhtml}></td>
                                 </tr>
