@@ -341,7 +341,7 @@ $LANG_GF02['msg187']   = 'Return to topic - click <a href="%s">here</a>';
 $LANG_GF02['msg188']   = 'Click to go directly to last post';
 $LANG_GF02['msg189']   = 'Sorry, you ran out of time to edit this post. Edit has been canceled.';
 $LANG_GF02['msg190']   = 'Silent Edit';
-$LANG_GF02['msg190b']  = 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.';
+$LANG_GF02['msg190b']  = 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post last updated date will not be changed to the current date and time.';
 $LANG_GF02['msg191']   = 'Edit not permitted. Allowable edit time frame expired.';
 $LANG_GF02['msg192']   = 'Completed ... Migrated %s topics and %s comments.';
 $LANG_GF02['msg193']   = 'Article to Forum Post Migration Tool';

@@ -343,7 +343,7 @@ $LANG_GF02['msg187']   = '<a href="%s">投稿へ戻る</a>';
 $LANG_GF02['msg188']   = 'クリックすると最新投稿へジャンプします。';
 $LANG_GF02['msg189']   = 'エラー: もうこの投稿は編集できません。';
 $LANG_GF02['msg190']   = 'こっそり編集';
-$LANG_GF02['msg190b']  = 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post date will not be changed to the current date and time.';
+$LANG_GF02['msg190b']  = 'When enabled and the forum post is saved, no notifications will be sent to users subscribed to this topic (or forum) about this update, and the forum post last updated date will not be changed to the current date and time.';
 $LANG_GF02['msg191']   = '編集できません。編集可能期間が終了したか、モデレータ権限がありません。';
 $LANG_GF02['msg192']   = '完了しました。%s個のトピックと %s個のコメントをインポートしました。';
 $LANG_GF02['msg193']   = '記事を掲示板にインポートするユーティリティ';

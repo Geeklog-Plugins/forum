@@ -252,14 +252,14 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($method == 'edit') && SEC_checkToken()
             // if user has un-checked the Silent option then they want to have user alerted of the edit and update the topic timestamp
 			if (isset($_POST['silentedit']) && $_POST['silentedit'] == 1 ) {
             	// This needs to be outside silentedit check since forum notification for site needs to be sent at least
-				gf_chknotifications($forum, $id, $uid, 'topic', true);
+				gf_chknotifications($id, $uid, true, true);
 			} else {
                 DB_query("UPDATE {$_TABLES['forum_topic']} SET lastupdated = $date WHERE id=$pid");
                 //Remove any lastviewed records in the log so that the new updated topic indicator will appear
                 DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$pid' and time > 0");
 				
 				// Check for any users subscribed notifications
-				gf_chknotifications($forum, $id, $uid);
+				gf_chknotifications($id, $uid, true);
 			}
 
             PLG_itemSaved($id, 'forum');
@@ -351,7 +351,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 				DB_query("UPDATE {$_TABLES['forum_forums']} SET post_count=post_count+1, topic_count=topic_count+1, last_post_rec=$lastid WHERE forum_id=$forum");
 
 				// Check for any users subscribed notifications - would only be for users subscribed to the forum
-				gf_chknotifications($forum,$lastid,$uid,"forum");
+				gf_chknotifications($lastid, $uid);
 				
 				// NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
 				gf_setnotification($notify, $forum, $lastid, $uid);
@@ -402,13 +402,13 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 				DB_query($sql);
 
 				// Find the id of the last inserted topic
-				list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
+				list($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_topic']} "));
 				
 				// Make sure users know new reply for parent topic
 				DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic='$id' and time > 0");
 				
 				// Check for any users subscribed notifications
-				gf_chknotifications($forum,$id,$uid);
+				gf_chknotifications($lastid, $uid);
 
 				PLG_itemSaved($lastid, 'forum');
 				COM_rdfUpToDateCheck('forum'); // forum rss feeds update
@@ -440,12 +440,6 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 	
 	// If reaches here then something is not correct when adding new topic or reply
 	$submit = $LANG_GF01['PREVIEW'];
-
-/*    if ( $captchaMsg == '' ) {
-        $display = gf_createHTMLDocument($display);
-        COM_output($display);
-        exit;
-    } */
 }
 
 
@@ -1217,13 +1211,14 @@ function gf_setnotification($notify, $forum, $id, $uid)
 * Users can subscribe to a complete forum or individual topics.
 * If they have both selected - we only want to send one notification - hense the SQL LIMIT 1
 *
-* This function needs to be called when there is a new topic or a reply
+* This function needs to be called when there is a new topic, new reply, or edit
 */
-function gf_chknotifications($forumid, $topicid, $userid, $type='topic', $siteNotificationOnly = false) 
+function gf_chknotifications($topicid, $userid, $editFlag = false, $siteNotificationOnly = false) 
 {
     global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM, $LANG08;
-
-    $pid = DB_getItem($_TABLES['forum_topic'],'pid',"id='$topicid'");
+	
+	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $topicid");
+	list($forumid, $pid) = DB_fetchArray($result);		
 	$pid_flag = false;
     if ($pid == 0) {
 		$pid_flag = true;
@@ -1240,22 +1235,21 @@ function gf_chknotifications($forumid, $topicid, $userid, $type='topic', $siteNo
 		$message = '';
 		// ***************************************************************
 		// This code logic is very similar to the user notifications below. If change here make sure it is reflected below
-		if ($type=='forum') {
-			// New Topic (first post in topic)
-			$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-			$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
+		if ($editFlag) {
+			// Edit of existing post then
+			$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid))); // An Edit message
 		} else {
-			// Reply or Edit Post
-			// 2 scenarios here. Either it is an edit of a post or a reply.
+			// New Topic or New Reply
 			if ($pid_flag) {
+				// New Topic (first post in topic (a parent))
+				$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
+				$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid))); // New Topic message
+			} else {	
 				// Reply then
 				// Lets find the current last post in $topic
 				$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 				list($lastrecid) = DB_fetchArray($sql);
-				$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
-			} else {
-				// Edit of existing post then
-				$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
+				$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid))); // New Reply message
 			}
 		}
 		// ***************************************************************
@@ -1333,25 +1327,24 @@ function gf_chknotifications($forumid, $topicid, $userid, $type='topic', $siteNo
 							$message = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
 							// ***************************************************************
 							// This code logic is very similar to the site notification above. If change here make sure it is reflected above						
-							if ($type == 'forum') {
-								// New Topic (first post in topic)
-								$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-								$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid)));
-								$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
+							if ($editFlag) {
+								// Edit of existing post then
+								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid))); // An Edit message
 							} else {
-								// Reply or Edit Post
-								// 2 scenarios here. Either it is an edit of a post or a reply.
+								// New Topic or New Reply
 								if ($pid_flag) {
+									// New Topic (first post in topic (a parent))
+									$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
+									$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid))); // New Topic message
+									$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
+								} else {
 									// Reply then
 									// Lets find the current last post in $topic
 									$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 									list($lastrecid) = DB_fetchArray($sql);
-									$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid)));
-								} else {
-									// Edit of existing post then
-									$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid)));
+									$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid))); // New Reply message
+									$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
 								}
-								$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
 							}
 							// ***************************************************************
 							$message .= "{$LANG_GF02['msg25']}{$_CONF['site_name']} {$LANG_GF01['ADMIN']}\n";
