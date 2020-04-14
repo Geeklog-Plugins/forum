@@ -237,7 +237,8 @@ function upgrade_294() {
 	
 	// For Github issue #89 https://github.com/Geeklog-Plugins/forum/issues/89
 	// For Github issue #82 https://github.com/Geeklog-Plugins/forum/issues/82
-	gf_cleanforum(); 
+	require_once $_CONF['path_admin'] . 'plugins/forum/gf_functions.php';
+	gf_cleanforum(); // Note this process can take a long time with a forum that has 1000s of posts
 
     COM_errorLog("Success - Completed Forum plugin version 2.9.4 update",1);
     return 0;

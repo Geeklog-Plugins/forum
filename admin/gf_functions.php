@@ -37,6 +37,8 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'gf_functions.php') !== false) {
 }
 
 
+// Needed to do this for Github Issue #57
+// Created Admin Forum Subscriptions page which reuses notify.php. This means this file can get called from the publich_html/forum and admin directories
 $foundFile = false;
 $included_files = get_included_files();
 foreach ($included_files as $filename) {
@@ -48,6 +50,8 @@ if (!$foundFile) {
 	require_once '../../../lib-common.php';
 }
 
+// Needed to set these since global scope is different when upgrading (at least when you upload the plugin)
+global $_PLUGINS, $LANG_GF06, $_CONF;
 if (!in_array('forum', $_PLUGINS)) {
 	COM_handle404();
 }
