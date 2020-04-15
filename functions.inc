@@ -36,7 +36,8 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'functions.inc') !== false) {
     die('This file can not be used on its own.');
 }
 
-global $_DB_table_prefix;
+// Need to declare this for global scope issues during install and upgrades
+global $_DB_table_prefix, $LANG_configselects;
 
 // used for Likes and Topic controls
 define("PLUGIN_NAME_FORUM", 'forum');
@@ -170,7 +171,7 @@ $_SMILIES = new ForumSmilies();
 function plugin_getmenuitems_forum()
 {
     global $CONF_FORUM,$_CONF,$LANG_GF00;
-	
+
     //if ($CONF_FORUM['registration_required'] == 0 || SEC_hasRights('forum.user')) {
 	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user'))) {
         $menuitems["{$LANG_GF00['pluginlabel']}"] = "{$_CONF['site_url']}/forum/index.php";
@@ -609,7 +610,7 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
 		$sql = "SELECT ft.id, ft.date, ft.subject AS title, ft.comment AS description, ft.views AS hits, ft.uid, "
 			 . "'' AS url " // empty URL means will be defined later based on id
 			 . "FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff "
-			 . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";		 
+			 . "WHERE ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 ";
 	} else {
 		// https://github.com/Geeklog-Plugins/forum/issues/87
 		// As of Forum v2.9.4 forum topic URL now required to use parent topic and page number. In search sql URL can now be changed before display (as of Geeklog v2.2.1sr1)
@@ -658,7 +659,7 @@ function plugin_dopluginsearch_forum($query, $datestart, $dateend, $topic, $type
 }
 
 // Format content to be displayed in the search results
-function plugin_searchformat_forum($id, $contentType, $content) 
+function plugin_searchformat_forum($id, $contentType, $content)
 {
 	// Remove any BBCode from forum post
 	if ($contentType == 'description') {
@@ -698,7 +699,7 @@ function forum_buildFeedsSql ($forumID, $limits)
     if ($CONF_FORUM['installed_version'] < 2.6) {
         return '';
     }
-	
+
     $groups = array ();
     $usergroups = SEC_getUserGroups(1);
     foreach ($usergroups as $group) {
@@ -1058,7 +1059,7 @@ function plugin_user_changed_forum($uid)
 	if ($uid > 1) { // For only regular users
 		// moderators use just username
 		DB_query("UPDATE {$_TABLES['forum_moderators']} SET mod_username = (SELECT username FROM {$_TABLES['users']} WHERE uid = mod_uid) WHERE mod_uid = $uid");
-		
+
 		// with topics, display name is used
 		require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 		$username = gf_preparefordb(COM_getDisplayName($uid), 'text');
@@ -1070,40 +1071,40 @@ function plugin_user_changed_forum($uid)
 function plugin_collectSitemapItems_forum($uid, $limit)
 {
 	global $_CONF, $_TABLES, $_GROUPS, $CONF_FORUM;
-	
-	// Let's only add 
+
+	// Let's only add
 	// - Forum Index Link (as that lists all Category and Forum URLs)
 	// - Forum Topics
-	
+
 	$retval = [];
 
 	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user', 'AND', $uid))) {
 		// Add Forum Index
 		$retval[] = ['url' => $_CONF['site_url'] . '/forum/index.php'];
-		
+
 		$what = 'url,date-modified';
 		$properties = explode(',', $what);
-		
+
 		// Figure out permissions and only list topic post (pid = 0)
 		// 0 = current user
 		if ($uid > 0) {
 			$userGroups = SEC_getUserGroups($uid);
-			
+
 		} else {
 			$userGroups = $_GROUPS;
 		}
 		$where = " AND (ff.grp_id IN (" . implode(",", $userGroups) . "))";
 		$sql = "SELECT ft.id, ft.date,"
 				. " (SELECT ft2.date FROM {$_TABLES['forum_topic']} ft2 WHERE ft.id = ft2.pid ORDER BY ft2.date DESC LIMIT 1) replydate" // find date of topic and latest date of any replies. Use newest one as modify date
-				. " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff" 
+				. " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff"
 				. " WHERE pid = 0 AND ft.forum = ff.forum_id $where";
-				
+
 		if ($limit > 0) {
 			$sql .= " LIMIT $limit";
 		}
 		$result = DB_query($sql);
 		$numRows = DB_numRows($result);
-		
+
 		for ($i = 0; $i < $numRows; $i++) {
 			$A = DB_fetchArray($result);
 
@@ -1111,7 +1112,7 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 			foreach ($properties as $p) {
 				switch ($p) {
 				case 'date-modified':
-					// Use newest date (the only way the topic date could be newer is if it was edited last) 
+					// Use newest date (the only way the topic date could be newer is if it was edited last)
 					if ($A['date'] > $A['replydate']) {
 						$props['date-modified'] = $A['date'];
 					} else {
@@ -1123,13 +1124,13 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 					break;
 				}
 			}
-			
+
 			$retval[] = $props;
 		}
 	}
 
-    return $retval;	
-	
+    return $retval;
+
 }
 
 /**
@@ -1145,8 +1146,8 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 {
     global $_CONF, $_TABLES, $_GROUPS, $CONF_FORUM;
-	
-	
+
+
 	$retval = [];
 
     // parse $what to see what we need to pull from the database
@@ -1184,11 +1185,11 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     if (count($fields) == 0) {
         return $retval;
     }
-	
+
 	// Check is anonymous users can access and if not, regular user can access
-	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user', 'AND', $uid)) {		
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user', 'AND', $uid)) {
         return $retval;
-    }		
+    }
 
     // prepare SQL request
     if ($id == '*') {
@@ -1196,24 +1197,24 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
     } else {
         $where = " AND ft.id = $id";
     }
-	
+
 	// Figure out permissions
 	if ($uid > 0) {
 		$userGroups = SEC_getUserGroups($uid);
-		
+
 	} else {
 		$userGroups = $_GROUPS;
 	}
 	$where .= " AND (ff.grp_id IN (" . implode(",", $userGroups) . "))";
-	
+
     $sql = "SELECT " . implode(',', $fields)
-            . " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff" 
+            . " FROM {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff"
 			. " WHERE ft.forum = ff.forum_id $where";
-			
+
     if ($id != '*') {
         $sql .= ' LIMIT 1';
     }
- 
+
     $result = DB_query($sql);
     $numRows = DB_numRows($result);
 
@@ -1282,14 +1283,14 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
 * Assumed have permission to do this so check before hand.
 *
 * @param   id   	int     Id of forum post
-* @return           boolean 
+* @return           boolean
 */
-function forum_deleteForumPost($id) 
+function forum_deleteForumPost($id)
 {
 	global $_TABLES;
-	
+
 	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $id");
-	list($forum, $pid) = DB_fetchArray($result);	 
+	list($forum, $pid) = DB_fetchArray($result);
 
 	if ($forum > 0) { // must exist
 		$parentTopic = false;
@@ -1298,13 +1299,13 @@ function forum_deleteForumPost($id)
 			$pid = $id;
 		}
 		DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE id = $id");
-			
-		PLG_itemDeleted($id, 'forum');			
-		
+
+		PLG_itemDeleted($id, 'forum');
+
 		if ($parentTopic) {
 			// Deleting a parent topic requires removing as well
 			TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
-		   
+
 		   // Cycle through all replies and delete any likes
 			$query = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE pid = $id");
 			while ($A = DB_fetchArray($query)) {
@@ -1317,15 +1318,15 @@ function forum_deleteForumPost($id)
 			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE topic_id = $id");
 			DB_query("DELETE FROM {$_TABLES['forum_watch']} WHERE topic_id = -$id");
 		}
-		
+
 		// Delete Likes for current message being deleted
 		LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
 
 		// Remove any lastviewed records in the log so that the new updated topic indicator will appear
 		DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic = $pid");
-		
-		gf_updateLastPost($forum, $pid);    			
-		
+
+		gf_updateLastPost($forum, $pid);
+
 		COM_rdfUpToDateCheck('forum'); // forum rss feeds update
 		// Remove new block and centerblock cached items
 		$cacheInstance = 'forum__newpostsblock_';
@@ -1348,12 +1349,12 @@ function forum_deleteForumPost($id)
 * @param   anchor  	boolean True will add hashtag id
 * @return           string   A URL to the forum post
 */
-function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true) 
+function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true)
 {
 	global $_CONF, $CONF_FORUM, $_TABLES;
-	
+
 	$retval = '';
-	
+
 	// Check if the number of records was specified to show
 	// Note: $CONF_FORUM['show_posts_perpage'] gets overridden in functions.inc with user setting
 	$show = $CONF_FORUM['show_posts_perpage'];
@@ -1386,7 +1387,7 @@ function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true)
 				break;
 			}
 		}
-		
+
 		$page = 1;
 		if ($i > $show && $found) {
 			$page =  $i / $show;
@@ -1400,12 +1401,12 @@ function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true)
 		if ($page > 1) {
 			$page_url = "&amp;page=$page";
 		}
-		
+
 		$hashtag = '';
 		if ($anchor) {
 			$hashtag = "#$id";
 		}
-		
+
 		$retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$pid$page_url$query$hashtag";
 	}
 	return $retval;
@@ -1420,7 +1421,7 @@ function phpblock_forum_newposts() {
     }
 
 	// Check is anonymous users can access and if not, regular user can access
-	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {
         return;
     }
 
@@ -1608,7 +1609,7 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
 
 	// Check is anonymous users can access and if not, regular user can access
     // if ($CONF_FORUM['registration_required'] && $_USER['uid'] < 2) {
-	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {		
+	if ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user')) {
         return;
     }
 
@@ -2030,12 +2031,12 @@ function forum_modPermission($forum = '', $uid = '', $permission = '') {
         // If user is part of forum Admin user group then he should automatically be assumed a moderator
         return TRUE;
     } else {
-		/* Retrieve all moderator records for this forum */        
+		/* Retrieve all moderator records for this forum */
 		if (empty($forum)) {
 			// See if user is a moderator of anything...
 			$forumSQL = '';
 		} else {
-			/* Retrieve all moderator records for this forum */        
+			/* Retrieve all moderator records for this forum */
 			$forumSQL = " WHERE mod_forum='$forum'";
 		}
 		$sql = "SELECT * FROM {$_TABLES['forum_moderators']}{$forumSQL}";
@@ -2108,7 +2109,7 @@ function plugin_getBlocks_forum($side, $topic='')
                                   'content'        => $display,
                                   'allow_autotags' => false,
                                   'convert_newlines' => false,
-								  'css_id' 		   => 'gl-blockForumNewPosts', // Used to jump to block position when user changes order of forum posts in block 
+								  'css_id' 		   => 'gl-blockForumNewPosts', // Used to jump to block position when user changes order of forum posts in block
                                   'help'           => '');
 
             }
@@ -2674,13 +2675,13 @@ function plugin_getItemLikeURL_forum($sub_type, $id)
     global $CONF_FORUM, $_TABLES;
 
     $retval = '';
-	
+
     if ($CONF_FORUM['likes_forum'] > 0) {
         // No sense rebuilding stuff here so use PLG_getItemInfo
         // PLG_getItemInfo will only return url if user has permissions
         $options['sub_type'] = $sub_type;
         $retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
-    }	
+    }
 
     return $retval;
 }
