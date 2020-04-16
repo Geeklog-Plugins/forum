@@ -456,6 +456,10 @@ function forum_update_ConfValues_2_9_4()
 	$c = config::get_instance();
 
     $n = 'forum';
+	
+    // Remove use_themes_template override
+	// This was removed in 2.9.0 but gets reinstalled in later versions by accident so remove for good here
+	$c->del('use_themes_template', $n);
 
     // Add Likes System config value
     $o = 59;
