@@ -41,11 +41,13 @@
 
 <div class="uk-grid">
   	<div class="uk-width-3-5">
+		{!if isAdminUser}
 		<form action="{phpself}" method="post">
 			<div class="uk-form-controls">
 				<select class="uk-select uk-width-auto" name="uid" onchange="this.form.submit();">{user_options}</select>
 			</div>
 		</form>
+		{!endif}	
 	</div>
 	<div class="uk-width-2-5 uk-text-right">
 		{select_forum}

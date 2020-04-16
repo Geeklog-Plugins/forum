@@ -39,7 +39,7 @@
 <!-- END subscribetopic_link -->
 
 <!-- BEGIN prevtopic_link -->
-<li><a href="{prevlink}"><span uk-icon="icon: arrow-left"></span>&nbsp;{LANG_prevlink}</a></li>  
+<li><a href="{prevlink}"><span uk-icon="icon: arrow-left"></span>&nbsp;{LANG_prevlink}</a></li>
 <!-- END prevtopic_link -->
 
 <!-- BEGIN nexttopic_link -->
@@ -81,7 +81,7 @@
 <!-- END returnmarkread_link -->
 
 <!-- BEGIN trash_link -->
-<a class="uk-button uk-button-danger uk-button-small" title="{LANG_deleteall}" uk-icon="icon: trash" onclick=' if(confirm("{LANG_DELALLCONFIRM}")) {document.report_table.op.value="delchecked"; document.report_table.submit();}'></a>
+<a class="uk-button uk-button-danger uk-button-small" title="{LANG_deleteall}" onclick='if(confirm("{LANG_DELALLCONFIRM}")) {document.report_table.op.value="delchecked"; document.report_table.submit();}'><span uk-icon="icon: trash"></span></a>
 <!-- END trash_link -->
 
 <!-- BEGIN memberoption_link -->

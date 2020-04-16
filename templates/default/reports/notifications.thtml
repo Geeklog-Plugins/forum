@@ -16,10 +16,12 @@
 
 <table width="100%" border="0" cellspacing="0" cellpadding="0">
     <tr>
-        <td class="alignright" style="width:95%; padding:5px 10px 5px 0px;">
-            <form action="{phpself}" method="post" style="margin:0px;">
+        <td style="width:95%; padding:5px 0px 5px 10px;">
+			{!if isAdminUser}
+            <form action="{phpself}" method="post" style="margin:0px;padding:2px">
                 <div><select name="uid" style="width:100px;" onchange="this.form.submit();">{user_options}</select></div>
             </form>
+			{!endif}
         </td>
         <td style="padding:5px 0px 5px 10px; white-space:nowrap;">{select_forum}</td>
     </tr>
@@ -35,7 +37,7 @@
 		{!else}
 			<td class="pluginCellTitle" style="white-space:nowrap;">{LANG_Heading9}</td>
 			<td class="pluginCellTitle" style="white-space:nowrap;">{LANG_Heading2}</td>
-		{!endif}		
+		{!endif}
         <td class="pluginCellTitle" style="white-space:nowrap;">{LANG_Heading3}</td>
         <td class="pluginCellTitle" style="white-space:nowrap;">{LANG_Heading4}</td>
         <td class="pluginCellTitle" style="white-space:nowrap;">{LANG_Heading5}</td>
@@ -63,7 +65,7 @@
 			{!else}
 				<td style="width:2%; padding:2px 5px;">{user_link}</td>
 				<td class="alignleft" style="padding:2px 5px; white-space:nowrap;">{forum_link}</td>
-			{!endif}			
+			{!endif}
 			<td class="alignleft" style="text-align:left;padding:2px 5px; white-space:nowrap;">{topic_link}</td>
 			<td style="width:2%; padding:2px 5px;">{date_added}</td>
 			<td style="width:2%; padding:2px 5px;">{topicauthor}</td>
