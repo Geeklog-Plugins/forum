@@ -1355,9 +1355,13 @@ function forum_buildForumPostURL($id, $query = '', $order = '', $anchor = true)
 
 	$retval = '';
 
-	// Check if the number of records was specified to show
-	// Note: $CONF_FORUM['show_posts_perpage'] gets overridden in functions.inc with user setting
-	$show = $CONF_FORUM['show_posts_perpage'];
+    // Check if the number of records was specified to show
+    // Note: $CONF_FORUM['show_posts_perpage'] gets overridden in functions.inc with user setting
+    if (empty($CONF_FORUM['show_posts_perpage'])) {
+        $show = 10; // need to do this as for some reason show_posts_perpage is empty when forum plugin gets enabled
+    } else {
+        $show = $CONF_FORUM['show_posts_perpage'];
+    }
 
 	// Get parent topic id
 	$id = (int) $id; // very basic check just to make sure SQL doesn't fail
