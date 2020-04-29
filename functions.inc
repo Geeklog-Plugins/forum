@@ -2681,10 +2681,14 @@ function plugin_getItemLikeURL_forum($sub_type, $id)
     $retval = '';
 
     if ($CONF_FORUM['likes_forum'] > 0) {
-        // No sense rebuilding stuff here so use PLG_getItemInfo
-        // PLG_getItemInfo will only return url if user has permissions
-        $options['sub_type'] = $sub_type;
-        $retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
+        // Make sure $id is just a number as forum topic id is numeric
+        // Cannot change id in this function, since the id from the calling function is used else where
+        if (strval((int) $id) == $id) {		
+			// No sense rebuilding stuff here so use PLG_getItemInfo
+			// PLG_getItemInfo will only return url if user has permissions
+			$options['sub_type'] = $sub_type;
+			$retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
+		}
     }
 
     return $retval;
