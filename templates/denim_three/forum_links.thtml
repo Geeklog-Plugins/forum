@@ -47,19 +47,19 @@
 <!-- END nexttopic_link -->
 
 <!-- BEGIN website_link -->
-<a href="{websitelink}" target="_blank" rel="nofollow noopener" uk-icon="icon: home"></a>
+<a href="{websitelink}" target="_blank" rel="nofollow noopener" uk-icon="icon: home" title="{LANG_website}"></a>
 <!-- END website_link -->
 
 <!-- BEGIN pm_link -->
-<a class="uk-icon-button uk-button-default uk-external-link-square" href="{pmlink}"></a>
+<a href="{pmlink}" title="{LANG_pm}">{pmlinktext}</a>
 <!-- END pm_link -->
 
 <!-- BEGIN profile_link -->
-<a href="{profilelink}" uk-icon="icon: user"></a>
+<a href="{profilelink}" uk-icon="icon: user" title="{LANG_profile}"></a>
 <!-- END profile_link -->
 
 <!-- BEGIN email_link -->
-<a href="{emaillink}" uk-icon="icon: mail"></a>
+<a href="{emaillink}" uk-icon="icon: mail" title="{LANG_email}"></a>
 <!-- END email_link -->
 
 <!-- BEGIN quotetopic_link -->

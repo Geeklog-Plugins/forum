@@ -84,19 +84,19 @@
 <!-- END nexttopic_link -->
 
 <!-- BEGIN website_link -->
-<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{websitelink}" target="_blank" rel="nofollow noopener">{websitelinktext}</a></td>
+<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{websitelink}" target="_blank" rel="nofollow noopener" title="{LANG_website}">{websitelinktext}</a></td>
 <!-- END website_link -->
 
 <!-- BEGIN pm_link -->
-<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{pmlink}">{pmlinktext}</a></td>
+<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{pmlink}" title="{LANG_pm}">{pmlinktext}</a></td>
 <!-- END pm_link -->
 
 <!-- BEGIN profile_link -->
-<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{profilelink}">{profilelinktext}</a></td>
+<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{profilelink}" title="{LANG_profile}">{profilelinktext}</a></td>
 <!-- END profile_link -->
 
 <!-- BEGIN email_link -->
-<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{emaillink}">{emaillinktext}</a></td>
+<td style="padding-top:3px; padding-right:3px;"><a class="profilebutton" href="{emaillink}" title="{LANG_email}">{emaillinktext}</a></td>
 <!-- END email_link -->
 
 <!-- BEGIN quotetopic_link -->

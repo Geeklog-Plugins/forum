@@ -78,18 +78,18 @@
 
 {# User Forum Rank #}
 <!-- BEGIN rankon_icon -->
-<span class="uk-text-success">■</span>
+<span class="uk-text-success">&#9632;</span>
 <!-- END rankon_icon -->
 
 <!-- BEGIN rankoff_icon -->
-<span>■</span>
+<span>&#9632;</span>
 <!-- END rankoff_icon -->
 
 <!-- BEGIN rankmod_icon -->
-<span class="uk-text-warning">■</span>
+<span class="uk-text-warning">&#9632;</span>
 <!-- END rankmod_icon -->
 
 <!-- BEGIN rankadmin_icon -->
-<span class="uk-text-danger">■</span>
+<span class="uk-text-danger">&#9632;</span>
 
 <!-- END rankadmin_icon -->

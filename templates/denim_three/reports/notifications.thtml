@@ -47,7 +47,7 @@
 				<select class="uk-select uk-width-auto" name="uid" onchange="this.form.submit();">{user_options}</select>
 			</div>
 		</form>
-		{!endif}	
+		{!endif}
 	</div>
 	<div class="uk-width-2-5 uk-text-right">
 		{select_forum}
@@ -68,7 +68,7 @@
 					{!else}
 						<th class="uk-width-1-6">{LANG_Heading9}</th>
 						<th class="uk-width-1-5@l uk-width-2-5@m uk-width-2-5">{LANG_Heading2}</th>
-					{!endif}					
+					{!endif}
                     <th class="uk-width-1-5@l uk-width-2-5@m uk-width-2-5">{LANG_Heading3}</th>
                     <th class="uk-width-1-6">{LANG_Heading4}</th>
                     <th class="uk-width-1-6">{LANG_Heading5}</th>
@@ -94,13 +94,13 @@
 					<td></td>
 					<td></td>
                 <tr>
-            </tfoot>				
-            <tbody>                      
+            </tfoot>
+            <tbody>
                 {notification_record}
                 {no_records_message}
             </tbody>
         </table>
-	</form>	
+	</form>
 
 </div>
 
@@ -109,7 +109,7 @@
 {!if links}
 <div class="uk-margin-top uk-text-right">
     {links}
-</div>	
+</div>
 {!endif}
 
 
