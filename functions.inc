@@ -274,6 +274,8 @@ function plugin_profileextrassave_forum($uid = '')
         $uid = $_USER['uid'];
     }
 
+    // Make sure post variables are set. Remember edit can happen by User for User Settings and edit/new by Admin on User Admin form
+    // Forum plugin fields display both on the Admin User form and the user settings form (so no reason to check which form we are on)
     if ($uid > 1) {
         $aim        = isset($_POST['forum_aim'])        ? gf_preparefordb($_POST['forum_aim'],'html')  : '';
         $icq        = isset($_POST['forum_icq'])        ? gf_preparefordb($_POST['forum_icq'],'html')  : '';
@@ -291,7 +293,8 @@ function plugin_profilevariablesedit_forum($uid, &$template)
 {
     global $_TABLES, $LANG_GF04, $CONF_FORUM;
 
-    // Need to handle new users as well
+    // Remember edit can happen by User for User Settings and edit/new by Admin on User Admin form
+    // Forum plugin fields display both on the Admin User form and the user settings form
     if ($uid > 1) {
         $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
         $A = DB_fetchArray ($result);
@@ -2683,7 +2686,7 @@ function plugin_getItemLikeURL_forum($sub_type, $id)
     if ($CONF_FORUM['likes_forum'] > 0) {
         // Make sure $id is just a number as forum topic id is numeric
         // Cannot change id in this function, since the id from the calling function is used else where
-        if (strval((int) $id) == $id) {		
+        if (strval((int) $id) == $id) {
 			// No sense rebuilding stuff here so use PLG_getItemInfo
 			// PLG_getItemInfo will only return url if user has permissions
 			$options['sub_type'] = $sub_type;
