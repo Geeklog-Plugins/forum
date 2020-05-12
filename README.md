@@ -35,7 +35,7 @@ This plugin provides a full featured discussion forum with integrated Geeklog fe
 Geeklog Homepage:
 https://www.geeklog.net
 
-Autotags Plugin Homepage:
+Forum Plugin Homepage:
 https://github.com/Geeklog-Plugins/forum
 
 To find the latest releases see:
