@@ -340,8 +340,9 @@ if (!$onlytopic) {
 
 
     $prev_sql = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE (forum='$forum') AND (pid=0) AND (id < '$showtopic') ORDER BY id DESC LIMIT 1");
-    $P = DB_fetchArray($prev_sql);
-    if ($P['id'] != "") {
+	$nrows  = DB_numRows($prev_sql);
+    if ($nrows > 0) {
+		$P = DB_fetchArray($prev_sql);
         $prevlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$P['id']}";
         $topicnavbar->set_var ('prevlink', $prevlink);
         $topicnavbar->set_var ('LANG_prevlink',$LANG_GF01['PREVTOPIC']);
@@ -349,8 +350,9 @@ if (!$onlytopic) {
     }
 
     $next_sql = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE (forum='$forum') AND (pid=0) AND (id > '$showtopic') ORDER BY id ASC LIMIT 1");
-    $N = DB_fetchArray($next_sql);
-    if ($N['id'] > 0) {
+	$nrows  = DB_numRows($next_sql);
+    if ($nrows > 0) {
+		$N = DB_fetchArray($next_sql);
         $nextlink = "{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$N['id']}";
         $topicnavbar->set_var ('nextlink', $nextlink);
         $topicnavbar->set_var ('LANG_nextlink',$LANG_GF01['NEXTTOPIC']);

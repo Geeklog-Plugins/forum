@@ -341,9 +341,9 @@ function gf_preparefordb($message,$postmode) {
     global $CONF_FORUM, $_CONF;
 
     // if magic quotes is on, remove the slashes from the $_POST
-    if (get_magic_quotes_gpc() ) {
-       $message = stripslashes($message);
-    }
+    //if (get_magic_quotes_gpc() ) {
+    //   $message = stripslashes($message);
+    //}
     
     // Remove any autotags the user doesn't have permission to use
     $message = PLG_replaceTags($message, '', true);    
