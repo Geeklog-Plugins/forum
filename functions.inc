@@ -297,8 +297,11 @@ function plugin_profilevariablesedit_forum($uid, &$template)
     // Forum plugin fields display both on the Admin User form and the user settings form
     if ($uid > 1) {
         $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
-        $A = DB_fetchArray ($result);
-    } else {
+		$nrows  = DB_numRows($result);
+        $A = DB_fetchArray($result);
+    } 
+	
+	if  (($uid == 1) || ($nrows == 0)) {
         $A['aim'] = '';
         $A['icq'] = '';
         $A['yim'] = '';
@@ -430,7 +433,17 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
 
     /* Display Instant Messaging Handles */
     $result = DB_query ("SELECT uid,aim,icq,yim,msnm,interests,occupation FROM {$_TABLES['forum_userinfo']} WHERE uid = $uid");
-    $A = DB_fetchArray ($result);
+	$nrows  = DB_numRows($result);
+    $A = DB_fetchArray($result);
+	
+	if  ($nrows == 0) {
+        $A['aim'] = '';
+        $A['icq'] = '';
+        $A['yim'] = '';
+        $A['msnm'] = '';
+        $A['interests'] = '';
+        $A['occupation'] = '';
+    }
 
     if ($CONF_FORUM['profile']['aim']) {
         $template->set_var ('lang_field', $LANG_GF04['label_aim']);
@@ -2222,6 +2235,7 @@ function plugin_getBlocksConfig_forum($side, $topic='')
 
 function forum_mb_wordwrap($str, $width, $break)
 {
+	/* Geeklog requires PHP's mbstring extension so this removed in Geeklog 2.2.2
     static $mb_enabled;
 
     if (!isset($mb_enabled)) {
@@ -2230,6 +2244,7 @@ function forum_mb_wordwrap($str, $width, $break)
     if (!$mb_enabled) {
         return wordwrap($str, $width, $break);
     }
+	*/
 
    // Return short or empty strings untouched
     if(empty($str) || mb_strlen($str, 'UTF-8') <= $width)
