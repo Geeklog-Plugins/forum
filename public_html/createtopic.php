@@ -66,6 +66,13 @@ if ($method == 'newtopic') {
 	$id = '';
 	$pid = 0;
 	$isParent = true;	
+	
+	// Grab Anonymous user name if set before by comment;
+    if (COM_isAnonUser() && empty($aname) && isset($_COOKIE[$_CONF['cookie_anon_name']])) {
+        $aname = GLText::stripTags($_COOKIE[$_CONF['cookie_anon_name']]);
+        $aname = COM_checkWords($aname, 'comment');
+        $aname = GLText::remove4byteUtf8Chars($aname);
+    }
 } elseif ($method == 'postreply' || $method == 'edit') {
 	// Get parent Topic and forum ids from id
 	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $id");
@@ -294,6 +301,11 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 	
     if ($method == 'newtopic') {
         if ($uid == 1) {
+			// Save anonymous username to cookie for use later 
+			$aname = COM_checkWords(GLText::stripTags($aname, 'comment'));
+			$aname = GLText::remove4byteUtf8Chars($aname);
+			SEC_setCookie($_CONF['cookie_anon_name'], $aname, time() + 31536000);
+			
             $name = gf_preparefordb($aname,'text');
         } else {
 			$name = gf_preparefordb(COM_getDisplayName($uid), 'text');
@@ -362,6 +374,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 				if ($uid != '1') {
 					DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$_USER['uid']}','$forum','$lastid','$date')");
 				}
+				
 				COM_redirect($_CONF['site_url'] . "/forum/viewtopic.php?msg=1&amp;showtopic=$lastid");
             } else {
                 //$display .= alertMessage($LANG_GF02['msg18'], $LANG_GF02['msg180']);
