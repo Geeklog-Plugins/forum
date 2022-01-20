@@ -100,12 +100,13 @@ $_TABLES['gf_userinfo']   = $_DB_table_prefix . 'forum_userinfo';
 /**
 * Load the plugin configuration
 */
-$CONF_FORUM = array();
+global $CONF_FORUM;
+$CONF_FORUM = [];
 require_once $_CONF['path_system'] . 'classes/config.class.php';
 $plg_config = config::get_instance();
 $temp = $plg_config->get_config('forum');
 if (is_array($temp)) {
-    $CONF_FORUM = array_merge($CONF_FORUM, $temp);
+    $CONF_FORUM = array_merge($CONF_FORUM, $temp);print_r($CONF_FORUM);
     $CONF_FORUM['recaptcha'] = (isset($CONF_FORUM['recaptcha'])) ? (int) $CONF_FORUM['recaptcha'] : 0;
 }
 
@@ -1100,7 +1101,7 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 
 	$retval = [];
 
-	if ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user', 'AND', $uid))) {
+	if (isset($CONF_FORUM['registration_required'] ) && ($CONF_FORUM['registration_required'] == 0 || ($CONF_FORUM['registration_required'] && SEC_hasRights('forum.user', 'AND', $uid)))) {
 		// Add Forum Index
 		$retval[] = ['url' => $_CONF['site_url'] . '/forum/index.php'];
 
