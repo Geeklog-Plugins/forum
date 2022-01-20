@@ -362,13 +362,13 @@ function gf_preparefordb($message,$postmode) {
     return $message;
 }
 
-function geshi_formatted($str,$type='') {
+function geshi_formatted($str,$type='Text') {
     global $_CONF, $CONF_FORUM;
 
     include_once 'geshi.php';
 
-    $geshi = new Geshi($str,$type,"{$CONF_FORUM['path_include']}geshi");
-	if (!$geshi->error()) {
+    $geshi = new Geshi($str, $type, "{$CONF_FORUM['path_include']}geshi");
+	if (!$geshi->error()) { // Make Sure Type Exists
 		$geshi->set_header_type(GESHI_HEADER_DIV);
 		//$geshi->enable_strict_mode(true);
 		//$geshi->enable_classes();
@@ -387,7 +387,7 @@ function geshi_formatted($str,$type='') {
 
 		return $geshi->parse_code();
 	} else {
-		// Language not found so fallback and return basic monospaced text code block (like when Geshi is not enabled) 
+		// Type / Code Language not found so fallback and return basic monospaced text code block (like when Geshi is not enabled) 
 		return '<pre class="codeblock">'  . htmlspecialchars($str,ENT_QUOTES, $CONF_FORUM['charset']) . '</pre>';
 	}
 }
