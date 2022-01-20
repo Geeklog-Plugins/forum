@@ -362,29 +362,34 @@ function gf_preparefordb($message,$postmode) {
     return $message;
 }
 
-function geshi_formatted($str,$type='PHP') {
+function geshi_formatted($str,$type='') {
     global $_CONF, $CONF_FORUM;
 
     include_once 'geshi.php';
 
     $geshi = new Geshi($str,$type,"{$CONF_FORUM['path_include']}geshi");
-    $geshi->set_header_type(GESHI_HEADER_DIV);
-    //$geshi->enable_strict_mode(true);
-    //$geshi->enable_classes();
-    $geshi->enable_line_numbers(GESHI_NO_LINE_NUMBERS, 5);
-    $geshi->set_overall_class('glforum-code');
-    //$geshi->set_overall_style('font-size: 12px; color: #000066; border: 1px solid #d0d0d0; background-color: #FAFAFA;', true);
-    //// Note the use of set_code_style to revert colours...
-    //$geshi->set_line_style('font: normal normal 95% \'Courier New\', Courier, monospace; color: #003030;', 'font-weight: bold; color: #006060;', true);
-    //$geshi->set_code_style('color: #000020;', 'color: #000020;');
-    //$geshi->set_line_style('background: red;', true);
-    //$geshi->set_link_styles(GESHI_LINK, 'color: #000060;');
-    //$geshi->set_link_styles(GESHI_HOVER, 'background-color: #f0f000;');
+	if (!$geshi->error()) {
+		$geshi->set_header_type(GESHI_HEADER_DIV);
+		//$geshi->enable_strict_mode(true);
+		//$geshi->enable_classes();
+		$geshi->enable_line_numbers(GESHI_NO_LINE_NUMBERS, 5);
+		$geshi->set_overall_class('glforum-code');
+		//$geshi->set_overall_style('font-size: 12px; color: #000066; border: 1px solid #d0d0d0; background-color: #FAFAFA;', true);
+		//// Note the use of set_code_style to revert colours...
+		//$geshi->set_line_style('font: normal normal 95% \'Courier New\', Courier, monospace; color: #003030;', 'font-weight: bold; color: #006060;', true);
+		//$geshi->set_code_style('color: #000020;', 'color: #000020;');
+		//$geshi->set_line_style('background: red;', true);
+		//$geshi->set_link_styles(GESHI_LINK, 'color: #000060;');
+		//$geshi->set_link_styles(GESHI_HOVER, 'background-color: #f0f000;');
 
-    $geshi->set_header_content("$type Formatted Code");
-    //$geshi->set_header_content_style('font-family: Verdana, Arial, sans-serif; color: #808080; font-size: 90%; font-weight: bold; background-color: #f0f0ff; border-bottom: 1px solid #d0d0d0; padding: 2px;');
+		$geshi->set_header_content("$type Formatted Code");
+		//$geshi->set_header_content_style('font-family: Verdana, Arial, sans-serif; color: #808080; font-size: 90%; font-weight: bold; background-color: #f0f0ff; border-bottom: 1px solid #d0d0d0; padding: 2px;');
 
-    return $geshi->parse_code();
+		return $geshi->parse_code();
+	} else {
+		// Language not found so fallback and return basic monospaced text code block (like when Geshi is not enabled) 
+		return '<pre class="codeblock">'  . htmlspecialchars($str,ENT_QUOTES, $CONF_FORUM['charset']) . '</pre>';
+	}
 }
 
 function gf_htmLawed($str, $permissions = '') {
