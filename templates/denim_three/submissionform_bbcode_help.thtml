@@ -31,9 +31,9 @@
 			<td style="text-decoration: line-through;">strikethrough text</td>
 		</tr>
 		<tr>
-			<td>[img]http://www.site.com/images/forum.png[/img] 
+			<td>[img]http://www.site.com/forum/images/forum.png[/img] 
 				<div class="uk-text-small uk-margin-left">OR</div>
-				[img h=65 w=50]http://www.site.com/images/forum.png[/img]
+				[img h=65 w=50]http://www.site.com/forum/images/forum.png[/img]
 			</td>
 			<td style="text-align: center;"><img src="{site_url}/forum/images/forum.png" alt=""{xhtml}></td>
 		</tr>
@@ -87,7 +87,7 @@
 		</tr>
 		<tr>
 			<td>[code]monospaced text[/code]</td>
-			<td>monospaced text</td>
+			<td><pre class="codeblock">monospaced text</pre></td>
 		</tr>
 		<tr>
 			<td>[code=XYX]formatted code[/code]
@@ -99,11 +99,14 @@
 						<li>html4strict</li>
 						<li>java</li>
 						<li>javascript</li>
+						<li>jquery</li>
 						<li>perl</li>
 						<li>php</li>
 						<li>plain</li>
 						<li>python</li>
+						<li>SQL</li>
 					</ul>
+					and many more...
 				</div>
 			</td>
 			<td>formatted code</td>

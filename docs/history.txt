@@ -5,6 +5,7 @@ Geeklog Forum Plugin History/Changes:
 For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/7?closed=1
 
 - [Improvement] Support for PHP 8
+- [Improvement] Updated GeSHI to v1.0.9.1 (now includes all 259 code languages)
 
 May 12, 2020 (2.9.4)
 ------------
