@@ -144,7 +144,7 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     }
 
     $min_height = 50;     // Base minimum  height of topic - will increase if avatar or sig is used
-    $date = strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
+    $date = COM_strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
     
     $sql = "SELECT u.*, ui.location FROM {$_TABLES['users']} u, {$_TABLES['userinfo']} ui 
     		WHERE u.uid = ui.uid 
@@ -190,7 +190,7 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
             }
         }
 
-        $regdate = $LANG_GF01['REGISTERED']. ': ' . strftime($_CONF['shortdate'],strtotime($userarray['regdate']));
+        $regdate = $LANG_GF01['REGISTERED']. ': ' . COM_strftime($_CONF['shortdate'],strtotime($userarray['regdate']));
         $numposts = $LANG_GF01['POSTS']. ': ' .$posts;
         if ($isUserBanned) {
             $user_status = $LANG_GF01['STATUS']. ' ' . $LANG28[42];
@@ -330,7 +330,7 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         $date = COM_getUserDateTimeFormat($showtopic['date']);
         $topictemplate->set_var ('posted_date', $date[0]);
     } else {
-        $date = strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
+        $date = COM_strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
         $topictemplate->set_var ('posted_date', $date);
     }
 

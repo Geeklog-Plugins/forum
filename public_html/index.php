@@ -45,7 +45,7 @@ require_once $CONF_FORUM['path_include'] . 'gf_format.php';
 // Pass thru filter any get or post variables to only allow numeric values and remove any hostile data
 $op        = isset($_REQUEST['op'])        ? COM_applyFilter($_REQUEST['op'])          : '';
 $msg       = isset($_GET['msg'])           ? COM_applyFilter($_GET['msg'])             : '';
-$page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)   : '';
+$page      = isset($_REQUEST['page'])      ? COM_applyFilter($_REQUEST['page'],true)   : 0;
 $sort      = isset($_REQUEST['sort'])      ? COM_applyFilter($_REQUEST['sort'],true)   : '';
 $order     = isset($_REQUEST['order'])     ? COM_applyFilter($_REQUEST['order'],true)  : '';
 $forum     = isset($_REQUEST['forum'])     ? COM_applyFilter($_REQUEST['forum'],true)  : '';
@@ -879,7 +879,7 @@ if (empty($forum)) {
                     $lastdate = COM_getUserDateTimeFormat($B['date']);
                     $lastdate = $lastdate[0];
                 } else {
-                    $lastdate =strftime($CONF_FORUM['default_Datetime_format'],$B['date']);
+                    $lastdate = COM_strftime($CONF_FORUM['default_Datetime_format'],$B['date']);
                 }
 
                 $lastpostmsgDate  = '<span class="forumtxt">' . $LANG_GF01['ON']. '</span>' .$lastdate;
@@ -1224,22 +1224,22 @@ if ($forum > 0) {
                 $lastdate = COM_getUserDateTimeFormat($lastreply['date']);
                 $lastdate = $lastdate[0];
             } else {
-                $lastdate = strftime($CONF_FORUM['default_Datetime_format'],$lastreply['date']);
+                $lastdate = COM_strftime($CONF_FORUM['default_Datetime_format'],$lastreply['date']);
             }
         } else {
-            $lastdate = strftime($CONF_FORUM['default_Datetime_format'],$record['lastupdated']);
+            $lastdate = COM_strftime($CONF_FORUM['default_Datetime_format'],$record['lastupdated']);
             $lastreply = $record;
         }
 
-        $firstdate1 = strftime($format1, $record['date']);
+        $firstdate1 = COM_strftime($format1, $record['date']);
         if ($firstdate1 == date($format2)) {
-            $firsttime = strftime($format3, $record['date']);
+            $firsttime = COM_strftime($format3, $record['date']);
             $firstdate = $LANG_GF01['TODAY'] . $firsttime;
         } elseif (isset($CONF_FORUM['use_userdate_format']) && $CONF_FORUM['use_userdate_format']) { // FIXME: why would it not be set?
             $firstdate = COM_getUserDateTimeFormat($record['date']);
             $firstdate = $firstdate[0];
         } else {
-            $firstdate = strftime($CONF_FORUM['default_Datetime_format'],$record['date']);
+            $firstdate = COM_strftime($CONF_FORUM['default_Datetime_format'],$record['date']);
         }
 
 		

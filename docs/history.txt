@@ -1,5 +1,11 @@
 Geeklog Forum Plugin History/Changes:
 
+? ?, 2022 (2.9.5)
+------------
+For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/7?closed=1
+
+- [Improvement] Support for PHP 8
+
 May 12, 2020 (2.9.4)
 ------------
 For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/6?closed=1

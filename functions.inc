@@ -106,7 +106,7 @@ require_once $_CONF['path_system'] . 'classes/config.class.php';
 $plg_config = config::get_instance();
 $temp = $plg_config->get_config('forum');
 if (is_array($temp)) {
-    $CONF_FORUM = array_merge($CONF_FORUM, $temp);print_r($CONF_FORUM);
+    $CONF_FORUM = array_merge($CONF_FORUM, $temp);
     $CONF_FORUM['recaptcha'] = (isset($CONF_FORUM['recaptcha'])) ? (int) $CONF_FORUM['recaptcha'] : 0;
 }
 
@@ -1581,7 +1581,7 @@ function phpblock_forum_newposts() {
                     $date = COM_getUserDateTimeFormat ($postdate);
                     $block->set_var ('date', $date[0]);
                 } else {
-                    $block->set_var ('date', strftime($CONF_FORUM['default_Datetime_format'], $postdate));
+                    $block->set_var ('date', COM_strftime($CONF_FORUM['default_Datetime_format'], $postdate));
                 }
 
                 $block->parse ('block_record', 'block_record',true);
@@ -1734,8 +1734,8 @@ function plugin_centerblock_forum ($where = 1, $page = 1, $topic = '')
             $lastdate = COM_getUserDateTimeFormat ($A['lastupdated']);
             $lastdate = $lastdate[0];
         } else {
-            $firstdate = strftime($CONF_FORUM['default_Datetime_format'], $A['date']);
-            $lastdate = strftime($CONF_FORUM['default_Datetime_format'], $A['lastupdated']);
+            $firstdate = COM_strftime($CONF_FORUM['default_Datetime_format'], $A['date']);
+            $lastdate = COM_strftime($CONF_FORUM['default_Datetime_format'], $A['lastupdated']);
         }
         if ($A['uid'] > 1) {
             $topicinfo = htmlspecialchars($A['subject']) . "<br" . XHTML . ">{$LANG_GF01['STARTEDBY']} " . COM_getDisplayName($A['uid']) . ', ';

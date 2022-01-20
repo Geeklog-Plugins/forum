@@ -420,12 +420,12 @@ forum config.php file (found in /path/to/geeklog/plugins/forum/) in your favorit
 <tr>
   <td><a name="desc_default_Datetime_format">default_Datetime_format</a></td>
   <td>$_CONF['shortdate']." ".$_CONF['timeonly']</td>
-  <td>Default date/time format to use if Forum setting for allow user-dateformat is disabled. Refer to the online <a href="http://ca3.php.net/manual/en/function.strftime.php">php manual</a> for more info on the time format string options.</td>
+  <td>Default date/time format to use if Forum setting for allow user-dateformat is disabled. Refer to the online <a href="http://ca3.php.net/manual/en/function.strftime.php">php manual</a> for more info on the time format string options. Please note as of Forum 2.9.5, it uses COM_strftime which uses the same format string options as the function strftime which was depreciated in PHP 8.1.</td>
 </tr>
 <tr class="r2">
   <td><a name="desc_default_Topic_Datetime_format">default_Topic_Datetime_format</a></td>
   <td>$_CONF['shortdate']." ".$_CONF['timeonly']</td>
-  <td>Date format that is shown at the top of of the topic post used if Forum setting for allow user-dateformat is disabled. Refer to the online <a href="http://ca3.php.net/manual/en/function.strftime.php">php manual</a> for more info on the time format string options.</td>
+  <td>Date format that is shown at the top of of the topic post used if Forum setting for allow user-dateformat is disabled. Refer to the online <a href="http://ca3.php.net/manual/en/function.strftime.php">php manual</a> for more info on the time format string options. Please note as of Forum 2.9.5, it uses COM_strftime which uses the same format string options as the function strftime which was depreciated in PHP 8.1.</td>
 </tr>
 <tr>
   <td><a name="desc_contentinfo_numchars">contentinfo_numchars</a></td>

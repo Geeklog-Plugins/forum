@@ -113,7 +113,7 @@ $A["subject"] = htmlspecialchars($A["subject"],ENT_QUOTES,$CONF_FORUM['charset']
 $A['comment'] = gf_FormatForPrint( $A['comment'], $A['postmode'] );
 $A['comment'] = str_replace('<br />', '<br>', $A['comment'] );
 
-$date = strftime($CONF_FORUM['default_Datetime_format'], $A['date']);
+$date = COM_strftime($CONF_FORUM['default_Datetime_format'], $A['date']);
 $title = $_CONF['site_name'] . ' - ' . sprintf($LANG_GF02['msg147'], $A['id']);
 
 $display .= "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">
@@ -144,7 +144,7 @@ $display .= "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3
 
 $result2 = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE (pid='$id')");
 while ($B = DB_fetchArray($result2)) {
-    $date = strftime($CONF_FORUM['default_Datetime_format'], $B['date']);
+    $date = COM_strftime($CONF_FORUM['default_Datetime_format'], $B['date']);
     $B["name"] = COM_getDisplayName($B["uid"]);
     $B['comment'] = gf_FormatForPrint( $B['comment'], $B['postmode'] );
     $B['comment'] = str_replace('<br />', '<br>', $B['comment'] );
