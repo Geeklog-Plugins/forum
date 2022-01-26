@@ -227,7 +227,11 @@ if ($op == "lastposts") {
     if ($chkactivity) {
         $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['forum_topic']} topic WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=topic.uid GROUP BY uid");
     } else {
-        $memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['userprefs']} userprefs WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=userprefs.uid");
+		if (COM_versionCompare(VERSION, '2.2.2', '>=')) {
+			$memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['user_attributes']} userattributes WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=userattributes.uid");
+		} else {
+			$memberlistsql = DB_query("SELECT user.uid FROM {$_TABLES['users']} user, {$_TABLES['userprefs']} userprefs WHERE user.uid > 1 AND user.status = " . USER_ACCOUNT_ACTIVE . " AND user.uid=userprefs.uid");
+		}
     }
 
     $membercount = DB_numRows($memberlistsql);
