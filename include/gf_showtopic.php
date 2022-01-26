@@ -145,11 +145,17 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
 
     $min_height = 50;     // Base minimum  height of topic - will increase if avatar or sig is used
     $date = COM_strftime( $CONF_FORUM['default_Topic_Datetime_format'], $showtopic['date'] );
-    
-    $sql = "SELECT u.*, ui.location FROM {$_TABLES['users']} u, {$_TABLES['userinfo']} ui 
-    		WHERE u.uid = ui.uid 
-    		AND u.uid = '{$showtopic['uid']}'";
-    
+
+    if (COM_versionCompare(VERSION, '2.2.2', '>=')) {
+        $sql = "SELECT u.*, ui.location FROM {$_TABLES['users']} u, {$_TABLES['user_attributes']} ui 
+                WHERE u.uid = ui.uid 
+                AND u.uid = '{$showtopic['uid']}'";
+    } else {
+        $sql = "SELECT u.*, ui.location FROM {$_TABLES['users']} u, {$_TABLES['userinfo']} ui 
+                WHERE u.uid = ui.uid 
+                AND u.uid = '{$showtopic['uid']}'";
+    }
+
     $userQuery = DB_query($sql);
     $isUserBanned = false;
     if ($showtopic['uid'] > 1 AND DB_numRows($userQuery) == 1) {
@@ -195,7 +201,9 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
         if ($isUserBanned) {
             $user_status = $LANG_GF01['STATUS']. ' ' . $LANG28[42];
         } else {
-            if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($_TABLES['userprefs'],'showonline',"uid={$showtopic['uid']}") == 1) {
+            $table = COM_versionCompare(VERSION, '2.2.2', '>=') ? $_TABLES['user_attributes'] : $_TABLES['userprefs'];
+
+            if (DB_count( $_TABLES['sessions'], 'uid', $showtopic['uid']) > 0 AND DB_getItem($table, 'showonline', "uid={$showtopic['uid']}") == 1) {
                 $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['ONLINE'];
             } else {
                 $user_status = $LANG_GF01['STATUS']. ' ' .$LANG_GF01['OFFLINE'];
