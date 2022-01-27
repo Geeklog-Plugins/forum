@@ -375,7 +375,7 @@ function plugin_profilevariablesdisplay_forum ($uid, &$template)
     $username = DB_getItem ($_TABLES['users'], 'username', "uid = $uid");
     $title = sprintf($LANG_GF02['msg158'], $postlimit, $username);
     $template->set_var ('start_block_last10', COM_startBlock($title, '', 'blockheader-child.thtml'));
-	$template->set_var('end_block_last10', COM_endBlock(COM_getBlockTemplate('-child', 'footer')));
+	$template->set_var('end_block_last10', COM_endBlock('blockfooter-child.thtml'));
 
     $query = DB_query ("SELECT id,date,forum,subject FROM {$_TABLES['forum_topic']} WHERE uid = {$uid} ORDER BY date DESC LIMIT 100");
     $numposts = 0;
