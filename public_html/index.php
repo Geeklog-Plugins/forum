@@ -87,7 +87,7 @@ if (!COM_isAnonUser() && $op == 'markallread') {
 		$url = $_CONF['site_url'] . "/forum/index.php?forum=$forum";
 		$message = $LANG_GF02['msg302a'];
 	} else {
-		if ($category == 0) {
+		if ($category === 0) {
 			// filter issue
 			COM_handle404('/forum/index.php');			
 		} elseif (empty($category)) {
