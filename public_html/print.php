@@ -104,7 +104,7 @@ if (!SEC_inGroup($groupname)) {
 $result = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE (id='$id')");
 $A = DB_fetchArray($result);
 
-$A["name"] = COM_getDisplayName($A["uid"]);
+$username = COM_getDisplayName($A['uid']);
 $A["name"] = htmlspecialchars($A["name"],ENT_QUOTES,$CONF_FORUM['charset']);
 
 $A["subject"] = COM_checkWords($A["subject"]);
@@ -114,58 +114,61 @@ $A['comment'] = gf_FormatForPrint( $A['comment'], $A['postmode'] );
 $A['comment'] = str_replace('<br />', '<br>', $A['comment'] );
 
 $date = COM_strftime($CONF_FORUM['default_Datetime_format'], $A['date']);
-$title = $_CONF['site_name'] . ' - ' . sprintf($LANG_GF02['msg147'], $A['id']);
 
-$display .= "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01//EN\" \"http://www.w3.org/TR/html4/strict.dtd\">
-<html>
-<head>
-    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">
-    <meta http-equiv=\"Content-Style-Type\" content=\"text/css\">
-    <meta name=\"robots\" content=\"NOINDEX\">
-    <title>{$title}</title>
-    <style type=\"text/css\">
-    <!--
-    body { font-size:small; font-family: sans, sans-serif, freesans, verdana, arial; }
-    table { font-size:small; }
-    h1 { font-size:x-large; }
-    h2 { font-size:medium; }
-    -->
-    </style>
-</head>
-<body>
-    <h1>{$LANG_GF01['SUBJECT']}: {$A['subject']}</h1>
-    <div style=\"margin-bottom:1em;\">
-        <p>
-        <b>{$LANG_GF01['POSTEDON']}:</b> $date<br>
-        <b>{$LANG_GF01['BY']}</b> {$A['name']}<br>
-        </p>
-    </div>
-    <div>{$A['comment']}</div>";
+$forumUrl = COM_buildUrl($_CONF['site_url'] . '/forum/viewtopic.php?showtopic=' . $A['id']);
+
+$printableURL = COM_buildUrl($_CONF['site_url'] . '/forum/print.php?id=' .  $A['id']);
+
+$forumTemplate = COM_newTemplate(CTL_plugin_templatePath('forum'));
+$forumTemplate->set_file(array (
+		'print_topic' => 'printable_topic.thtml'));                    
+
+$forumTemplate->set_block('print_topic', 'block_reply_post');
+
+$forumTemplate->set_var('lang_posted_on', $LANG_GF01['POSTEDON']);
+$forumTemplate->set_var('lang_by', $LANG_GF01['BY']);
+$forumTemplate->set_var('topic_date', $date);
+$forumTemplate->set_var('topic_author', $username);
+if ($A['uid'] == 1) {
+	$forumTemplate->set_var('topic_nickname', $A['name']);
+} else {
+	$forumTemplate->set_var('topic_nickname', '');
+}
+$forumTemplate->set_var('topic_comment', $A['comment']);
 
 $result2 = DB_query("SELECT * FROM {$_TABLES['forum_topic']} WHERE (pid='$id')");
 while ($B = DB_fetchArray($result2)) {
     $date = COM_strftime($CONF_FORUM['default_Datetime_format'], $B['date']);
-    $B["name"] = COM_getDisplayName($B["uid"]);
+    $username = COM_getDisplayName($B["uid"]);
     $B['comment'] = gf_FormatForPrint( $B['comment'], $B['postmode'] );
     $B['comment'] = str_replace('<br />', '<br>', $B['comment'] );
-    $display .= "
-    <hr>
-    <div style=\"margin-bottom:1em;\">
-        <h2>{$B['subject']}</h2>
-        <p>
-        <b>{$LANG_GF01['POSTEDON']}:</b> $date<br>
-        <b>{$LANG_GF01['BY']}</b> {$B['name']}<br>
-        </p>
-    </div>
-    <div>{$B['comment']}</div>";
+
+	$forumTemplate->set_var('reply_subject', $B['subject']);
+	$forumTemplate->set_var('reply_date', $date);
+	$forumTemplate->set_var('reply_author', $username);
+	if ($B['uid'] == 1) {
+		$forumTemplate->set_var('reply_nickname', $B['name']);
+	} else {
+		$forumTemplate->set_var('reply_nickname', '');
+	}
+	$forumTemplate->set_var('reply_comment', $B['comment']);
+	
+	$forumTemplate->parse('reply_posts', 'block_reply_post', true);
 }
 
-$display .= "
-    <hr>
-    <p>{$_CONF['site_name']} - {$LANG_GF01['FORUM']}<br>
-    <a href=\"{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}\">{$_CONF['site_url']}/forum/viewtopic.php?showtopic={$A['id']}</a>
-    </p>
-</body>
-</html>";
+$forumTemplate->parse('output', 'print_topic');
+$display = $forumTemplate->finish($forumTemplate->get_var('output'));
+
+$display = COM_createHTMLPrintableDocument(
+	$display,
+	array(
+		'itemURL'   	=> $forumUrl,
+		'printableURL'  => $printableURL,
+		'itemtitle' 	=> sprintf($LANG_GF01['printed_subject'], $A["subject"]),
+		'itembyline' 	=> "",
+		'itemmodified' 	=> "",
+		'itemextras' 	=> ""
+	)
+);		
 
 COM_output($display);

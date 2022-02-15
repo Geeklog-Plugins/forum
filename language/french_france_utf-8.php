@@ -162,6 +162,7 @@ $LANG_GF01['SubscribeLink_FALSE'] = 'Souscription : Desactivee';
 $LANG_GF01['SUBSCRIPTIONS']  = 'Souscriptions';
 $LANG_GF01['TOP']            = 'En haut';
 $LANG_GF01['PRINTABLE']      = 'Version imprimante';
+$LANG_GF01['printed_subject']   = 'Forum Subject: %s';
 $LANG_GF01['USERPREFS']      = 'Preferences';
 $LANG_GF01['SPEEDLIMIT']     = '"Votre dernier message a ete poste il y a %s secondes.<br' . XHTML . '>Pour des raisons de securite, %s secondes sont necessaires entre chacune de vos publication."';
 $LANG_GF01['ACCESSERROR']    = 'Acces reserve aux membres';

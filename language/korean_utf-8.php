@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => '메일통지 설정목록',
     'TOP' => '토픽 첫머리',
     'PRINTABLE' => '인쇄용 페이지',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => '게시판의 사용자설정',
     'SPEEDLIMIT' => '"귀하의 최신 덧글은 %s 초 전이었습니다. <br' . XHTML . '> 다음의 덧글쓰기 까지 최소한 %s 초 이상 기다려 주시기 바랍니다."',
     'ACCESSERROR' => '접속 에러',

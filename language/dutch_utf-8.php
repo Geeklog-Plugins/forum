@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Abonnementen',
     'TOP' => 'Bovenkant van bericht',
     'PRINTABLE' => 'Afdruk Versie',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'Gebruiker Voorkeuren',
     'SPEEDLIMIT' => '"Je laatste commentaar was %s seconden geleden.<br' . XHTML . '>Deze site verplicht minstens %s seconden tussen plaatsingen."',
     'ACCESSERROR' => 'TOEGANG FOUT',

@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Adviseringer',
     'TOP' => 'Gå til toppen',
     'PRINTABLE' => 'Udskriftsvenlig Udgave',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'Bruger Indstillinger',
     'SPEEDLIMIT' => '"Dit sidste indlæg var for %s sekunder siden.<br' . XHTML . '>Denne hjemmeside kræver mindst %s sekunder mellem hvert indlæg."',
     'ACCESSERROR' => 'ADGANG NÆGTET',

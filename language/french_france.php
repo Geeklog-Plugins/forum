@@ -169,6 +169,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Souscriptions',
     'TOP' => 'En haut',
     'PRINTABLE' => 'Version imprimante',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'Préférences utilisateur',
     'SPEEDLIMIT' => '"Votre dernier message a été posté il y a %s secondes.<br' . XHTML . '>Pour des raisons de sécurité, %s secondes sont nécessaires entre chacune de vos publication."',
     'ACCESSERROR' => 'ACCESS ERROR',

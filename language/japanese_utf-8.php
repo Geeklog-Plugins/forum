@@ -165,6 +165,7 @@ $LANG_GF01['SubscribeLink_FALSE'] = 'このトピックのメール通知:無効
 $LANG_GF01['SUBSCRIPTIONS']  = '投稿オプション';
 $LANG_GF01['TOP']            = 'トップ';
 $LANG_GF01['PRINTABLE']      = '印刷用ページ';
+$LANG_GF01['printed_subject']   = 'Forum Subject: %s';
 $LANG_GF01['USERPREFS']      = 'ユーザ設定';
 $LANG_GF01['SPEEDLIMIT']     = '"あなたの最新の投稿は %s 秒前でした。<br' . XHTML . '>次の投稿まで、最低 %s 秒お待ちください。"';
 $LANG_GF01['ACCESSERROR']    = 'アクセスエラー';

@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Subscriptions',
     'TOP' => 'Top of Post',
     'PRINTABLE' => 'Printable Version',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'User Preferences',
     'SPEEDLIMIT' => '"Your last comment was %s seconds ago.<br' . XHTML . '>This site requires at least %s seconds between forum posts."',
     'ACCESSERROR' => 'ACCESS ERROR',

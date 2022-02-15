@@ -163,6 +163,7 @@ $LANG_GF01['SubscribeLink_FALSE'] = 'Subscribe:Disabled';
 $LANG_GF01['SUBSCRIPTIONS']  = 'Subscriptions';
 $LANG_GF01['TOP']            = 'Top of Post';
 $LANG_GF01['PRINTABLE']      = 'Printable Version';
+$LANG_GF01['printed_subject']   = 'Forum Subject: %s';
 $LANG_GF01['USERPREFS']      = 'Preferences';
 $LANG_GF01['SPEEDLIMIT']     = 'Your last comment was %s seconds ago. This site requires at least %s seconds between forum posts.';
 $LANG_GF01['ACCESSERROR']    = 'ACCESS ERROR';

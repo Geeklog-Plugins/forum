@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Varslinger',
     'TOP' => 'Til toppen',
     'PRINTABLE' => 'Utskriftsvennlig',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'Forum innstillinger',
     'SPEEDLIMIT' => '"Ditt siste innlegg var for %s sekunder siden.<br' . XHTML . '>Systemet krever minst %s sekunder mellom innlegg."',
     'ACCESSERROR' => 'ADGANGSFEIL',

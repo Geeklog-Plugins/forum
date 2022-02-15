@@ -165,6 +165,7 @@ $LANG_GF01 = array(
     'SUBSCRIPTIONS' => 'Subscriptions',
     'TOP' => 'Top of Post',
     'PRINTABLE' => 'גירסה להדפסה',
+	'printed_subject' => 'Forum Subject: %s',
     'USERPREFS' => 'User Preferences',
     'SPEEDLIMIT' => 'תגובתכם הקודמת הייתה לפני %s שניות.<br' . XHTML . '>אתר זה דורש לפחות %s שניות בין שליחת הודעות פורומים.',
     'ACCESSERROR' => 'שגיאה בגישה',
