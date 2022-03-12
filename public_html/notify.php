@@ -54,7 +54,7 @@ $forum      = isset($_REQUEST['forum'])  ? COM_applyFilter($_REQUEST['forum'],tr
 $id         = isset($_REQUEST['id'])     ? COM_applyFilter($_REQUEST['id'],true)    	: '';
 $notifytype = isset($_REQUEST['filter']) ? COM_applyFilter($_REQUEST['filter'], true)   : '';
 $op         = isset($_REQUEST['op'])     ? COM_applyFilter($_REQUEST['op'])         	: '';
-$page       = isset($_GET['page'])       ? COM_applyFilter($_GET['page'],true)      	: '';
+$page       = isset($_GET['page'])       ? (int) COM_applyFilter($_GET['page'],true)    : 0;
 $topic      = isset($_REQUEST['topic'])  ? COM_applyFilter($_REQUEST['topic'],true) 	: '';
 	
 // If Admin then allow to look at any user subscriptions
@@ -217,7 +217,7 @@ if (isset($_REQUEST['submit'])) {
 // Page Navigation Logic
 $show = $CONF_FORUM['show_messages_perpage'];
 // Check if this is the first page.
-if ($page == 0) {
+if ($page === 0) {
      $page = 1;
 }
 

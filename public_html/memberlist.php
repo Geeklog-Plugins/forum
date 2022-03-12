@@ -56,7 +56,7 @@ $chkactivity = isset($_REQUEST['chkactivity']) ? COM_applyFilter($_REQUEST['chka
 $direction   = isset($_GET['direction'])       ? COM_applyFilter($_GET['direction'])            : '';
 $op          = isset($_GET['op'])              ? COM_applyFilter($_GET['op'])                   : '';
 $order       = isset($_GET['order'])           ? COM_applyFilter($_GET['order'],true)           : '';
-$page        = isset($_GET['page'])            ? COM_applyFilter($_GET['page'],true)            : '';
+$page        = isset($_GET['page'])            ? (int) COM_applyFilter($_GET['page'],true)      : 0;
 $prevorder   = isset($_GET['prevorder'])       ? COM_applyFilter($_GET['prevorder'],true)       : '';
 $showuser    = isset($_GET['showuser'])        ? COM_applyFilter($_GET['showuser'],true)        : '';
 $sort        = isset($_GET['sort'])            ? COM_applyFilter($_GET['sort'],true)            : '';
@@ -184,7 +184,7 @@ if ($op == "lastposts") {
     // Check if the number of records was specified to show
 	$show = $CONF_FORUM['show_members_perpage'];
     // Check if this is the first page.
-    if ($page == 0) {
+    if ($page === 0) {
         $page = 1;
     }
 
@@ -253,14 +253,15 @@ if ($op == "lastposts") {
         $sql .= "AND user.uid=userprefs.uid";
     }
     */
+	$prefsTable = COM_versionCompare(VERSION, '2.2.2', '>=') ? $_TABLES['user_attributes'] : $_TABLES['userprefs'];
     $sql = "SELECT u.uid, u.uid, u.username, u.regdate, u.email, u.homepage, COUNT(ft.uid) AS posts, up.emailfromuser ";
     if ($chkactivity) {
-        $sql .= "FROM {$_TABLES['users']} u, {$_TABLES['userprefs']} up, {$_TABLES['forum_topic']} ft 
+        $sql .= "FROM {$_TABLES['users']} u, {$prefsTable} up, {$_TABLES['forum_topic']} ft 
         		WHERE u.uid > 1 AND u.status = " . USER_ACCOUNT_ACTIVE . " AND u.uid = ft.uid AND u.uid=up.uid ";
     } else {
         $sql .= "FROM {$_TABLES['users']} u  
         		LEFT JOIN {$_TABLES['forum_topic']} ft ON u.uid = ft.uid, 
-        		{$_TABLES['userprefs']} up
+        		{$prefsTable} up
         		WHERE u.uid > 1 AND u.status = " . USER_ACCOUNT_ACTIVE . " AND u.uid = up.uid ";
     }    
     $sql .= "GROUP BY u.uid 
