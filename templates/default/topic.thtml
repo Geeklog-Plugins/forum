@@ -31,7 +31,7 @@
                 {topic_comment}
             </div>
             <div style="clear:both;"></div>
-            {user_signature}
+            {post_signature}
     </td>
 </tr>
 <tr class="pluginRow{csscode}" style="display:{preview_mode};">
@@ -142,12 +142,12 @@
 </form>
 <!-- END mod_functions -->
 
-<!-- BEGIN user_signature -->
+<!-- BEGIN post_signature -->
 <div style="height:45px; padding-top:10px;">
 	<hr class=""size="1" style="width: 95%; color:black; text-align:left; margin-left:0; margin-bottom:0.5em; padding:0;" noshade{xhtml}>
-	<b>{sig}</b><br{xhtml}>
-	{remote_ip}
+	<!-- <br{XHTML}>{signature_divider_html} -->
+	{user_signature}
 </div>
-<!-- END user_signature -->
+<!-- END post_signature -->
 
 {# end {templatelocation} #}

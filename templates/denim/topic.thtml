@@ -23,7 +23,7 @@
 			{# <div class="uk-panel uk-panel-box uk-width-medium-1-1 uk-panel-box-primary uk-text-break uk-margin glforum-post-link"> #}
 			<div class="uk-panel uk-width-medium-1-1 uk-text-break uk-margin glforum-post-link glforum-panel-topic">
 				{topic_comment}
-				{user_signature}
+				{post_signature}
 			</div>
 			<div class="uk-text-right uk-text-bottom uk-margin-right">
                 {!if likes_control}
@@ -142,9 +142,10 @@
 </form>
 <!-- END mod_functions -->
 
-<!-- BEGIN user_signature -->
+<!-- BEGIN post_signature -->
 <hr class="uk-margin-large-top"{xhtml}>
-<b>{sig}</b>
-<!-- END user_signature -->
+<!-- <br{XHTML}>{signature_divider_html} -->
+{user_signature}
+<!-- END post_signature -->
 
 {# end {templatelocation} #}

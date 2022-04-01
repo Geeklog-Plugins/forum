@@ -93,7 +93,7 @@ function showrank($rank, $rankname)
 
 function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $query = '')
 {
-    global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09, $LANG28;
+    global $CONF_FORUM, $_CONF, $_TABLES, $_USER, $LANG_GF01, $LANG_GF02, $LANG_GF09, $LANG28, $LANG31;
     global $oldPost;
 
     $oldPost = 0;
@@ -120,10 +120,10 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     $topictemplate->set_block('topictemplate', 'ip_address');
     $topictemplate->set_block('topictemplate', 'anon_ip_address');
 	$topictemplate->set_block('topictemplate', 'banned_ip_address');
-    $topictemplate->set_block('topictemplate', 'user_signature');
+    $topictemplate->set_block('topictemplate', 'post_signature');
     $topictemplate->set_block('topictemplate', 'mod_functions');
     
-    $blocks = array('block_user_name', 'block_anon_user_name', 'block_user_information', 'block_anon_user_information', 'user_signature', 'mod_functions');
+    $blocks = array('block_user_name', 'block_anon_user_name', 'block_user_information', 'block_anon_user_information', 'post_signature', 'mod_functions');
     foreach ($blocks as $block) {
         $topictemplate->set_block('topictemplate', $block);
     }    
@@ -486,14 +486,19 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
 	
     $topictemplate->set_var ('topic_comment', $showtopic['comment']);
     $topictemplate->set_var ('comment_minheight', "min-height:{$min_height}px");
-    if (isset($sig) && trim($sig) != '') {
-        $topictemplate->set_var ('sig', PLG_replaceTags(($sig)));
-        $topictemplate->set_var ('show_sig', '');
-        $topictemplate->parse ('user_signature', 'user_signature');
+    if ($showtopic['uid'] > 1 && isset($userarray['sig']) && !empty(trim($userarray['sig']))) {
+		$topictemplate->set_var('signature_divider_html', $LANG31['sig_divider_html']);
+
+		// Converts to HTML, fixes links, and executes autotags
+		$sig_html = GLText::getDisplayText(stripslashes($userarray['sig']), $userarray['postmode'], GLTEXT_LATEST_VERSION);
+		
+		$topictemplate->set_var('user_signature', $sig_html);
+        $topictemplate->set_var ('show_sig', ''); // For Backwards compatible and used for display class
+		$topictemplate->parse ('post_signature', 'post_signature');
     } else {
-        $topictemplate->set_var ('sig', '');
-        $topictemplate->set_var ('show_sig', 'none');
         $topictemplate->set_var ('user_signature', '');
+        $topictemplate->set_var ('show_sig', 'none'); // For Backwards compatible and used for display class
+        $topictemplate->set_var ('post_signature', '');
     }
     $topictemplate->set_var ('forumid', $showtopic['forum']);
     $topictemplate->set_var ('topic_id', $showtopic['id']);
