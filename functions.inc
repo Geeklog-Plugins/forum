@@ -86,7 +86,7 @@ $_TABLES['forum_userinfo']     = $_DB_table_prefix . 'forum_userinfo';
  * Do not use these, as they will be soon removed.
  *
  * TODO: remove these references in version 2.10.0
- */
+ 
 $_TABLES['gf_userprefs']  = $_DB_table_prefix . 'forum_userprefs';
 $_TABLES['gf_topic']      = $_DB_table_prefix . 'forum_topic';
 $_TABLES['gf_categories'] = $_DB_table_prefix . 'forum_categories';
@@ -96,6 +96,7 @@ $_TABLES['gf_moderators'] = $_DB_table_prefix . 'forum_moderators';
 $_TABLES['gf_banned_ip']  = $_DB_table_prefix . 'forum_banned_ip';
 $_TABLES['gf_log']        = $_DB_table_prefix . 'forum_log';
 $_TABLES['gf_userinfo']   = $_DB_table_prefix . 'forum_userinfo';
+*/
 
 /**
 * Load the plugin configuration
@@ -161,10 +162,16 @@ $CONF_FORUM['show_popular_perpage'] = (isset($CONF_FORUM['show_popular_perpage']
 $CONF_FORUM['installed_version'] = floatval(DB_getItem($_TABLES['plugins'], 'pi_version', "pi_name = 'forum'"));
 
 /**
-* Initialise the handling of smilies
+* Initialize the handling of smilies
 */
 require_once $CONF_FORUM['path_include'] . 'ForumSmilies.class.php';
 $_SMILIES = new ForumSmilies();
+
+/**
+* Initialize Forum CSS variable to track if css file needs to be loaded
+*/
+global $FORUM_CSS;
+$FORUM_CSS = false;
 
 /**
 * Returns the items for this plugin that should appear on the main menu
@@ -182,13 +189,15 @@ function plugin_getmenuitems_forum()
 
 
 function plugin_autotags_forum($op,$content='',$autotag='') {
-    global $_CONF, $LANG_GF00, $LANG_GF01;
+    global $_CONF, $LANG_GF00, $LANG_GF01, $FORUM_CSS;
 
     if ($op == 'tagname') {
         return 'forum';
-    } elseif ($op == 'description') {
+    } elseif ($op == 'description') { 
         return array('forum' => $LANG_GF00['autotag_desc_forum']);
-    } elseif ($op == 'parse') {
+    } elseif ($op == 'parse') { 
+		$FORUM_CSS = true; 
+
         $id = COM_applyFilter($autotag['parm1']);
         if (!empty($id)) {
             $linktext = $LANG_GF01['HERE'];
@@ -1839,12 +1848,19 @@ function forum_stripBBCode($text_to_search) {
 */
 function plugin_getheadercode_forum()
 {
-    global $_SCRIPTS;
+    global $_SCRIPTS, $FORUM_CSS;
 
-    $_SCRIPTS->setCSSFile('forum', CTL_plugin_themeFindFile('forum', 'css', 'forum.css'));
+	// Figure out web path is forum then assume loading a forum file so need css (also consider forum admin pages)
+	// Easier to do than setting $FORUM_CSS on all forum pages
+	$currentDirectory = strtolower(ltrim(ltrim(dirname($_SERVER['REQUEST_URI']), '\\'), '/'));	
 
-    // Look for forum templates functions.php for current theme. If exist add in its required javascript and css
-    CTL_plugin_setTemplatesFunctions("forum");
+	// Only set if on forum page or of forum block is set. No autotags need css style so no worries there
+	if ($FORUM_CSS || ($currentDirectory == 'forum' || $currentDirectory == 'admin/plugins/forum')) {
+		$_SCRIPTS->setCSSFile('forum', CTL_plugin_themeFindFile('forum', 'css', 'forum.css'));
+
+		// Look for forum templates functions.php for current theme. If exist add in its required javascript and css
+		CTL_plugin_setTemplatesFunctions("forum");
+	}
 }
 
 /**
@@ -2113,7 +2129,7 @@ function forum_modPermission($forum = '', $uid = '', $permission = '') {
 */
 function plugin_getBlocks_forum($side, $topic='')
 {
-    global $_TABLES, $_CONF, $CONF_FORUM, $LANG_GF01;
+    global $_TABLES, $_CONF, $CONF_FORUM, $LANG_GF01, $FORUM_CSS;
 
     $retval = array();
 
@@ -2125,6 +2141,7 @@ function plugin_getBlocks_forum($side, $topic='')
         // Check if right topic
         if (($CONF_FORUM['sideblock_topic_option'] == TOPIC_ALL_OPTION) || ($CONF_FORUM['sideblock_topic_option'] == TOPIC_HOMEONLY_OPTION && COM_onFrontpage()) || ($CONF_FORUM['sideblock_topic_option'] == TOPIC_SELECTED_OPTION && in_array($topic, $CONF_FORUM['sideblock_topic']))) {
             if (($side=='left' && $CONF_FORUM['sideblock_isleft'] == 1) || ($side=='right' && $CONF_FORUM['sideblock_isleft'] == 0)) {
+				$FORUM_CSS = true;
                 // Create a block
                 $display = phpblock_forum_newposts();
 
@@ -2146,6 +2163,7 @@ function plugin_getBlocks_forum($side, $topic='')
     // Forum Menu Block
     if ($CONF_FORUM['usermenu'] == 'blockmenu' && $CONF_FORUM['add_forum_menu_check']) {
         if (($side=='left' && $CONF_FORUM['menublock_isleft'] == 1) || ($side=='right' && $CONF_FORUM['menublock_isleft'] == 0)) {
+			$FORUM_CSS = true;
             // Create a block
             $display = phpblock_forum_menu();
 
