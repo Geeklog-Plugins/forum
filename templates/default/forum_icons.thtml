@@ -65,7 +65,7 @@
 <!-- END topiclocked_icon -->
 
 <!-- BEGIN mood_icon -->
-<img style="vertical-align:middle;" src="{moodicon}" title="{moodicontitle}" alt="{moodtitle}"{xhtml}><br{xhtml}>
+<img style="vertical-align:middle;" src="{moodicon}" width="40" height="40" title="{moodicontitle}" alt="{moodtitle}"{xhtml}><br{xhtml}>
 <!-- END mood_icon -->
 
 <!-- BEGIN memberbadge_icon -->
