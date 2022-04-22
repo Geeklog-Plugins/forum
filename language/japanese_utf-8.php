@@ -242,12 +242,19 @@ $LANG_GF02['msg14']    = '登録が必要です。エラーだと思われたら
 $LANG_GF02['msg18']    = 'エラー! 必須項目が入力されていないかまたは短すぎます。';
 $LANG_GF02['msg19']    = 'メッセージが登録されました';
 $LANG_GF02['msg22']    = '- 掲示板投稿通知';
-$LANG_GF02['msg23a']   = "A reply has been made to the thread '%s' by %s.\n\nThis topic was started by %s in the %s forum.\n\nYou may view the reply at:\n%s\n";
-$LANG_GF02['msg23b']   = "A new topic '%s' has been posted by %s in the '%s' forum on the %s website.\n\nYou may view it at:\n%s\n";
-$LANG_GF02['msg23d']   = "An edit has been made to a post in the thread '%s' by %s.\n\nThis topic was started by %s in the %s forum.\n\nYou may view the edited post at:\n%s\n";
-$LANG_GF02['msg25']    = "\n";
-$LANG_GF02['msg26a']   = "\nYou are receiving this email because you have chosen to be notified when a reply has been made to this topic. To stop receiving notifications on this topic go to:\n%s\n";
-$LANG_GF02['msg26b']   = "\nYou are receiving this email because you have chosen to be notified when a new topic has been posted to this forum. To stop receiving notifications for this forum go to:\n%s\n";
+
+$LANG_GF02['reply_to_thread_msg']   	= "A reply has been made to the thread '%s' by %s.";
+$LANG_GF02['topic_started_msg']     	= "This topic was started by %s in the %s forum.";
+$LANG_GF02['view_reply_at_msg']     	= "You may view the reply at:";
+$LANG_GF02['new_topic_msg']   			= "A new topic '%s' has been posted by %s in the '%s' forum on the %s website.";
+$LANG_GF02['view_topic_at_msg']     	= "You may view it at:";
+$LANG_GF02['edit_to_post_msg']   	= "An edit has been made to a post in the thread '%s' by %s.";
+$LANG_GF02['view_edit_at_msg']     	= "You may view the edited post at:";
+$LANG_GF02['stop_reply_notify_msg'] 	= "You are receiving this email because you have chosen to be notified when a reply has been made to this topic. To stop receiving notifications on this topic go to:";
+$LANG_GF02['stop_new_notify_msg'] 	= "You are receiving this email because you have chosen to be notified when a new topic has been posted to this forum. To stop receiving notifications for this forum go to:";
+$LANG_GF02['great_day_msg']     		= "Have a great day!";
+
+
 $LANG_GF02['msg33']    = '投稿者: ';
 $LANG_GF02['msg36']    = '気分アイコン:';
 $LANG_GF02['msg38']    = 'メール通知';

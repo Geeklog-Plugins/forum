@@ -562,7 +562,7 @@ if ($submit == $LANG_GF01['PREVIEW']) {
 		$previewitem['locked']    = $edittopic['locked'];
 		$previewitem['forum']     = $edittopic['forum'];
 	} else {
-		$previewitem['pid']       = '';
+		$previewitem['pid']       = 0;
 		$previewitem['locked']    = '';
 		$previewitem['forum']     = $forum;
 	}
@@ -1220,15 +1220,15 @@ function gf_setnotification($notify, $forum, $id, $uid)
 
 /*
 * Function is called to check for notifications that may be setup by forum users
-* A record in the forum_watch table is created for each users's subscribed notifications
+* A record in the forum_watch table is created for each user's subscribed notifications
 * Users can subscribe to a complete forum or individual topics.
-* If they have both selected - we only want to send one notification - hense the SQL LIMIT 1
+* If they have both selected - we only want to send one notification - hence the SQL LIMIT 1
 *
 * This function needs to be called when there is a new topic, new reply, or edit
 */
 function gf_chknotifications($topicid, $userid, $editFlag = false, $siteNotificationOnly = false) 
 {
-    global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM, $LANG08;
+    global $_TABLES,$LANG_GF01,$LANG_GF02,$_CONF,$CONF_FORUM, $LANG08, $LANG31;
 	
 	$result = DB_query("SELECT forum, pid FROM {$_TABLES['forum_topic']} WHERE id = $topicid");
 	list($forumid, $pid) = DB_fetchArray($result);		
@@ -1238,38 +1238,60 @@ function gf_chknotifications($topicid, $userid, $editFlag = false, $siteNotifica
         $pid = $topicid;
     }
 	
-	$subjectline = "{$_CONF['site_name']} {$LANG_GF02['msg22']}";
+	$mailSubject = "{$_CONF['site_name']} {$LANG_GF02['msg22']}"; // - Forum Post Notification
 	$postername = COM_getDisplayName($userid);
 	
 	// Notify Site Email if enabled in Configuration
     if (isset($_CONF['notification']) && in_array('forum', $_CONF['notification'])) {	
 		$topicrec = DB_query("SELECT subject,name,forum FROM {$_TABLES['forum_topic']} WHERE id='$pid'");
 		$A = DB_fetchArray($topicrec);
-		$message = '';
+		// Create HTML and plaintext version of email
+		$t = COM_newTemplate(CTL_plugin_templatePath('forum', 'emails'));
+		
+		$t->set_file(array('email_html' => 'post_notification-html.thtml'));
+		$t->set_file(array('email_plaintext' => 'post_notification-plaintext.thtml'));
+
+		$t->set_var('email_divider', $LANG31['email_divider']);
+		$t->set_var('email_divider_html', $LANG31['email_divider_html']);
+		$t->set_var('LB', LB);
+		
 		// ***************************************************************
 		// This code logic is very similar to the user notifications below. If change here make sure it is reflected below
 		if ($editFlag) {
 			// Edit of existing post then
-			$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid))); // An Edit message
+			$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['edit_to_post_msg'], $A['subject'], $postername));
+			$t->set_var('lang_topic_started_msg', sprintf($LANG_GF02['topic_started_msg'], $A['name'], $_CONF['site_name']));
+			$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_edit_at_msg']);
+			$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($topicid)));			
 		} else {
 			// New Topic or New Reply
 			if ($pid_flag) {
 				// New Topic (first post in topic (a parent))
 				$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-				$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid))); // New Topic message
+				
+				$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['new_topic_msg'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name']));
+				$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_topic_at_msg']);
+				$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($pid)));					
 			} else {	
 				// Reply then
 				// Lets find the current last post in $topic
 				$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 				list($lastrecid) = DB_fetchArray($sql);
-				$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid))); // New Reply message
+				
+				$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['reply_to_thread_msg'], $A['subject'], $postername));
+				$t->set_var('lang_topic_started_msg', sprintf($LANG_GF02['topic_started_msg'], $A['name'], $_CONF['site_name']));
+				$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_reply_at_msg']);
+				$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($lastrecid)));
 			}
 		}
 		// ***************************************************************
-		$message .= "\n------------------------------\n";
-		$message .= "\n$LANG08[34]\n";
-		$message .= "\n------------------------------\n";
-		COM_mail($_CONF['site_mail'], $subjectline, $message);
+		
+		// Output final content
+		$message = [];
+		$message[] = $t->parse('output', 'email_html');	
+		$message[] = $t->parse('output', 'email_plaintext');	
+		
+		COM_mail($_CONF['site_mail'], $mailSubject, $message, '' , true);
 	}
 
 	if (!$siteNotificationOnly) {
@@ -1336,38 +1358,72 @@ function gf_chknotifications($topicid, $userid, $editFlag = false, $siteNotifica
 									}
 								}
 							}
+							
+							// Create HTML and plaintext version of email
+							$t = COM_newTemplate(CTL_plugin_templatePath('forum', 'emails'));
+							
+							$t->set_file(array('email_html' => 'post_notification-html.thtml'));
+							$t->set_file(array('email_plaintext' => 'post_notification-plaintext.thtml'));
 
-							$message = "{$LANG_GF01['HELLO']} {$B['username']},\n\n";
+							$t->set_var('email_divider', $LANG31['email_divider']);
+							$t->set_var('email_divider_html', $LANG31['email_divider_html']);
+							$t->set_var('LB', LB);
+							
+							$t->set_var('site_name', $_CONF['site_name']);
+							$t->set_var('site_url', $_CONF['site_url']);
+							$t->set_var('site_slogan', $_CONF['site_slogan']);		
+									
+							$t->set_var('lang_hello_msg', $LANG_GF01['HELLO']);
+							$t->set_var('username', $B['username']);
 							// ***************************************************************
 							// This code logic is very similar to the site notification above. If change here make sure it is reflected above						
 							if ($editFlag) {
 								// Edit of existing post then
-								$message .= sprintf($LANG_GF02['msg23d'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($topicid))); // An Edit message
+								$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['edit_to_post_msg'], $A['subject'], $postername));
+								$t->set_var('lang_topic_started_msg', sprintf($LANG_GF02['topic_started_msg'], $A['name'], $_CONF['site_name']));
+								$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_edit_at_msg']);
+								$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($topicid)));
 							} else {
 								// New Topic or New Reply
 								if ($pid_flag) {
 									// New Topic (first post in topic (a parent))
 									$forum_name = DB_getItem($_TABLES['forum_forums'], "forum_name", "forum_id='$forumid'");
-									$message .= sprintf($LANG_GF02['msg23b'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($pid))); // New Topic message
-									$message .= sprintf($LANG_GF02['msg26b'], "{$_CONF['site_url']}/forum/notify.php");
+									
+									$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['new_topic_msg'], $A['subject'], $A['name'], $forum_name, $_CONF['site_name']));
+									$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_topic_at_msg']);
+									$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($pid)));
+									$t->set_var('lang_stop_notify_msg', $LANG_GF02['stop_new_notify_msg']);
+									$t->set_var('subscriptions_url', "{$_CONF['site_url']}/forum/notify.php");			
 								} else {
 									// Reply then
 									// Lets find the current last post in $topic
 									$sql = DB_query("SELECT MAX(id) FROM {$_TABLES['forum_topic']} WHERE pid=$pid");
 									list($lastrecid) = DB_fetchArray($sql);
-									$message .= sprintf($LANG_GF02['msg23a'], $A['subject'], $postername, $A['name'], $_CONF['site_name'], html_entity_decode(forum_buildForumPostURL($lastrecid))); // New Reply message
-									$message .= sprintf($LANG_GF02['msg26a'], "{$_CONF['site_url']}/forum/notify.php");
+									
+									$t->set_var('lang_topic_thread_msg', sprintf($LANG_GF02['reply_to_thread_msg'], $A['subject'], $postername));
+									$t->set_var('lang_topic_started_msg', sprintf($LANG_GF02['topic_started_msg'], $A['name'], $_CONF['site_name']));
+									$t->set_var('lang_view_post_at_msg', $LANG_GF02['view_reply_at_msg']);
+									$t->set_var('post_url', html_entity_decode(forum_buildForumPostURL($lastrecid)));									
+									$t->set_var('lang_stop_notify_msg', $LANG_GF02['stop_reply_notify_msg']);
+									$t->set_var('subscriptions_url', "{$_CONF['site_url']}/forum/notify.php");	
 								}
 							}
 							// ***************************************************************
-							$message .= "{$LANG_GF02['msg25']}{$_CONF['site_name']} {$LANG_GF01['ADMIN']}\n";
+							$t->set_var('lang_great_day_msg', $LANG_GF02['great_day_msg']);
+							$t->set_var('lang_admin', $LANG_GF01['ADMIN']);
+							
+							// Output final content
+							$message = [];
+							$message[] = $t->parse('output', 'email_html');	
+							$message[] = $t->parse('output', 'email_plaintext');								
+							
 							// Check and see if Site admin has enabled email notifications
 							if ($CONF_FORUM['allow_notification']) {
 								if ($nologRecord and $userNotifyOnceOption == 1 ) {
 									DB_query("INSERT INTO {$_TABLES['forum_log']} (uid,forum,topic,time) VALUES ('{$N['uid']}', '$forumid', '$topicid','0') ");
 								}
 								if (($B['email'] != '')  AND COM_isEmail($B['email'])) {
-									COM_mail($B['email'], $subjectline, $message);
+									COM_mail($B['email'], $mailSubject, $message, '' , true);
 								}
 							}
 						}

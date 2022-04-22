@@ -238,12 +238,20 @@ $LANG_GF02['msg14']    = 'Desole, Vous avez ete banni du forum.<br' . XHTML . '>
 $LANG_GF02['msg18']    = 'Erreur! Tous les champs requis n\'ont pas ete remplis ou sont trop courts.';
 $LANG_GF02['msg19']    = 'Votre message a ete poste.';
 $LANG_GF02['msg22']    = '- Notification de reponse au sujet';
-$LANG_GF02['msg23a']   = "A reply has been made to the thread '%s' by %s.\n\nThis topic was started by %s in the %s forum.\n\nYou may view the reply at:\n%s\n";
-$LANG_GF02['msg23b']   = "A new topic '%s' has been posted by %s in the '%s' forum on the %s website.\n\nYou may view it at:\n%s\n";
-$LANG_GF02['msg23d']   = "An edit has been made to a post in the thread '%s' by %s.\n\nThis topic was started by %s in the %s forum.\n\nYou may view the edited post at:\n%s\n";
-$LANG_GF02['msg25']    = "\nMerci et bonne journee ! \n";
-$LANG_GF02['msg26a']    = "\nVous avez recu ce mail parce que vous avez choisi d'etre averti quand une reponse est faite a ce sujet.\nSi vous ne souhaitez plus surveiller ce sujet, vous pouvez cliquer sur le lien suivant:\n%s\n";
-$LANG_GF02['msg26b']    = "\nYou are receiving this email because you have chosen to be notified when a new topic has been posted to this forum. To stop receiving notifications for this forum go to:\n%s\n";
+
+
+$LANG_GF02['reply_to_thread_msg']   	= "A reply has been made to the thread '%s' by %s.";
+$LANG_GF02['topic_started_msg']     	= "This topic was started by %s in the %s forum.";
+$LANG_GF02['view_reply_at_msg']     	= "You may view the reply at:";
+$LANG_GF02['new_topic_msg']   			= "A new topic '%s' has been posted by %s in the '%s' forum on the %s website.";
+$LANG_GF02['view_topic_at_msg']     	= "You may view it at:";
+$LANG_GF02['edit_to_post_msg']   	= "An edit has been made to a post in the thread '%s' by %s.";
+$LANG_GF02['view_edit_at_msg']     	= "You may view the edited post at:";
+$LANG_GF02['stop_reply_notify_msg'] 	= "You are receiving this email because you have chosen to be notified when a reply has been made to this topic. To stop receiving notifications on this topic go to:";
+$LANG_GF02['stop_new_notify_msg'] 	= "You are receiving this email because you have chosen to be notified when a new topic has been posted to this forum. To stop receiving notifications for this forum go to:";
+$LANG_GF02['great_day_msg']     		= "Have a great day!";
+
+
 $LANG_GF02['msg33']    = 'Auteur : ';
 $LANG_GF02['msg36']    = 'Humeur';
 $LANG_GF02['msg38']    = ' M\'avertir des reponses ';
