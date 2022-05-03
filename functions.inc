@@ -1200,6 +1200,11 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
         case 'title':
             $fields[] = 'ft.subject';
             break;
+		case 'likes':
+			// Likes forum setting is a global variable and not an item per item setting
+			$fields[] = $CONF_FORUM['likes_forum'] . ' AS likes';
+			$groupby_fields[] = 'likes';
+			break;				
         case 'url':
             // needed for $id == '*', but also in case we're only requesting
             // the URL (so that $fields isn't empty)
@@ -1269,6 +1274,9 @@ function plugin_getiteminfo_forum($id, $what, $uid = 0, $options = array())
             case 'title':
                 $props['title'] = stripslashes($A['subject']);
                 break;
+			case 'likes':
+				$props['likes'] = $A['likes'];
+				break;					
             case 'url':
 				// Decode as could be used in redirect etc...
                 if (empty($A['id'])) {
@@ -2655,7 +2663,7 @@ function plugin_usercontributed_forum($uid)
  *
  * @return   int    0 = disabled, 1 = Likes and Dislikes, 2 = Likes only
  */
-function plugin_likesenabled_forum($sub_type)
+function plugin_likesenabled_forum($sub_type, $id)
 {
     global $CONF_FORUM;
 
