@@ -2659,6 +2659,26 @@ function plugin_usercontributed_forum($uid)
 }
 
 /**
+ * Find out Likes plural label for item
+ *
+ * @return   string 	Plural name of item that can be liked or disliked
+ */
+function plugin_likeslabel_forum($sub_type)
+{
+    global $CONF_FORUM, $LANG_GF01;
+
+    $retval = false;
+
+    if ($CONF_FORUM['likes_forum'] > 0) {
+		if ($sub_type == 'post') {
+			$retval = $LANG_GF01['FORUMPOSTS'];
+        }
+    }
+
+    return $retval;
+}
+
+/**
  * Is Likes system enabled for forum posts
  *
  * @return   int    0 = disabled, 1 = Likes and Dislikes, 2 = Likes only
