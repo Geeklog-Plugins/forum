@@ -40,7 +40,7 @@ if (strpos(strtolower($_SERVER['PHP_SELF']), 'functions.inc') !== false) {
 global $_DB_table_prefix, $LANG_configselects;
 
 // used for Likes and Topic controls
-define("PLUGIN_NAME_FORUM", 'forum');
+define("FORUM_PLUGIN_NAME", 'forum');
 
 // Forum topic type for Likes
 define("LIKES_TYPE_FORUM_POST", 'post');
@@ -1344,12 +1344,12 @@ function forum_deleteForumPost($id)
 
 		if ($parentTopic) {
 			// Deleting a parent topic requires removing as well
-			TOPIC_deleteTopicAssignments(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+			TOPIC_deleteTopicAssignments(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_TOPIC);
 
 		   // Cycle through all replies and delete any likes
 			$query = DB_query("SELECT id FROM {$_TABLES['forum_topic']} WHERE pid = $id");
 			while ($A = DB_fetchArray($query)) {
-				LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $A['id']);
+				LIKES_deleteActions(FORUM_PLUGIN_NAME, LIKES_TYPE_FORUM_POST, $A['id']);
 			}
 			// Now lets delete those replies
 			DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE pid = $id");
@@ -1360,7 +1360,7 @@ function forum_deleteForumPost($id)
 		}
 
 		// Delete Likes for current message being deleted
-		LIKES_deleteActions(PLUGIN_NAME_FORUM, LIKES_TYPE_FORUM_POST, $id);
+		LIKES_deleteActions(FORUM_PLUGIN_NAME, LIKES_TYPE_FORUM_POST, $id);
 
 		// Remove any lastviewed records in the log so that the new updated topic indicator will appear
 		DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE topic = $pid");
@@ -1924,7 +1924,7 @@ function forum_getGeeklogTopic($type, $id) {
     // If topic assignment not found at current level then check next higher level
     switch ($type) {
         case TOPIC_TYPE_FORUM_TOPIC:
-            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+            TOPIC_getTopic(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_TOPIC);
             $current_topic = TOPIC_currentTopic();
 
             if (empty($current_topic)) {
@@ -1934,7 +1934,7 @@ function forum_getGeeklogTopic($type, $id) {
             }
 
         case TOPIC_TYPE_FORUM_FORUM:
-            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_FORUM);
+            TOPIC_getTopic(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_FORUM);
             $current_topic = TOPIC_currentTopic(); // since TOPIC_getTopic called again need to get current topioc again since it may have changed
 
             if (empty($current_topic)) {
@@ -1944,7 +1944,7 @@ function forum_getGeeklogTopic($type, $id) {
             }
 
         case TOPIC_TYPE_FORUM_CATEGORY:
-            TOPIC_getTopic(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_CATEGORY);
+            TOPIC_getTopic(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_CATEGORY);
 
         default:
             $current_topic = TOPIC_currentTopic(); // since TOPIC_getTopic called again need to get current topioc again since it may have changed
@@ -1998,7 +1998,7 @@ function forum_getGeeklogTopicLabel($sub_type, $id) {
 
         $sql = "SELECT t.tid, t.topic FROM {$_TABLES['topics']} t, {$_TABLES['topic_assignments']} ta
                 WHERE t.tid = ta.tid
-                AND ta.type = '" . PLUGIN_NAME_FORUM . "'
+                AND ta.type = '" . FORUM_PLUGIN_NAME . "'
                 AND ta.subtype = '" . $sub_type . "' AND ta.id = '" . $id . "'" . COM_getPermSQL('AND', 0, 2, 't');
 
         $result = DB_query($sql);
@@ -2689,9 +2689,12 @@ function plugin_likesenabled_forum($sub_type, $id)
 
     $retval = false;
 
-    if ($CONF_FORUM['likes_forum'] > 0) {
-        $retval = $CONF_FORUM['likes_forum'];
-    }
+	// Make sure proper sub type is passed
+	if ($sub_type =='post') {
+		if ($CONF_FORUM['likes_forum'] > 0) {
+			$retval = $CONF_FORUM['likes_forum'];
+		}
+	}
 
     return $retval;
 }
@@ -2758,7 +2761,7 @@ function plugin_getItemLikeURL_forum($sub_type, $id)
 			// No sense rebuilding stuff here so use PLG_getItemInfo
 			// PLG_getItemInfo will only return url if user has permissions
 			$options['sub_type'] = $sub_type;
-			$retval = PLG_getItemInfo(PLUGIN_NAME_FORUM, $id, 'url', 0, $options);
+			$retval = PLG_getItemInfo(FORUM_PLUGIN_NAME, $id, 'url', 0, $options);
 		}
     }
 
@@ -2786,7 +2789,7 @@ function plugin_getrelateditems_forum($tids, $max, $trim)
     // Find newest Forum Topics user has access too
     $sql = "SELECT ft.id, ft.subject title, ft.date forum_date
         FROM {$_TABLES['topic_assignments']} ta, {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
-        WHERE ta.type = '" . PLUGIN_NAME_FORUM . "' AND ta.subtype = '" . TOPIC_TYPE_FORUM_TOPIC . "' AND ta.id = ft.id AND (ta.tid IN ('" . implode("','", $tids) . "'))
+        WHERE ta.type = '" . FORUM_PLUGIN_NAME . "' AND ta.subtype = '" . TOPIC_TYPE_FORUM_TOPIC . "' AND ta.id = ft.id AND (ta.tid IN ('" . implode("','", $tids) . "'))
         AND ft.forum = ff.forum_id AND (ff.grp_id IN ('" . implode( "','", $_GROUPS ) . "')) AND ft.date <> 1 AND ft.pid = 0
         GROUP BY ft.id ORDER BY forum_date DESC LIMIT {$max}";
 */
@@ -2794,7 +2797,7 @@ function plugin_getrelateditems_forum($tids, $max, $trim)
     // Find newest Forum Topics user has access too. Check both forum topics and the forum itself
     $sql = "SELECT ft.id, ft.subject title, ft.date forum_date
         FROM {$_TABLES['topic_assignments']} ta, {$_TABLES['forum_topic']} ft, {$_TABLES['forum_forums']} ff
-        WHERE ta.type = '" . PLUGIN_NAME_FORUM . "'
+        WHERE ta.type = '" . FORUM_PLUGIN_NAME . "'
         AND ((ta.subtype = '" . TOPIC_TYPE_FORUM_TOPIC . "' AND ta.id = ft.id)
         OR (ta.subtype = '" . TOPIC_TYPE_FORUM_FORUM . "' AND ta.id = ft.forum))
         AND (ta.tid IN ('" . implode("','", $tids) . "'))

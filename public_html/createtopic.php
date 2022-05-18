@@ -247,7 +247,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && ($method == 'edit') && SEC_checkToken()
 
 			// If moderator and a root post
 			if ($editmoderator && $isParent) {
-				TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_TOPIC);
+				TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_TOPIC);
 			}                
 
             //NOTIFY - Checkbox variable in form set to "on" when checked and they have not already subscribed to forum
@@ -347,7 +347,7 @@ if (($submit == $LANG_GF01['SUBMIT']) && (($uid == 1) || SEC_checkToken())) {
 				
 				// If moderator on a root post
 				if ($editmoderator) {
-					TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_TOPIC);
+					TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $lastid, TOPIC_TYPE_FORUM_TOPIC);
 				}
 
 				PLG_itemSaved($lastid, 'forum');
@@ -820,10 +820,10 @@ if ($editorDisplay) {
     // Only for Forum Admins and Moderators on editing the root parent forum topic or a new root parent forum topic post
     if (($method == 'newtopic' OR ($method == 'edit' AND $edittopic['pid'] == 0)) AND $editmoderator) {
         if ($submit != $LANG_GF01['PREVIEW']) {
-            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
+            $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
         } else {
             // Since preview make sure grab topic selection from control
-            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
+            $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_TOPIC);
         }
         // If empty then no edit access to any topics so don't show
         if (!empty($topic_selection_control)) {

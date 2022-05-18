@@ -101,23 +101,23 @@ if ($type === 'category') {
                     $mode = $LANG_GF01['EDIT'];
                 }
             }
-        }        
+        }
     }
-    
+
     if ($mode == 'add' AND $submit != $LANG_GF01['CANCEL']) {
         if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken() && !$name_missing) {
             //$name = gf_preparefordb($_POST['name'],'text');
             $dscp = gf_preparefordb($_POST['dscp'],'text');
             DB_query("INSERT INTO {$_TABLES['forum_categories']} (cat_order,cat_name,cat_dscp) VALUES ('$catorder','$name','$dscp')");
-            
+
             // Find the id of the last inserted Category
             list ($lastid) = DB_fetchArray(DB_query("SELECT max(id) FROM {$_TABLES['forum_categories']} "));
-            
+
             // Must have Edit access to all topics selected
             if (TOPIC_hasMultiTopicAccess('topic') > 2) {
-                TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $lastid, TOPIC_TYPE_FORUM_CATEGORY);
+                TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $lastid, TOPIC_TYPE_FORUM_CATEGORY);
             }
-            
+
             COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=1');
         } else {
             $boards_addcategory = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
@@ -125,12 +125,12 @@ if ($type === 'category') {
             $boards_addcategory->set_block('boards_addcategory', 'message', 'gl_topics_row');
             if ($name_missing) {
                 $boards_addcategory->set_var('status_message', $LANG_GF93['namerequired']);
-                $boards_addcategory->parse('message','message');                
+                $boards_addcategory->parse('message','message');
             } else {
                 $boards_addcategory->set_var('message', '');
             }
-            
-            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_CATEGORY);
+
+            $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_CATEGORY);
             // If empty then no edit access to any topics so don't show
             if (!empty($topic_selection_control)) {
                 $boards_addcategory->set_var('LANG_TOPIC', $LANG_ADMIN['topic']);
@@ -139,9 +139,9 @@ if ($type === 'category') {
                 $boards_addcategory->set_var('topic_selection', $topic_selection_control);
                 $boards_addcategory->parse ('gl_topics', 'gl_topics_row');
             } else {
-                $boards_addcategory->set_var('gl_topics', '');            
+                $boards_addcategory->set_var('gl_topics', '');
             }
-            
+
             $boards_addcategory->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
             $boards_addcategory->set_var ('title', $LANG_GF93['addcat']);
             $boards_addcategory->set_var ('mode', 'add');
@@ -166,7 +166,7 @@ if ($type === 'category') {
         if (($confirm == 1) && SEC_checkToken()) {
             // Deletes Category and any forums and topics within it
             forum_deleteCategory($id);
-            
+
             COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=2');
         } else {
             $catname = DB_getItem($_TABLES['forum_categories'], "cat_name","id=$id");
@@ -193,12 +193,12 @@ if ($type === 'category') {
         //$name = gf_preparefordb($_POST['name'],'text');
         $dscp = gf_preparefordb($_POST['dscp'],'text');
         DB_query("UPDATE {$_TABLES['forum_categories']} SET cat_order='$catorder',cat_name='$name',cat_dscp='$dscp' WHERE id='$id'");
-        
+
         // Must have Edit access to all topics selected
         if (TOPIC_hasMultiTopicAccess('topic') > 2) {
-            TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_CATEGORY);
+            TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_CATEGORY);
         }
-        
+
         COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=3');
     } elseif ($mode == $LANG_GF01['EDIT']) {
         $esql = DB_query("SELECT * FROM {$_TABLES['forum_categories']} WHERE (id='$id')");
@@ -208,12 +208,12 @@ if ($type === 'category') {
         $boards_edtcategory->set_block('boards_edtcategory', 'message', 'gl_topics_row');
         if ($name_missing) {
             $boards_edtcategory->set_var('status_message', $LANG_GF93['namerequired']);
-            $boards_edtcategory->parse('message','message');                
+            $boards_edtcategory->parse('message','message');
         } else {
             $boards_edtcategory->set_var('message', '');
         }
-        
-        $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_CATEGORY);
+
+        $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_CATEGORY);
         // If empty then no edit access to any topics so don't show
         if (!empty($topic_selection_control)) {
             $boards_edtcategory->set_var('LANG_TOPIC', $LANG_ADMIN['topic']);
@@ -222,9 +222,9 @@ if ($type === 'category') {
             $boards_edtcategory->set_var('topic_selection', $topic_selection_control);
             $boards_edtcategory->parse ('gl_topics', 'gl_topics_row');
         } else {
-            $boards_edtcategory->set_var('gl_topics', '');            
+            $boards_edtcategory->set_var('gl_topics', '');
         }
-        
+
         $boards_edtcategory->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
         $boards_edtcategory->set_var ('title', sprintf($LANG_GF93['editcatnote'], stripslashes($E['cat_name'])));
         $boards_edtcategory->set_var ('catname', $E['cat_name']);
@@ -251,12 +251,12 @@ if ($type === 'category') {
 		$recCount = 0;
 		$orphanTopicRowCount = 0;
 		$delRowCount = 0;
-		
+
         // Resync each forum in this category
         $query = DB_query("SELECT forum_id FROM {$_TABLES['forum_forums']} WHERE forum_cat='$id'");
         while (list($forum_id) = DB_fetchArray($query)) {
 			$recCount = $recCount + gf_resyncforum($forum_id);
-			
+
 			list($temp_orphanTopicRowCount, $temp_delRowCount) = gf_cleanforum($forum_id);
 			$orphanTopicRowCount = $orphanTopicRowCount + $temp_orphanTopicRowCount;
 			$delRowCount = $delRowCount + $temp_delRowCount;
@@ -269,7 +269,7 @@ if ($type === 'category') {
 // FORUM Maintenance Section
 if ($type == "forum") {
 	$name_missing = false;
-	
+
     // Make sure a name is at least specified
     if (($mode == 'save' || $mode == 'add') && ($submit != $LANG_GF01['CANCEL'])) {
         if (($submit == $LANG_GF01['SAVE'])) {
@@ -280,9 +280,9 @@ if ($type == "forum") {
                     $mode = $LANG_GF01['EDIT'];
                 }
             }
-        }        
+        }
     }
-    
+
     if ($mode == 'add' AND $submit != $LANG_GF01['CANCEL']) {
         if (($submit == $LANG_GF01['SAVE']) && SEC_checkToken() && !$name_missing) {
             $category    = isset($_POST['category'])    ? COM_applyFilter($_POST['category'],true)    : 0;
@@ -314,7 +314,7 @@ if ($type == "forum") {
                     }
                 }
             }
-            
+
             $category_id = isset($_GET['category']) ? COM_applyFilter($_GET['category'],true) : '';
 			$categorylist = '';
             $result    = DB_query("SELECT id, cat_name FROM {$_TABLES['forum_categories']} ORDER BY cat_order");
@@ -328,17 +328,17 @@ if ($type == "forum") {
                         $categorylist .= '<option value="' . $G['id'] . '">' . $G['cat_name'] . '</option>';
                     }
                 }
-            }            
-            
+            }
+
             $boards_addforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
             $boards_addforum->set_file (array ('boards_addforum'=>'boards_edtforum.thtml'));
             $boards_addforum->set_block('boards_addforum', 'message');
             if ($name_missing) {
                 $boards_addforum->set_var('status_message', $LANG_GF93['namerequired']);
-                $boards_addforum->parse('message','message');                
+                $boards_addforum->parse('message','message');
             } else {
                 $boards_addforum->set_var('message', '');
-            }            
+            }
             $boards_addforum->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
             $boards_addforum->set_var ('title', $LANG_GF93['addforum']);
             $boards_addforum->set_var ('mode', 'add');
@@ -357,8 +357,8 @@ if ($type == "forum") {
             $boards_addforum->set_var ('LANG_hiddendscp', $LANG_GF93['hiddendscp']);
             $boards_addforum->set_var ('LANG_hideposts', $LANG_GF93['hideposts']);
             $boards_addforum->set_var ('LANG_hidepostsdscp', $LANG_GF93['hidepostsdscp']);
-            
-            $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_FORUM);
+
+            $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, '', false, false, true, false, 2, TOPIC_TYPE_FORUM_FORUM);
             // If empty then no edit access to any topics so don't show
             if (!empty($topic_selection_control)) {
                 $boards_addforum->set_var('LANG_TOPIC', $LANG_ADMIN['topic']);
@@ -367,8 +367,8 @@ if ($type == "forum") {
                 $boards_addforum->set_var('topic_selection', $topic_selection_control);
                 $boards_addforum->parse ('gl_topics', 'gl_topics_row');
             } else {
-                $boards_addforum->set_var('gl_topics', '');            
-            }             
+                $boards_addforum->set_var('gl_topics', '');
+            }
 
             $boards_addforum->set_var ('groupname', $groupname);
             $boards_addforum->set_var ('grouplist', $grouplist);
@@ -376,7 +376,7 @@ if ($type == "forum") {
             $boards_addforum->set_var ('LANG_SAVE', $LANG_GF01['SAVE']);
             $boards_addforum->set_var ('gltoken_name', CSRF_TOKEN);
             $boards_addforum->set_var ('gltoken', SEC_createToken());
-            
+
             $boards_addforum->parse ('output', 'boards_addforum');
             $display .= $boards_addforum->finish ($boards_addforum->get_var('output'));
             $display .= COM_endBlock();
@@ -401,10 +401,10 @@ if ($type == "forum") {
                 $boards_mergeforum->set_var ('id', $id);
                 $boards_mergeforum->set_var ('type', 'forum');
                 $forumlist = '';
-                $sql = "SELECT forum_id, forum_name, cat_name 
-                    FROM {$_TABLES['forum_forums']} ff, {$_TABLES['forum_categories']} fc 
+                $sql = "SELECT forum_id, forum_name, cat_name
+                    FROM {$_TABLES['forum_forums']} ff, {$_TABLES['forum_categories']} fc
                     WHERE fc.id = ff.forum_cat
-                    ORDER BY cat_order, forum_order";     
+                    ORDER BY cat_order, forum_order";
                 $result    = DB_query($sql);
                 $nrows    = DB_numRows($result);
                 if ($nrows > 1) {
@@ -414,9 +414,9 @@ if ($type == "forum") {
                             $forumlist .= '<option value="' . $G['forum_id'] . '">' . $G['cat_name'] . '&nbsp;&#62;&nbsp;' . $G['forum_name'] . '</option>';
                         }
                     }
-                }             
+                }
                 $boards_mergeforum->set_var ('forumlist', $forumlist);
-                
+
                 $boards_mergeforum->set_var ('LANG_MERGE', $LANG_GF01['MERGE']);
                 $boards_mergeforum->set_var ('LANG_CANCEL', $LANG_GF01['CANCEL']);
                 $boards_mergeforum->set_var ('gltoken_name', CSRF_TOKEN);
@@ -473,12 +473,12 @@ if ($type == "forum") {
         if ($privgroup == 0) $privgroup = 2;
         DB_query("UPDATE {$_TABLES['forum_forums']} SET forum_cat=$category,forum_name='$name', forum_order=$order,forum_dscp='$dscp', grp_id=$privgroup,
                 is_hidden='$is_hidden', is_readonly='$is_readonly', no_newposts='$no_newposts' WHERE forum_id='$id'");
-                
+
         // Must have Edit access to all topics selected
         if (TOPIC_hasMultiTopicAccess('topic') > 2 OR !TOPIC_checkTopicSelectionControl()) {
-            TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $id, TOPIC_TYPE_FORUM_FORUM);
+            TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $id, TOPIC_TYPE_FORUM_FORUM);
         }
-        
+
         COM_redirect($_CONF['site_admin_url'] .'/plugins/forum/boards.php?msg=8');
     } elseif ($mode == $LANG_GF01['RESYNC'])  {
         $recCount = gf_resyncforum($id);
@@ -500,7 +500,7 @@ if ($type == "forum") {
                 $grouplist .= '<option value="' .$grp. '">' . $name. '</option>';
             }
         }
-        
+
         $categorylist = '';
         $result    = DB_query("SELECT id, cat_name FROM {$_TABLES['forum_categories']} ORDER BY cat_order");
         $nrows    = DB_numRows($result);
@@ -513,17 +513,17 @@ if ($type == "forum") {
                     $categorylist .= '<option value="' . $G['id'] . '">' . $G['cat_name'] . '</option>';
                 }
             }
-        }          
+        }
 
         $boards_edtforum = COM_newTemplate(CTL_plugin_templatePath('forum', 'admin'));
         $boards_edtforum->set_file (array ('boards_edtforum'=>'boards_edtforum.thtml'));
         $boards_edtforum->set_block('boards_edtforum', 'message');
         if ($name_missing) {
             $boards_edtforum->set_var('status_message', $LANG_GF93['namerequired']);
-            $boards_edtforum->parse('message','message');                
+            $boards_edtforum->parse('message','message');
         } else {
             $boards_edtforum->set_var('message', '');
-        }        
+        }
         $boards_edtforum->set_var ('phpself', $_CONF['site_admin_url'] .'/plugins/forum/boards.php');
         $boards_edtforum->set_var ('title', sprintf($LANG_GF93['editforumnote'], $forum_name));
         $boards_edtforum->set_var ('id', $id);
@@ -549,8 +549,8 @@ if ($type == "forum") {
         $boards_edtforum->set_var ('LANG_hiddendscp', $LANG_GF93['hiddendscp']);
         $boards_edtforum->set_var ('LANG_hideposts', $LANG_GF93['hideposts']);
         $boards_edtforum->set_var ('LANG_hidepostsdscp', $LANG_GF93['hidepostsdscp']);
-        
-        $topic_selection_control = TOPIC_getTopicSelectionControl(PLUGIN_NAME_FORUM, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_FORUM);
+
+        $topic_selection_control = TOPIC_getTopicSelectionControl(FORUM_PLUGIN_NAME, $id, false, false, true, false, 2, TOPIC_TYPE_FORUM_FORUM);
         // If empty then no edit access to any topics so don't show
         if (!empty($topic_selection_control)) {
             $boards_edtforum->set_var('LANG_TOPIC', $LANG_ADMIN['topic']);
@@ -559,15 +559,15 @@ if ($type == "forum") {
             $boards_edtforum->set_var('topic_selection', $topic_selection_control);
             $boards_edtforum->parse ('gl_topics', 'gl_topics_row');
         } else {
-            $boards_edtforum->set_var('gl_topics', '');            
-        }            
+            $boards_edtforum->set_var('gl_topics', '');
+        }
 
         $boards_edtforum->set_var ('grouplist', $grouplist);
         $boards_edtforum->set_var ('LANG_SAVE', $LANG_GF01['SAVE']);
         $boards_edtforum->set_var ('LANG_CANCEL', $LANG_GF01['CANCEL']);
         $boards_edtforum->set_var ('gltoken_name', CSRF_TOKEN);
         $boards_edtforum->set_var ('gltoken', SEC_createToken());
-        
+
         $boards_edtforum->parse ('output', 'boards_edtforum');
         $display .= $boards_edtforum->finish ($boards_edtforum->get_var('output'));
         $display .= COM_endBlock();
@@ -621,7 +621,7 @@ while ($A = DB_FetchArray($asql)) {
     $boards->set_var ('catname', $A['cat_name']);
     $boards->set_var ('catdesc', $A['cat_dscp']);
     $boards->set_var ('catorder', $A['cat_order']);
-    
+
     $geeklog_topic = '';
     if (SEC_hasRights('forum.edit')) {
         $geeklog_topic = forum_getGeeklogTopicLabel(TOPIC_TYPE_FORUM_CATEGORY, $A['id']);
@@ -629,8 +629,8 @@ while ($A = DB_FetchArray($asql)) {
             $boards->set_var ('lang_geeklog_topic', $LANG_GF02['gl_topics_assigned']);
         }
     }
-    $boards->set_var ('geeklog_topic_category', $geeklog_topic); 
-    
+    $boards->set_var ('geeklog_topic_category', $geeklog_topic);
+
 
     /* Display each forum within this category */
     $bsql = DB_query("SELECT * FROM {$_TABLES['forum_forums']} WHERE forum_cat={$A['id']} ORDER BY forum_order");
@@ -641,7 +641,7 @@ while ($A = DB_FetchArray($asql)) {
         $boards->set_var ('forumname', $B['forum_name']);
         $boards->set_var ('forumid', $B['forum_id']);
         $boards->set_var ('messagecount', COM_numberFormat($B['post_count']));
-        
+
         $geeklog_topic = '';
         if (forum_modPermission($B['forum_id'],$_USER['uid'],'mod_edit')) {
             $geeklog_topic = forum_getGeeklogTopicLabel(TOPIC_TYPE_FORUM_FORUM, $B['forum_id']);
@@ -649,8 +649,8 @@ while ($A = DB_FetchArray($asql)) {
                 $boards->set_var ('lang_geeklog_topic', $LANG_GF02['gl_topics_assigned']);
             }
         }
-        $boards->set_var ('geeklog_topic_forum', $geeklog_topic); 
-        
+        $boards->set_var ('geeklog_topic_forum', $geeklog_topic);
+
 
         /* Check if this is a private forum */
         if ($B['grp_id'] != '2') {
@@ -661,7 +661,7 @@ while ($A = DB_FetchArray($asql)) {
         }
         $boards->set_var ('forumorder', $B['forum_order']);
 		$boards->set_var('gltoken_name', CSRF_TOKEN);
-		$boards->set_var('gltoken', SEC_createToken());        
+		$boards->set_var('gltoken', SEC_createToken());
         if ($j == 1) {
             $boards->parse ('forum_record', 'forum_record');
         } else {
@@ -671,16 +671,16 @@ while ($A = DB_FetchArray($asql)) {
     if ($bnrows == 0) {
         $boards->set_var('hide_options','none');
         $boards->set_var('forum_record', '');
-        
+
         $boards->set_var ('records_message', $LANG_GF93['noforum']);
         $boards->parse ('no_records_message', 'no_records_message');
     }  else {
     	$boards->set_var ('no_records_message', '');
         $boards->set_var('hide_options','');
     }
-    
+
 	$boards->set_var('gltoken_name', CSRF_TOKEN);
-	$boards->set_var('gltoken', SEC_createToken());    
+	$boards->set_var('gltoken', SEC_createToken());
     $boards->parse ('category_record', 'category_record',true);
 
 }
@@ -718,12 +718,12 @@ function forum_addForum($name,$category,$dscp="",$order="",$grp_id=2,$is_readonl
     if (DB_numrows($modquery) < 1){
         DB_query("INSERT INTO {$_TABLES['forum_moderators']} (mod_uid,mod_username,mod_forum,mod_delete,mod_ban,mod_edit,mod_move,mod_stick) VALUES ('{$_USER['uid']}','{$_USER['username']}', '$forumid','1','1','1','1','1')");
     }
-    
+
     // Must have Edit access to all topics selected
     if (TOPIC_hasMultiTopicAccess('topic') > 2 OR !TOPIC_checkTopicSelectionControl()) {
-        TOPIC_saveTopicSelectionControl(PLUGIN_NAME_FORUM, $forumid, TOPIC_TYPE_FORUM_FORUM);
-    }    
-    
+        TOPIC_saveTopicSelectionControl(FORUM_PLUGIN_NAME, $forumid, TOPIC_TYPE_FORUM_FORUM);
+    }
+
     return $forumid;
 }
 
@@ -740,10 +740,10 @@ function forum_deleteCategory($id) {
     $query = DB_query("SELECT forum_id FROM {$_TABLES['forum_forums']} WHERE forum_cat='$id'");
     while (list($forum_id) = DB_fetchArray($query)) {
         forum_deleteForum($forum_id);
-    }    
+    }
     // Now delete forum category
     DB_query("DELETE FROM {$_TABLES['forum_categories']} WHERE id='$id'");
-    
+
     return true;
 }
 
@@ -755,12 +755,12 @@ function forum_deleteCategory($id) {
 */
 function forum_deleteForum($id) {
 	global $_TABLES;
-	
+
     // Cycle through each forum post in forum and delete related items
     $query = DB_query("SELECT id, pid FROM {$_TABLES['forum_topic']} WHERE forum='$id'");
     while (list($topic_id, $topic_parent_id) = DB_fetchArray($query)) {
 		forum_deleteForumPost($topic_id);
-    }    
+    }
     // Now delete all these forum posts for all topics in the forum
     DB_query("DELETE FROM {$_TABLES['forum_topic']} WHERE forum='$id'");
     // Now delete anything else related to forum
@@ -769,29 +769,29 @@ function forum_deleteForum($id) {
     DB_query("DELETE FROM {$_TABLES['forum_log']} WHERE forum='$id'");
     // Now delete forum
     DB_query("DELETE FROM {$_TABLES['forum_forums']} WHERE forum_id='$id'");
-    
+
     return true;
 }
 
 /* Function to merge a forum into another forum
 *
 * @param        string     $id        Forum id to merge
-* @param        string     $id        New Forum id 
+* @param        string     $id        New Forum id
 * @return       boolean               Returns true
 */
 function forum_mergeForum($id, $new_id) {
     global $_TABLES;
-    
+
     DB_query("UPDATE {$_TABLES['forum_topic']} SET forum='$new_id' WHERE forum='$id'");
     DB_query("UPDATE {$_TABLES['forum_watch']} SET forum_id='$new_id' WHERE forum_id='$id'");
     DB_query("UPDATE {$_TABLES['forum_log']} SET forum='$new_id' WHERE forum='$id'");
 
-    // Resynch forum now    
+    // Resynch forum now
     gf_resyncforum($new_id);
-    
+
     // Delete old forum now and any other records we do not need
     forum_deleteForum($id);
-    
+
     return true;
 }
 
