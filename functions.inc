@@ -303,6 +303,8 @@ function plugin_profilevariablesedit_forum($uid, &$template)
 {
     global $_TABLES, $LANG_GF04, $CONF_FORUM;
 
+	$nrows = 0;
+
     // Remember edit can happen by User for User Settings and edit/new by Admin on User Admin form
     // Forum plugin fields display both on the Admin User form and the user settings form
     if ($uid > 1) {
@@ -2665,17 +2667,9 @@ function plugin_usercontributed_forum($uid)
  */
 function plugin_likeslabel_forum($sub_type)
 {
-    global $CONF_FORUM, $LANG_GF01;
+    global $LANG_GF01;
 
-    $retval = false;
-
-    if ($CONF_FORUM['likes_forum'] > 0) {
-		if ($sub_type == 'post') {
-			$retval = $LANG_GF01['FORUMPOSTS'];
-        }
-    }
-
-    return $retval;
+    return $LANG_GF01['FORUMPOSTS'];
 }
 
 /**
