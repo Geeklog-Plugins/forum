@@ -2619,6 +2619,34 @@ function plugin_itemdeleted_forum($id, $type)
 }
 
 /**
+ * Lets Geeklog know the names of language variables and arrays that can be overridden if need be
+ *
+ * @return   array
+ */
+function plugin_getlanguageoverrides_forum()
+{
+
+    return array('LANG_GF01', 'LANG_GF02');
+}
+
+/**
+ * Return URL of item even if the item doesn't exist, e.g., after it has been deleted
+ *
+ * @param  string  $sub_type  (unused) sub type of plugin
+ * @param  string  $item_id   the id of the item
+ * @return string
+ * @since  Geeklog 2.2.2
+ */
+function plugin_idToURL_forum($sub_type, $item_id)
+{
+    global $_CONF;
+	
+	$url = $retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$item_id#$item_id";
+
+    return $url;
+}
+
+/**
  * Return an array of Block Locations in plugin templates
  */
 function plugin_getBlockLocations_forum()
