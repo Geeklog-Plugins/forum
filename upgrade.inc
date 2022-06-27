@@ -244,4 +244,15 @@ function upgrade_294() {
     return 0;
 }
 
+function upgrade_295() {
+	global $_CONF, $_TABLES;
+	
+	// Requires Geeklog 2.2.2
+	// Older forum posts may be linked to users that no longer exist. This must be a bug in an older version of the forum as user delete function does exist now to deal with forum posts (which deletes watch records and reassigns posts to anonymous users)
+	DB_query("UPDATE {$_TABLES['forum_topic']} ft SET ft.uid = 1 WHERE ft.uid NOT IN (SELECT uid FROM {$_TABLES['users']})");
+
+    COM_errorLog("Success - Completed Forum plugin version 2.9.5 update",1);
+    return 0;
+}
+
 ?>

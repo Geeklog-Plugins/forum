@@ -998,6 +998,8 @@ function plugin_upgrade_forum() {
                 break;
 
             case "2.9.4" :
+				if (upgrade_295() != 0) break 2;
+			
                 $current_version = "2.9.5";
 
                 break;

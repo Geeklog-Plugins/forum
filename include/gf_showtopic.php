@@ -222,7 +222,12 @@ function showtopic($showtopic, $mode='', $postcount=1, $onetwo=1, $page=1, $quer
     }
 
     // As of Geeklog 2.2.1 it now returns a photo for anonymous user if configured
-	if ($showtopic['uid'] == 1) {
+	if ($showtopic['uid'] > 1 && !isset($userarray)) {
+		// Note: Had to check if userarray doesn't exist for an actual user of a forum post as it looks like older forums posts may exist that point to a user that no longer exists (must be a bug in an older version of the forum)
+		// Force user to be anonymous
+		// There is an update routine to fix this in forum version 2.9.5
+		$avatar = USER_getPhoto(1, '', '', $CONF_FORUM['avatar_width'], '', $showtopic['name']);
+	} elseif ($showtopic['uid'] == 1) {
 		$avatar = USER_getPhoto($showtopic['uid'], '', '', $CONF_FORUM['avatar_width'], '', $showtopic['name']);
 	} else {
 		$avatar = USER_getPhoto($showtopic['uid'], $userarray['photo'], '', $CONF_FORUM['avatar_width']);
