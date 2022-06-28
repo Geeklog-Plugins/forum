@@ -1156,7 +1156,9 @@ function plugin_collectSitemapItems_forum($uid, $limit)
 					}
 					break;
 				case 'url':
-					$props['url'] = html_entity_decode(forum_buildForumPostURL($A['id']));
+					//$props['url'] = html_entity_decode(forum_buildForumPostURL($A['id']));
+					// Do not want hashtag in sitemap as it will then not match canonical link of page
+					$props['url'] = html_entity_decode(forum_buildForumPostURL($A['id'], '', '', false)); 
 					break;
 				}
 			}
@@ -2643,7 +2645,9 @@ function plugin_idToURL_forum($sub_type, $item_id)
 {
     global $_CONF;
 	
-	$url = $retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$item_id#$item_id";
+	// $url = $retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$item_id#$item_id";
+	// do not want hashtag as that will get added to sitemap
+	$url = $retval = $_CONF['site_url'] . "/forum/viewtopic.php?showtopic=$item_id";
 
     return $url;
 }
