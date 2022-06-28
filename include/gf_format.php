@@ -188,6 +188,10 @@ function do_bbcode_color  ($action, $attributes, $content, $params, $node_object
     if ( $action == 'validate') {
         return true;
     }
+	if (!isset ($attributes['default'])) {
+		return $content;
+	}
+	
     return '<span style="color: '.COM_applyFilter($attributes['default']).';">'.$content.'</span>';
 }
 
