@@ -1,11 +1,15 @@
 Geeklog Forum Plugin History/Changes:
 
-? ?, 2022 (2.9.5)
+October 3, 2022 (2.9.5)
 ------------
 For a complete list of closed issues and features please see: https://github.com/Geeklog-Plugins/forum/milestone/7?closed=1
 
 - [Improvement] Support for PHP 8
 - [Improvement] Updated GeSHI to v1.0.9.1 (now includes all 259 code languages)
+- [Improvement] Allow for HTML and plaintext Forum Notification Emails
+- [Improvement] Support the new Sitemap Plugin API
+- [Improvement] If Anonymous user is posting should check for Geeklog Anonymous Username cookie and autofill that name
+- [Bug] Fixed forum posts linked to users that no longer exist cause error
 
 May 12, 2020 (2.9.4)
 ------------

@@ -2,7 +2,7 @@
 
 * Current Maintainers: [Geeklog Community Members](https://github.com/Geeklog-Plugins/forum/graphs/contributors)
 * Original Author: Blaine Lang
-* Latest Release Supports: Geeklog v2.2.1sr1 or higher and MySQL 4.1 or higher
+* Latest Release Supports: Geeklog v2.2.2 or higher, PHP 8.1 and MySQL 4.1 or higher
 
 ## Summary
 
