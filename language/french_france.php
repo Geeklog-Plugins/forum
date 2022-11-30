@@ -476,6 +476,12 @@ $LANG_GF09 = array(
     'replytopic' => 'Répondre'
 );
 
+/* Block Locations */
+$LANG_GF20 = array (
+    'blocks_showtopic_name'     => 'Forum Show Topic',
+    'blocks_showtopic_desc'     => 'Displays blocks right after every X number of topic posts.'
+);
+
 $LANG_GF91 = array(
     'gfstats' => 'Statistiques du forum',
     'statsmsg' => 'Statistiques du forum :',
