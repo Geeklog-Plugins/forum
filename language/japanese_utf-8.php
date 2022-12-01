@@ -390,6 +390,7 @@ $LANG_GF02['gl_topics_inherit_category'] = '%s (inherited from Category)';
 $LANG_GF02['gl_topics_inherit_forum'] = '%s (inherited from Forum)';
 $LANG_GF02['gl_topics_inherit_config'] = '%s (inherited from Config)';
 $LANG_GF02['gl_topics_assigned']   = 'Geeklog Topic Assigned:';
+$LANG_GF02['gl_printed_subject']   = 'Forum Subject: %s';
 
 $LANG_GF03 = array (
     'delete'            => '削除',
