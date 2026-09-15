@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "forum",
+  "name": "forum",
+  "icon": "public_html/images/forum.png",
+  "requires": {
+    "geeklog": "2.2.2"
+  }
+}
