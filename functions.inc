@@ -187,6 +187,95 @@ function plugin_getmenuitems_forum()
     }
 }
 
+/**
+ * Advertise the Forum section to Geeklog's What's New block.
+ *
+ * @return array|false Section heading and period, or false when disabled
+ */
+function plugin_whatsnewsupported_forum()
+{
+    global $CONF_FORUM, $LANG_GF00, $LANG_WHATSNEW;
+
+    if (empty($CONF_FORUM['show_whatsnew']) ||
+        ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user'))) {
+        return false;
+    }
+
+    $interval = max(1, (int) $CONF_FORUM['whatsnew_interval']);
+
+    return array(
+        $LANG_GF00['pluginlabel'],
+        COM_formatTimeString($LANG_WHATSNEW['new_last'], $interval)
+    );
+}
+
+/**
+ * Render recently created or updated Forum topics in Geeklog's What's New.
+ *
+ * Results are filtered by the visitor's Forum groups in SQL before LIMIT,
+ * so a restricted topic cannot displace an accessible one. Each topic is
+ * emitted only once; the reply count is calculated in the same query.
+ *
+ * @return string HTML list of accessible topics
+ */
+function plugin_getwhatsnew_forum()
+{
+    global $_CONF, $_TABLES, $CONF_FORUM;
+
+    if (empty($CONF_FORUM['show_whatsnew']) ||
+        ($CONF_FORUM['registration_required'] && !SEC_hasRights('forum.user'))) {
+        return '';
+    }
+
+    $groups = array_map('intval', SEC_getUserGroups());
+    if (empty($groups)) {
+        return '';
+    }
+
+    $cutoff = time() - max(1, (int) $CONF_FORUM['whatsnew_interval']);
+    $groupList = implode(',', $groups);
+    $sql = "SELECT t.id, t.subject, t.date, t.lastupdated, t.last_reply_rec, "
+         . "COUNT(r.id) AS new_replies "
+         . "FROM {$_TABLES['forum_topic']} AS t "
+         . "INNER JOIN {$_TABLES['forum_forums']} AS f ON f.forum_id = t.forum "
+         . "LEFT JOIN {$_TABLES['forum_topic']} AS r "
+         . "ON r.pid = t.id AND r.date >= {$cutoff} "
+         . "WHERE t.pid = 0 AND t.date <> '1' "
+         . "AND f.grp_id IN ({$groupList}) AND f.no_newposts = 0 "
+         . "AND f.is_hidden = 0 "
+         . "AND (t.date >= {$cutoff} OR t.lastupdated >= {$cutoff}) "
+         . "GROUP BY t.id, t.subject, t.date, t.lastupdated, t.last_reply_rec "
+         . "ORDER BY t.lastupdated DESC LIMIT 15";
+
+    $result = DB_query($sql);
+    $items = array();
+    while ($topic = DB_fetchArray($result)) {
+        $title = stripslashes($topic['subject']);
+        $displayTitle = COM_truncate($title, $_CONF['title_trim_length'], '...');
+        $newReplies = (int) $topic['new_replies'];
+        if ($newReplies > 0) {
+            $displayTitle .= ' [+' . $newReplies . ']';
+        }
+
+        $lastPostId = (int) $topic['last_reply_rec'];
+        $postId = $lastPostId > 0 ? $lastPostId : (int) $topic['id'];
+        $attributes = array();
+        if ($displayTitle !== $title) {
+            $attributes['title'] = $title;
+        }
+
+        $items[] = COM_createLink(
+            $displayTitle,
+            forum_buildForumPostURL($postId),
+            $attributes
+        ) . LB;
+    }
+
+    return empty($items)
+        ? ''
+        : COM_makeList($items, PLG_getThemeItem('core-css-list-new', 'core'));
+}
+
 
 function plugin_autotags_forum($op,$content='',$autotag='') {
     global $_CONF, $LANG_GF00, $LANG_GF01, $FORUM_CSS;
