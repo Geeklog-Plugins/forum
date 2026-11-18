@@ -90,6 +90,11 @@ $CONF_FORUM['show_search_perpage'] = 20;
 // How many lines to show on one page in the search results
 $CONF_FORUM['show_newposts_perpage'] = 20;
 
+// Include recently active public/accessible topics in Geeklog's What's New block.
+// The interval is expressed in seconds (default: four weeks).
+$CONF_FORUM['show_whatsnew'] = true;
+$CONF_FORUM['whatsnew_interval'] = 28 * 24 * 60 * 60;
+
 // How many users to show on one page in the memberlist results
 $CONF_FORUM['show_members_perpage'] = 20;
 
